@@ -1,11 +1,11 @@
 import { Command, flags } from '@oclif/command'
+import { match, __ } from 'ts-pattern'
 
 export default class Build extends Command {
   static description = 'Generate output format of your choosing from these following formats: html, pdf, epub'
 
   static examples = [
-    `$ convertedbook build pdf
-`,
+    '$ convertedbook build pdf',
   ]
 
   static flags = {
@@ -19,11 +19,16 @@ export default class Build extends Command {
   static args = [{ name: 'file' }]
 
   async run() {
-    const { args, flags } = this.parse(Build)
+    const buildCmd = this.parse(Build),
+      { flags } = buildCmd
 
-    this.log('Building')
-    if (args.file && flags.force) {
-      this.log(`you input --force and --file: ${args.file}`)
-    }
+    const output = match(flags)
+      .with({ force: true }, () => (
+        'Building - flag force'
+      ))
+      .with(__, () => 'Building')
+      .run()
+
+    this.log(output)
   }
 }
