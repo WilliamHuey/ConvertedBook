@@ -16,17 +16,16 @@ export default class Build extends Command {
     force: flags.boolean({ char: 'f' }),
   }
 
-  static args = [{ name: 'file' }]
+  static args = [{ name: 'html' }]
 
   async run() {
-    const buildCmd = this.parse(Build),
-      { flags } = buildCmd
+    const buildCmd = this.parse(Build)
 
-    const output = match(flags)
-      .with({ force: true }, () => (
-        'Building - flag force'
-      ))
-      .with(__, () => 'Building')
+    const output = match(buildCmd)
+      .with(({
+        args: { html: 'html' }
+      }), () => 'Building - Html')
+      .with(__, () => 'Building into all formats')
       .run()
 
     this.log(output)
