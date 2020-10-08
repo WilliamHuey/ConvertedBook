@@ -11,6 +11,7 @@
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.0",
+    "predicate": "^2.0.0",
     "ts-pattern": "^1.1.0",
     "tslib": "^1.14.0"
   },
