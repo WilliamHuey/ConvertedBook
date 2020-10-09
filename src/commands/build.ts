@@ -23,6 +23,33 @@ export default class Build extends Command {
 
   static BuildWithOrder = ['html', 'pdf'];
 
+  static buildReport = ({ argv }: { argv: string[] }) => {
+    // Check for 'html', 'pdf' or 'pdf', 'html'
+    const numberArgs = argv.length,
+      buildOrder = Build.BuildWithOrder;
+
+    // Check if the special order formats are found
+    const buildIntersection = intersection(argv, buildOrder),
+      buildIntersectionLen = buildIntersection.length,
+      exactMatchBuildOrder = buildIntersectionLen === numberArgs,
+      additionalArgsBuildOrder = buildIntersectionLen < numberArgs;
+
+    // Create a comma list of the supported build formats
+    const listBuildOrder = listify(buildOrder),
+      argsCommaList = listify(argv);
+
+    return {
+      conditionsLogs: {
+        listBuildOrder,
+        argsCommaList
+      },
+      conditions: {
+        exactMatchBuildOrder,
+        additionalArgsBuildOrder
+      }
+    };
+  }
+
   async run() {
     const buildCmd = this.parse(Build);
     const output = match(buildCmd)
@@ -32,19 +59,21 @@ export default class Build extends Command {
         argv: []
       }), () => `Building - Into all formats: ${Build.acceptedOutputFormats.join(', ')}`)
       .with(__, ({ argv }) => {
-        // Check for 'html', 'pdf' or 'pdf', 'html'
-        const numberArgs = argv.length,
-          buildOrder = Build.BuildWithOrder;
+        // Get the status of the arguments
+        const {
+          conditionsLogs,
+          conditions
+        } = Build.buildReport({ argv });
 
-        // Check if the special order formats are found
-        const buildIntersection = intersection(argv, buildOrder),
-          buildIntersectionLen = buildIntersection.length,
-          exactMatchBuildOrder = buildIntersectionLen === numberArgs,
-          additionalArgsBuildOrder = buildIntersectionLen < numberArgs;
+        const {
+          listBuildOrder,
+          argsCommaList
+        } = conditionsLogs;
 
-        // Create a comma list of the supported build formats
-        const listBuildOrder = listify(buildOrder),
-          argsCommaList = listify(argv);
+        const {
+          exactMatchBuildOrder,
+          additionalArgsBuildOrder
+        } = conditions;
 
         // Build format matches
         const result = cond([
