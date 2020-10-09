@@ -1,6 +1,7 @@
 import { Command, flags } from '@oclif/command';
 import { match, __ } from 'ts-pattern';
-import { intersection, difference, cond, always } from 'ramda';
+import { intersection, cond, always } from 'ramda';
+const listify = require('listify');
 
 export default class Build extends Command {
   static examples = [
@@ -20,7 +21,7 @@ export default class Build extends Command {
 
   static description = `Generate output format of your choosing from these following formats: ${Build.acceptedOutputFormats.join(', ')}`
 
-  static BuildWithOrder = new Map([['htmlPdf', ['html', 'pdf']]]);
+  static BuildWithOrder = ['html', 'pdf'];
 
   async run() {
     const buildCmd = this.parse(Build);
@@ -31,25 +32,29 @@ export default class Build extends Command {
         argv: []
       }), () => `Building - Into all formats: ${Build.acceptedOutputFormats.join(', ')}`)
       .with(__, ({ argv }) => {
-        const numberArgs = argv.length;
-
         // Check for 'html', 'pdf' or 'pdf', 'html'
-        const htmlWithPdf = Build.BuildWithOrder.get('htmlPdf') || [];
+        const numberArgs = argv.length,
+          buildOrder = Build.BuildWithOrder;
 
-        const buildIntersection = intersection(argv, htmlWithPdf),
-          buildDifference = difference(argv, htmlWithPdf),
+        // Check if the special order formats are found
+        const buildIntersection = intersection(argv, buildOrder),
           buildIntersectionLen = buildIntersection.length,
-          exactMatchHtmlWithPdf = buildIntersectionLen === numberArgs,
-          additionalArgsHtmlWithPdf = buildIntersectionLen < numberArgs;
+          exactMatchBuildOrder = buildIntersectionLen === numberArgs,
+          additionalArgsBuildOrder = buildIntersectionLen < numberArgs;
 
+        // Create a comma list of the supported build formats
+        const listBuildOrder = listify(buildOrder),
+          argsCommaList = listify(argv);
+
+        // Build format matches
         const result = cond([
           [
-            always(additionalArgsHtmlWithPdf),
-            always(`Building - Html, pdf and ${buildDifference.join('')}`)
+            always(additionalArgsBuildOrder),
+            always(`Building - ${argsCommaList}`)
           ],
           [
-            always(exactMatchHtmlWithPdf),
-            always('Building - Html and pdf')
+            always(exactMatchBuildOrder),
+            always(`Building - ${listBuildOrder}`)
           ]
         ]);
 
