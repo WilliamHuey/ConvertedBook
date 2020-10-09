@@ -1,6 +1,6 @@
-import { Command, flags } from '@oclif/command'
-import { match, __ } from 'ts-pattern'
-import { intersection, cond, always } from 'ramda'
+import { Command, flags } from '@oclif/command';
+import { match, __ } from 'ts-pattern';
+import { intersection, difference, cond, always } from 'ramda';
 
 export default class Build extends Command {
   static examples = [
@@ -15,7 +15,7 @@ export default class Build extends Command {
 
   static args = Build.acceptedOutputFormats
     .map(format => {
-      return { name: format }
+      return { name: format };
     })
 
   static description = `Generate output format of your choosing from these following formats: ${Build.acceptedOutputFormats.join(', ')}`
@@ -23,7 +23,7 @@ export default class Build extends Command {
   static BuildWithOrder = new Map([['htmlPdf', ['html', 'pdf']]]);
 
   async run() {
-    const buildCmd = this.parse(Build)
+    const buildCmd = this.parse(Build);
     const output = match(buildCmd)
 
       // No build arguments
@@ -31,36 +31,32 @@ export default class Build extends Command {
         argv: []
       }), () => `Building - Into all formats: ${Build.acceptedOutputFormats.join(', ')}`)
       .with(__, ({ argv }) => {
-        const numberArgs = argv.length
+        const numberArgs = argv.length;
 
         // Check for 'html', 'pdf' or 'pdf', 'html'
-        const htmlWithPdf = Build.BuildWithOrder.get('htmlPdf') || []
+        const htmlWithPdf = Build.BuildWithOrder.get('htmlPdf') || [];
 
         const buildIntersection = intersection(argv, htmlWithPdf),
+          buildDifference = difference(argv, htmlWithPdf),
           buildIntersectionLen = buildIntersection.length,
           exactMatchHtmlWithPdf = buildIntersectionLen === numberArgs,
-          additionalArgsHtmlWithPdf = buildIntersectionLen < numberArgs
-
-        console.log(exactMatchHtmlWithPdf)
-        console.log(additionalArgsHtmlWithPdf)
+          additionalArgsHtmlWithPdf = buildIntersectionLen < numberArgs;
 
         const result = cond([
           [
             always(additionalArgsHtmlWithPdf),
-            always('Building - Html, pdf and epub')
+            always(`Building - Html, pdf and ${buildDifference.join('')}`)
           ],
           [
             always(exactMatchHtmlWithPdf),
-            () => {
-              return 'Building - Html and pdf'
-            }
+            always('Building - Html and pdf')
           ]
-        ])
+        ]);
 
-        return result()
+        return result();
       })
-      .run()
+      .run();
 
-    this.log(output)
+    this.log(output);
   }
 }

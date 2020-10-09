@@ -17,6 +17,10 @@
     ],
     "one-var": 0,
     "no-console": 0,
-    "comma-dangle": 0
+    "comma-dangle": 0,
+    "semi": [
+      2,
+      "always"
+    ]
   }
 }
