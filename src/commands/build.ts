@@ -1,7 +1,6 @@
 import { Command, flags } from '@oclif/command'
-import { match, when, __ } from 'ts-pattern'
-import { isPlainObject } from 'is-what'
-import { intersection } from 'ramda'
+import { match, __ } from 'ts-pattern'
+import { intersection, cond, always } from 'ramda'
 
 export default class Build extends Command {
   static examples = [
@@ -14,46 +13,52 @@ export default class Build extends Command {
 
   static acceptedOutputFormats = ['html', 'pdf', 'epub']
 
-  static args = Build.acceptedOutputFormats.map((format) => {
-    return { name: format }
-  })
+  static args = Build.acceptedOutputFormats
+    .map(format => {
+      return { name: format }
+    })
 
   static description = `Generate output format of your choosing from these following formats: ${Build.acceptedOutputFormats.join(', ')}`
 
   static BuildWithOrder = new Map([['htmlPdf', ['html', 'pdf']]]);
 
-  private checkAcceptedOutputFormats = () => {
-
-  }
-
   async run() {
     const buildCmd = this.parse(Build)
-
     const output = match(buildCmd)
 
       // No build arguments
       .with(({
         argv: []
-      }), () => 'Building - Into all formats')
+      }), () => `Building - Into all formats: ${Build.acceptedOutputFormats.join(', ')}`)
       .with(__, ({ argv }) => {
-
         const numberArgs = argv.length
 
         // Check for 'html', 'pdf' or 'pdf', 'html'
-        const htmlWithPdf = Build.BuildWithOrder
-          .get('htmlPdf') || [];
-        const buildIntersection = intersection(argv, htmlWithPdf)
-        const buildIntersectionLen = buildIntersection.length
-        const matchHtmlWithPdf = buildIntersectionLen &&
-          (buildIntersectionLen === numberArgs)
+        const htmlWithPdf = Build.BuildWithOrder.get('htmlPdf') || []
 
-        console.log(matchHtmlWithPdf)
+        const buildIntersection = intersection(argv, htmlWithPdf),
+          buildIntersectionLen = buildIntersection.length,
+          exactMatchHtmlWithPdf = buildIntersectionLen === numberArgs,
+          additionalArgsHtmlWithPdf = buildIntersectionLen < numberArgs
 
+        console.log(exactMatchHtmlWithPdf)
+        console.log(additionalArgsHtmlWithPdf)
 
+        const result = cond([
+          [
+            always(additionalArgsHtmlWithPdf),
+            always('Building - Html, pdf and epub')
+          ],
+          [
+            always(exactMatchHtmlWithPdf),
+            () => {
+              return 'Building - Html and pdf'
+            }
+          ]
+        ])
 
-        return 'Building - Various';
+        return result()
       })
-
       .run()
 
     this.log(output)

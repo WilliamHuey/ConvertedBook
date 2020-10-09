@@ -12,7 +12,6 @@
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.0",
     "@types/ramda": "^0.27.23",
-    "is-what": "^3.11.2",
     "ramda": "^0.27.1",
     "ts-pattern": "^1.1.0",
     "tslib": "^1.14.0"
