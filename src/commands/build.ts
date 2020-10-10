@@ -4,6 +4,9 @@ import { cond, always } from 'ramda';
 import { buildReport } from '../functions/build/build-report';
 
 export default class Build extends Command {
+  // Allow any number of arguments
+  static strict = false;
+
   public buildReport = buildReport.bind(this);
 
   static examples = [
@@ -60,7 +63,7 @@ export default class Build extends Command {
           ],
           [
             always(additionalArgsOverBuildOrder),
-            always(`Building - Additional ${argsCommaList}`)
+            always(`Building - ${argsCommaList}`)
           ],
           [
             always(exactMatchBuildOrder),
@@ -68,7 +71,7 @@ export default class Build extends Command {
           ],
           [
             always(multipleArgsNotDependentBuildOrder),
-            always(`Building - Multiple ${argsCommaList}`)
+            always(`Building - ${argsCommaList}`)
           ]
         ]);
 

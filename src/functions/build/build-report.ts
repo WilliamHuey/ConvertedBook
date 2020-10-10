@@ -11,14 +11,14 @@ export function buildReport(this: Build, { argv }: { argv: string[] }) {
   // Check arguments against the build order with only regards
   // to the elements and not the order (presence comparison)
   const equalElements = length(buildOrder) === length(argv) &&
-    isEmpty(symmetricDifference(buildOrder, argv))
+    isEmpty(symmetricDifference(buildOrder, argv));
 
   // Check if the special order formats are found
   const buildIntersection = intersection(buildOrder, argv),
     buildIntersectionLen = buildIntersection.length,
     exactMatchBuildOrder = equalElements,
     additionalArgsOverBuildOrder = buildIntersectionLen < numberArgs &&
-      buildIntersectionLen == buildOrderLen,
+      buildIntersectionLen === buildOrderLen,
     multipleArgsNotDependentBuildOrder = numberArgs >= 2 &&
       (!exactMatchBuildOrder && !additionalArgsOverBuildOrder),
     onlyOneBuildFormat = numberArgs === 1;
