@@ -47,18 +47,28 @@ export default class Build extends Command {
 
         const {
           exactMatchBuildOrder,
-          additionalArgsBuildOrder
+          additionalArgsOverBuildOrder,
+          onlyOneBuildFormat,
+          multipleArgsNotDependentBuildOrder
         } = conditions;
 
         // Build format matches
         const result = cond([
           [
-            always(additionalArgsBuildOrder),
-            always(`Building - ${argsCommaList}`)
+            always(onlyOneBuildFormat),
+            always(`Building - ${argv}`)
+          ],
+          [
+            always(additionalArgsOverBuildOrder),
+            always(`Building - Additional ${argsCommaList}`)
           ],
           [
             always(exactMatchBuildOrder),
             always(`Building - ${listBuildOrder}`)
+          ],
+          [
+            always(multipleArgsNotDependentBuildOrder),
+            always(`Building - Multiple ${argsCommaList}`)
           ]
         ]);
 
