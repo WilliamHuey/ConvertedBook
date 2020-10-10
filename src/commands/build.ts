@@ -1,9 +1,11 @@
 import { Command, flags } from '@oclif/command';
 import { match, __ } from 'ts-pattern';
-import { intersection, cond, always } from 'ramda';
-const listify = require('listify');
+import { cond, always } from 'ramda';
+import { buildReport } from '../functions/build/build-report';
 
 export default class Build extends Command {
+  public buildReport = buildReport.bind(this);
+
   static examples = [
     '$ convertedbook build pdf',
   ]
@@ -23,39 +25,12 @@ export default class Build extends Command {
 
   static BuildWithOrder = ['html', 'pdf'];
 
-  static buildReport = ({ argv }: { argv: string[] }) => {
-    // Check for 'html', 'pdf' or 'pdf', 'html'
-    const numberArgs = argv.length,
-      buildOrder = Build.BuildWithOrder;
-
-    // Check if the special order formats are found
-    const buildIntersection = intersection(argv, buildOrder),
-      buildIntersectionLen = buildIntersection.length,
-      exactMatchBuildOrder = buildIntersectionLen === numberArgs,
-      additionalArgsBuildOrder = buildIntersectionLen < numberArgs;
-
-    // Create a comma list of the supported build formats
-    const listBuildOrder = listify(buildOrder),
-      argsCommaList = listify(argv);
-
-    return {
-      conditionsLogs: {
-        listBuildOrder,
-        argsCommaList
-      },
-      conditions: {
-        exactMatchBuildOrder,
-        additionalArgsBuildOrder
-      }
-    };
-  }
-
   async run() {
     const buildCmd = this.parse(Build);
-    const output = match(buildCmd)
 
-      // No build arguments
+    const output = match(buildCmd)
       .with(({
+        // No build arguments
         argv: []
       }), () => `Building - Into all formats: ${Build.acceptedOutputFormats.join(', ')}`)
       .with(__, ({ argv }) => {
@@ -63,7 +38,7 @@ export default class Build extends Command {
         const {
           conditionsLogs,
           conditions
-        } = Build.buildReport({ argv });
+        } = this.buildReport({ argv });
 
         const {
           listBuildOrder,

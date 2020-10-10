@@ -20,7 +20,7 @@ describe('build', () => {
     .command(['build', 'html', 'pdf', 'epub'])
     .it('runs build', ctx => {
       // Unsure why a /n character was introduce, but
-      // need to remove it to perform a proper comparison
+      // need to remove it to perform a proper comparison from ctx.stdout
       expect(ctx.stdout.trim()).to.contain('Building - html, pdf, and epub');
     });
 });
