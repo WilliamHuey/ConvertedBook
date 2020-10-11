@@ -5,12 +5,15 @@ import { cond, always } from 'ramda';
 
 // Library modules
 import { buildReport } from '../functions/build/build-report';
+import { buildLog } from '../functions/build/build-log';
 
 export default class Build extends Command {
   // Allow any number of arguments
   static strict = false;
 
   public buildReport = buildReport.bind(this);
+
+  public buildLog = buildLog.bind(this);
 
   static examples = [
     '$ convertedbook build pdf',
@@ -36,7 +39,7 @@ export default class Build extends Command {
       .with(({
         // No build arguments
         argv: []
-      }), () => `Building - Into all formats: ${Build.acceptedOutputFormats.join(', ')}`)
+      }), () => `Start Building: Into all formats: ${Build.acceptedOutputFormats.join(', ')}`)
       .with(__, ({ argv }) => {
         // Get the status of the arguments
         const {
@@ -59,7 +62,7 @@ export default class Build extends Command {
 
         // Unknown format warning
         if (hasUnknownFormats) {
-          console.warn('Unknown formats:', unknownFormats);
+          console.warn('Ignoring unknown formats:', unknownFormats);
         }
 
         // Build format matches
@@ -67,20 +70,38 @@ export default class Build extends Command {
           [
             always(onlyOneBuildFormat),
             () => {
-              return always(`Building - ${argsCommaList}`);
+              return this.buildLog({
+                action: 'start',
+                buildFormats: argsCommaList
+              });
             }
           ],
           [
             always(additionalArgsOverBuildOrder),
-            always(`Building - ${argsCommaList}`)
+            () => {
+              return this.buildLog({
+                action: 'start',
+                buildFormats: argsCommaList
+              });
+            }
           ],
           [
             always(exactMatchBuildOrder),
-            always(`Building - ${argsCommaList}`)
+            () => {
+              return this.buildLog({
+                action: 'start',
+                buildFormats: argsCommaList
+              });
+            }
           ],
           [
             always(multipleArgsNotDependentBuildOrder),
-            always(`Building - ${argsCommaList}`)
+            () => {
+              return this.buildLog({
+                action: 'start',
+                buildFormats: argsCommaList
+              });
+            }
           ]
         ]);
 
