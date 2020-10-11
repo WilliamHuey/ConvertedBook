@@ -1,6 +1,9 @@
+// Third party modules
 import { Command, flags } from '@oclif/command';
 import { match, __ } from 'ts-pattern';
 import { cond, always } from 'ramda';
+
+// Library modules
 import { buildReport } from '../functions/build/build-report';
 
 export default class Build extends Command {
@@ -14,15 +17,13 @@ export default class Build extends Command {
   ]
 
   static flags = {
-    help: flags.help({ char: 'h' })
+    help: flags.help({ char: 'h' }),
+    input: flags.string({ char: 'i' }),
+    output: flags.string({ char: 'o' }),
+    args: flags.string({ char: 'a' })
   }
 
   static acceptedOutputFormats = ['html', 'pdf', 'epub']
-
-  static args = Build.acceptedOutputFormats
-    .map(format => {
-      return { name: format };
-    })
 
   static description = `Generate output format of your choosing from these following formats: ${Build.acceptedOutputFormats.join(', ')}`
 
@@ -44,8 +45,9 @@ export default class Build extends Command {
         } = this.buildReport({ argv });
 
         const {
-          listBuildOrder,
-          argsCommaList
+          argsCommaList,
+          unknownFormats,
+          hasUnknownFormats
         } = conditionsLogs;
 
         const {
@@ -55,11 +57,18 @@ export default class Build extends Command {
           multipleArgsNotDependentBuildOrder
         } = conditions;
 
+        // Unknown format warning
+        if (hasUnknownFormats) {
+          console.warn('Unknown formats:', unknownFormats);
+        }
+
         // Build format matches
         const result = cond([
           [
             always(onlyOneBuildFormat),
-            always(`Building - ${argv}`)
+            () => {
+              return always(`Building - ${argsCommaList}`);
+            }
           ],
           [
             always(additionalArgsOverBuildOrder),
@@ -67,7 +76,7 @@ export default class Build extends Command {
           ],
           [
             always(exactMatchBuildOrder),
-            always(`Building - ${listBuildOrder}`)
+            always(`Building - ${argsCommaList}`)
           ],
           [
             always(multipleArgsNotDependentBuildOrder),
