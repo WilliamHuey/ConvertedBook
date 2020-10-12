@@ -8,20 +8,20 @@ describe('build', () => {
     .stdout()
     .command(['build'])
     .it('runs build', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Start Building:');
+      expect(ctx.stdout.trim()).to.contain('Start building:');
     });
 
   test
     .stdout()
     .command(['build', 'html', 'pdf'])
     .it('runs build', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Start Building: html and pdf');
+      expect(ctx.stdout.trim()).to.contain('Start building: html and pdf');
     });
 
   test
     .stdout()
     .command(['build', 'html', 'pdf', 'epub'])
     .it('runs build', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Start Building: html, pdf, and epub');
+      expect(ctx.stdout.trim()).to.contain('Start building: html, pdf, and epub');
     });
 });

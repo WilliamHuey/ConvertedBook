@@ -7,22 +7,39 @@ import { isString, isBoolean } from 'is-what';
 const listify = require('listify');
 
 export enum action {
+  beforeStart,
   start
 }
 
+const messages: { [index: string]: any } = {
+  noValidFormats: 'Did not build as there are no valid formats: ',
+  ignoreUnknownFormats: 'Ignoring unknown formats: ',
+  buildingStartPrefix: 'Start building: '
+};
+
 type BuildFormat = { action: action.start; buildFormats: string[] }
 type AllFormats = { action: action.start; allFormats: boolean }
-type BuildOptions = BuildFormat | AllFormats
+type BuildBeforeStart = { action: action.beforeStart; log: string; data?: any }
+type BuildOptions = BuildFormat | AllFormats | BuildBeforeStart
 
 export function buildLog(this: Build, buildOptions: BuildOptions) {
   return match(buildOptions)
+    .with({
+      action: action.beforeStart,
+      log: when(log => {
+        return isString(log);
+      })
+    }, () => {
+      const { log, data } = buildOptions as BuildBeforeStart;
+      return `${messages[log]}${data}`;
+    })
     .with({
       action: action.start,
       buildFormats: when(buildFormats => {
         return isString(buildFormats);
       })
     }, () => {
-      return `Start Building: ${(buildOptions as BuildFormat).buildFormats}`;
+      return `${messages.buildingStartPrefix}${(buildOptions as BuildFormat).buildFormats}`;
     })
     .with({
       action: action.start,
@@ -30,7 +47,7 @@ export function buildLog(this: Build, buildOptions: BuildOptions) {
         return isBoolean(allFormats);
       })
     }, () => {
-      return `Start Building: ${listify(Build.acceptedOutputFormats)}`;
+      return `${messages.buildingStartPrefix}${listify(Build.acceptedOutputFormats)}`;
     })
     .run();
 }

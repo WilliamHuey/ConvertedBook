@@ -69,54 +69,38 @@ export default class Build extends Command {
 
         // No more processing without any valid output formats
         if (noValidFormats) {
-          console.warn('Did not build as there are no valid formats: ', unknownFormats);
+          console.warn(this.buildLog({
+            action: action.beforeStart,
+            log: 'noValidFormats',
+            data: unknownFormats
+          }));
           return;
         }
 
         // Unknown format warning
         if (hasUnknownFormats) {
-          console.warn('Ignoring unknown formats:', unknownFormats);
+          console.warn(this.buildLog({
+            action: action.beforeStart,
+            log: 'ignoreUnknownFormats',
+            data: unknownFormats
+          }));
         }
 
-        // Build format matches
+        // Build format matches where all the argument
+        // conditions share the same log format
         const result = cond([
-          [
-            always(onlyOneBuildFormat),
-            () => {
-              return this.buildLog({
-                action: action.start,
-                buildFormats: argsCommaList
-              });
-            }
-          ],
-          [
-            always(additionalArgsOverBuildOrder),
-            () => {
-              return this.buildLog({
-                action: action.start,
-                buildFormats: argsCommaList
-              });
-            }
-          ],
-          [
-            always(exactMatchBuildOrder),
-            () => {
-              return this.buildLog({
-                action: action.start,
-                buildFormats: argsCommaList
-              });
-            }
-          ],
-          [
-            always(multipleArgsNotDependentBuildOrder),
-            () => {
-              return this.buildLog({
-                action: action.start,
-                buildFormats: argsCommaList
-              });
-            }
-          ]
-        ]);
+          onlyOneBuildFormat,
+          additionalArgsOverBuildOrder,
+          exactMatchBuildOrder,
+          multipleArgsNotDependentBuildOrder
+        ].map(argsCond => {
+          return [always(argsCond), () => {
+            return this.buildLog({
+              action: action.start,
+              buildFormats: argsCommaList
+            });
+          }];
+        }));
 
         return result();
       })
