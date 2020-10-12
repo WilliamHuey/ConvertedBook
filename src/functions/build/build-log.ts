@@ -14,11 +14,17 @@ export enum action {
 export enum messagesKeys {
   noValidFormats = 'noValidFormats' as any,
   ignoreUnknownFormats = 'ignoreUnknownFormats' as any,
+  noArgsOrFlags = 'noArgsOrFlags' as any,
+  noArgsButFlags = 'noArgsButFlags' as any,
+  argsButNoFlags = 'argsButNoFlags' as any,
 }
 
 const messages: { [index: string]: any } = {
   noValidFormats: 'Did not build as there are no valid formats: ',
   ignoreUnknownFormats: 'Ignoring unknown formats: ',
+  noArgsOrFlags: 'No args and no flags',
+  noArgsButFlags: 'No args but has flags',
+  argsButNoFlags: 'Args but no flags',
   buildingStartPrefix: 'Start building: '
 };
 
@@ -36,7 +42,7 @@ export function buildLog(this: Build, buildOptions: BuildOptions) {
       })
     }, () => {
       const { log, data } = buildOptions as BuildBeforeStart;
-      return `${messages[log]}${data}`;
+      return `${messages[log]}${data || ''}`;
     })
     .with({
       action: action.start,

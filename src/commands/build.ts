@@ -1,6 +1,6 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { match, __ } from 'ts-pattern';
+import { match, when, __ } from 'ts-pattern';
 import { cond, always, unnest } from 'ramda';
 const listify = require('listify');
 
@@ -12,9 +12,9 @@ export default class Build extends Command {
   // Allow any number of arguments
   static strict = false;
 
-  public buildReport = buildReport.bind(this);
+  public buildReport = buildReport.bind(this)
 
-  public buildLog = buildLog.bind(this);
+  public buildLog = buildLog.bind(this)
 
   static examples = [
     '$ convertedbook build pdf',
@@ -27,7 +27,7 @@ export default class Build extends Command {
     args: flags.string({ char: 'a' })
   }
 
-  static BuildWithOrder = ['html', 'pdf'];
+  static BuildWithOrder = ['html', 'pdf']
 
   static acceptedOutputFormats = unnest([Build.BuildWithOrder, 'epub'])
 
@@ -38,12 +38,43 @@ export default class Build extends Command {
 
     const output = match(buildCmd)
       .with(({
-        // No build arguments
-        argv: []
+        // No build arguments and no flags
+        argv: [],
+        flags: when(flags => {
+          return Object.keys(flags).length === 0;
+        })
       }), () => {
         return this.buildLog({
-          action: action.start,
-          allFormats: true
+          action: action.beforeStart,
+          log: messagesKeys.noArgsOrFlags
+        });
+      })
+      .with(({
+        // No build arguments, but has flags
+        argv: [],
+        flags: when(flags => {
+          return Object.keys(flags).length > 0;
+        })
+      }), () => {
+        // Further checks on the flags
+        return this.buildLog({
+          action: action.beforeStart,
+          log: messagesKeys.noArgsButFlags
+        });
+      })
+      .with(({
+        // Arguments, but no flags
+        argv: when(argv => {
+          return argv.length > 0;
+        }),
+        flags: when(flags => {
+          return Object.keys(flags).length === 0;
+        })
+      }), () => {
+        // Can not continue
+        return this.buildLog({
+          action: action.beforeStart,
+          log: messagesKeys.argsButNoFlags
         });
       })
       .with(__, ({ argv }) => {

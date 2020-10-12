@@ -4,8 +4,11 @@ const listify = require('listify');
 
 // Library modules
 import Build from '../../commands/build';
+import { buildFlags } from './build-flags';
 
 export function buildReport(this: Build, { argv }: { argv: string[] }) {
+  buildFlags({});
+
   // Discern which is an unknown format or flag
   const recognizedFormats = intersection(Build.acceptedOutputFormats, argv);
   const unrecognizedElements = difference(argv, Build.acceptedOutputFormats);
