@@ -1,12 +1,12 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { match, __ } from 'ts-pattern';
-import { cond, always } from 'ramda';
+import { cond, always, unnest } from 'ramda';
 const listify = require('listify');
 
 // Library modules
 import { buildReport } from '../functions/build/build-report';
-import { buildLog, action } from '../functions/build/build-log';
+import { buildLog, action, messagesKeys } from '../functions/build/build-log';
 
 export default class Build extends Command {
   // Allow any number of arguments
@@ -27,11 +27,11 @@ export default class Build extends Command {
     args: flags.string({ char: 'a' })
   }
 
-  static acceptedOutputFormats = ['html', 'pdf', 'epub']
+  static BuildWithOrder = ['html', 'pdf'];
+
+  static acceptedOutputFormats = unnest([Build.BuildWithOrder, 'epub'])
 
   static description = `Generate output format of your choosing from these following formats: ${listify(Build.acceptedOutputFormats)}`
-
-  static BuildWithOrder = ['html', 'pdf'];
 
   async run() {
     const buildCmd = this.parse(Build);
@@ -71,7 +71,7 @@ export default class Build extends Command {
         if (noValidFormats) {
           console.warn(this.buildLog({
             action: action.beforeStart,
-            log: 'noValidFormats',
+            log: messagesKeys.noValidFormats,
             data: unknownFormats
           }));
           return;
@@ -81,7 +81,7 @@ export default class Build extends Command {
         if (hasUnknownFormats) {
           console.warn(this.buildLog({
             action: action.beforeStart,
-            log: 'ignoreUnknownFormats',
+            log: messagesKeys.ignoreUnknownFormats,
             data: unknownFormats
           }));
         }

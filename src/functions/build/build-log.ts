@@ -11,6 +11,11 @@ export enum action {
   start
 }
 
+export enum messagesKeys {
+  noValidFormats = 'noValidFormats' as any,
+  ignoreUnknownFormats = 'ignoreUnknownFormats' as any,
+}
+
 const messages: { [index: string]: any } = {
   noValidFormats: 'Did not build as there are no valid formats: ',
   ignoreUnknownFormats: 'Ignoring unknown formats: ',
@@ -19,7 +24,7 @@ const messages: { [index: string]: any } = {
 
 type BuildFormat = { action: action.start; buildFormats: string[] }
 type AllFormats = { action: action.start; allFormats: boolean }
-type BuildBeforeStart = { action: action.beforeStart; log: string; data?: any }
+type BuildBeforeStart = { action: action.beforeStart; log: messagesKeys; data?: any }
 type BuildOptions = BuildFormat | AllFormats | BuildBeforeStart
 
 export function buildLog(this: Build, buildOptions: BuildOptions) {
