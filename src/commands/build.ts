@@ -6,7 +6,7 @@ const listify = require('listify');
 
 // Library modules
 import { buildReport } from '../functions/build/build-report';
-import { buildLog } from '../functions/build/build-log';
+import { buildLog, action } from '../functions/build/build-log';
 
 export default class Build extends Command {
   // Allow any number of arguments
@@ -42,8 +42,8 @@ export default class Build extends Command {
         argv: []
       }), () => {
         return this.buildLog({
-          action: 'start',
-          buildFormats: listify(Build.acceptedOutputFormats)
+          action: action.start,
+          allFormats: true
         });
       })
       .with(__, ({ argv }) => {
@@ -84,7 +84,7 @@ export default class Build extends Command {
             always(onlyOneBuildFormat),
             () => {
               return this.buildLog({
-                action: 'start',
+                action: action.start,
                 buildFormats: argsCommaList
               });
             }
@@ -93,7 +93,7 @@ export default class Build extends Command {
             always(additionalArgsOverBuildOrder),
             () => {
               return this.buildLog({
-                action: 'start',
+                action: action.start,
                 buildFormats: argsCommaList
               });
             }
@@ -102,7 +102,7 @@ export default class Build extends Command {
             always(exactMatchBuildOrder),
             () => {
               return this.buildLog({
-                action: 'start',
+                action: action.start,
                 buildFormats: argsCommaList
               });
             }
@@ -111,7 +111,7 @@ export default class Build extends Command {
             always(multipleArgsNotDependentBuildOrder),
             () => {
               return this.buildLog({
-                action: 'start',
+                action: action.start,
                 buildFormats: argsCommaList
               });
             }
