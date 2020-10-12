@@ -36,11 +36,13 @@ export function buildReport(this: Build, { argv }: { argv: string[] }) {
     onlyOneBuildFormat = numberArgs === 1;
 
   // Create a comma list of the supported build formats
-  const argsCommaList = listify(recognizedFormats);
+  const argsCommaList = listify(recognizedFormats),
+    noValidFormats = argsCommaList.length === 0;
 
   return {
-    conditionsLogs: {
+    conditionsHelpers: {
       argsCommaList,
+      noValidFormats,
       unknownFormats,
       hasUnknownFormats
     },

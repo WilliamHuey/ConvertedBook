@@ -2,18 +2,22 @@
 import Build from '../../commands/build';
 
 // Third party modules
-import { match } from 'ts-pattern';
-
-export function buildLog(this: Build, {
-  action,
-  buildFormats
-}: {
+import { match, when } from 'ts-pattern';
+import { isString } from 'is-what';
+interface BuildFormats {
   action: string;
   buildFormats: string[];
-}) {
-  return match(action)
-    .with('start', () => {
-      return `Start Building: ${buildFormats}`;
+}
+
+export function buildLog(this: Build, buildOptions: BuildFormats) {
+  return match(buildOptions)
+    .with({
+      action: 'start',
+      buildFormats: when(buildFormats => {
+        return isString(buildFormats);
+      })
+    }, () => {
+      return `Start Building: ${buildOptions.buildFormats}`;
     })
     .run();
 }

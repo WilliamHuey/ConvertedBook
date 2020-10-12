@@ -2,6 +2,7 @@
 import { Command, flags } from '@oclif/command';
 import { match, __ } from 'ts-pattern';
 import { cond, always } from 'ramda';
+const listify = require('listify');
 
 // Library modules
 import { buildReport } from '../functions/build/build-report';
@@ -28,7 +29,7 @@ export default class Build extends Command {
 
   static acceptedOutputFormats = ['html', 'pdf', 'epub']
 
-  static description = `Generate output format of your choosing from these following formats: ${Build.acceptedOutputFormats.join(', ')}`
+  static description = `Generate output format of your choosing from these following formats: ${listify(Build.acceptedOutputFormats)}`
 
   static BuildWithOrder = ['html', 'pdf'];
 
@@ -39,19 +40,25 @@ export default class Build extends Command {
       .with(({
         // No build arguments
         argv: []
-      }), () => `Start Building: Into all formats: ${Build.acceptedOutputFormats.join(', ')}`)
+      }), () => {
+        return this.buildLog({
+          action: 'start',
+          buildFormats: listify(Build.acceptedOutputFormats)
+        });
+      })
       .with(__, ({ argv }) => {
         // Get the status of the arguments
         const {
-          conditionsLogs,
+          conditionsHelpers,
           conditions
         } = this.buildReport({ argv });
 
         const {
           argsCommaList,
+          noValidFormats,
           unknownFormats,
           hasUnknownFormats
-        } = conditionsLogs;
+        } = conditionsHelpers;
 
         const {
           exactMatchBuildOrder,
@@ -59,6 +66,12 @@ export default class Build extends Command {
           onlyOneBuildFormat,
           multipleArgsNotDependentBuildOrder
         } = conditions;
+
+        // No more processing without any valid output formats
+        if (noValidFormats) {
+          console.warn('Did not build as there are no valid formats: ', unknownFormats);
+          return;
+        }
 
         // Unknown format warning
         if (hasUnknownFormats) {
