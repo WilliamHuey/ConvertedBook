@@ -69,7 +69,7 @@ export default class Build extends Command {
 
         // No more processing without any valid output formats
         if (noValidFormats) {
-          console.warn(this.buildLog({
+          console.log(this.buildLog({
             action: action.beforeStart,
             log: messagesKeys.noValidFormats,
             data: unknownFormats
@@ -79,7 +79,7 @@ export default class Build extends Command {
 
         // Unknown format warning
         if (hasUnknownFormats) {
-          console.warn(this.buildLog({
+          console.log(this.buildLog({
             action: action.beforeStart,
             log: messagesKeys.ignoreUnknownFormats,
             data: unknownFormats

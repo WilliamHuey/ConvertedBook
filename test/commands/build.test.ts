@@ -24,4 +24,18 @@ describe('build', () => {
     .it('runs build', ctx => {
       expect(ctx.stdout.trim()).to.contain('Start building: html, pdf, and epub');
     });
+
+  test
+    .stdout()
+    .command(['build', 'sdaf'])
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Did not build as there are no valid formats');
+    });
+
+  test
+    .stdout()
+    .command(['build', 'pdf', 'sdaf'])
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Ignoring unknown formats');
+    });
 });
