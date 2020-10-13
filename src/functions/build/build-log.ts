@@ -22,9 +22,9 @@ export enum messagesKeys {
 const messages: { [index: string]: any } = {
   noValidFormats: 'Did not build as there are no valid formats: ',
   ignoreUnknownFormats: 'Ignoring unknown formats: ',
-  noArgsOrFlags: 'No args and no flags',
-  noArgsButFlags: 'No args but has flags',
-  argsButNoFlags: 'Args but no flags',
+  noArgsOrFlags: 'Build failed: No arguments but no flags available.',
+  noArgsButFlags: 'No arguments but has flags.',
+  argsButNoFlags: 'Build: failed: Arguments provided but no flags present.',
   buildingStartPrefix: 'Start building: '
 };
 

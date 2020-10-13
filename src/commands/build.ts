@@ -1,6 +1,6 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { match, when, __ } from 'ts-pattern';
+import { match, when } from 'ts-pattern';
 import { cond, always, unnest } from 'ramda';
 const listify = require('listify');
 
@@ -33,6 +33,71 @@ export default class Build extends Command {
 
   static description = `Generate output format of your choosing from these following formats: ${listify(Build.acceptedOutputFormats)}`
 
+  // Rigorous checks after more simple args and flags check
+  private buildChecks = ({ argv }: { argv: string[] }) => {
+    // Get the status of the arguments
+    const {
+      conditionsHelpers,
+      conditions
+    } = this.buildReport({ argv });
+
+    const {
+      argsCommaList,
+      noValidFormats,
+      unknownFormats,
+      hasUnknownFormats
+    } = conditionsHelpers;
+
+    const {
+      exactMatchBuildOrder,
+      additionalArgsOverBuildOrder,
+      onlyOneBuildFormat,
+      multipleArgsNotDependentBuildOrder
+    } = conditions;
+
+    // No more processing without any valid output formats
+    if (noValidFormats) {
+      return {
+        msg: this.buildLog({
+          action: action.beforeStart,
+          log: messagesKeys.noValidFormats,
+          data: unknownFormats
+        }),
+        continue: false
+      };
+    }
+
+    // Unknown format warning
+    if (hasUnknownFormats) {
+      console.log(this.buildLog({
+        action: action.beforeStart,
+        log: messagesKeys.ignoreUnknownFormats,
+        data: unknownFormats
+      }));
+    }
+
+    // Build format matches where all the argument
+    // conditions share the same log format
+    const result = cond([
+      onlyOneBuildFormat,
+      additionalArgsOverBuildOrder,
+      exactMatchBuildOrder,
+      multipleArgsNotDependentBuildOrder
+    ].map(argsCond => {
+      return [always(argsCond), () => {
+        return {
+          msg: this.buildLog({
+            action: action.start,
+            buildFormats: argsCommaList
+          }),
+          continue: true
+        };
+      }];
+    }));
+
+    return result();
+  }
+
   async run() {
     const buildCmd = this.parse(Build);
 
@@ -44,10 +109,14 @@ export default class Build extends Command {
           return Object.keys(flags).length === 0;
         })
       }), () => {
-        return this.buildLog({
-          action: action.beforeStart,
-          log: messagesKeys.noArgsOrFlags
-        });
+        // Can not continue
+        return {
+          msg: this.buildLog({
+            action: action.beforeStart,
+            log: messagesKeys.noArgsOrFlags
+          }),
+          continue: false
+        };
       })
       .with(({
         // No build arguments, but has flags
@@ -57,10 +126,13 @@ export default class Build extends Command {
         })
       }), () => {
         // Further checks on the flags
-        return this.buildLog({
-          action: action.beforeStart,
-          log: messagesKeys.noArgsButFlags
-        });
+        return {
+          msg: this.buildLog({
+            action: action.beforeStart,
+            log: messagesKeys.noArgsButFlags
+          }),
+          continue: true
+        };
       })
       .with(({
         // Arguments, but no flags
@@ -72,71 +144,27 @@ export default class Build extends Command {
         })
       }), () => {
         // Can not continue
-        return this.buildLog({
-          action: action.beforeStart,
-          log: messagesKeys.argsButNoFlags
-        });
+        return {
+          msg: this.buildLog({
+            action: action.beforeStart,
+            log: messagesKeys.argsButNoFlags
+          }),
+          continue: false
+        };
       })
-      .with(__, ({ argv }) => {
-        // Get the status of the arguments
-        const {
-          conditionsHelpers,
-          conditions
-        } = this.buildReport({ argv });
-
-        const {
-          argsCommaList,
-          noValidFormats,
-          unknownFormats,
-          hasUnknownFormats
-        } = conditionsHelpers;
-
-        const {
-          exactMatchBuildOrder,
-          additionalArgsOverBuildOrder,
-          onlyOneBuildFormat,
-          multipleArgsNotDependentBuildOrder
-        } = conditions;
-
-        // No more processing without any valid output formats
-        if (noValidFormats) {
-          console.log(this.buildLog({
-            action: action.beforeStart,
-            log: messagesKeys.noValidFormats,
-            data: unknownFormats
-          }));
-          return;
-        }
-
-        // Unknown format warning
-        if (hasUnknownFormats) {
-          console.log(this.buildLog({
-            action: action.beforeStart,
-            log: messagesKeys.ignoreUnknownFormats,
-            data: unknownFormats
-          }));
-        }
-
-        // Build format matches where all the argument
-        // conditions share the same log format
-        const result = cond([
-          onlyOneBuildFormat,
-          additionalArgsOverBuildOrder,
-          exactMatchBuildOrder,
-          multipleArgsNotDependentBuildOrder
-        ].map(argsCond => {
-          return [always(argsCond), () => {
-            return this.buildLog({
-              action: action.start,
-              buildFormats: argsCommaList
-            });
-          }];
-        }));
-
-        return result();
+      .with(({
+        // Arguments and flags present
+        argv: when(argv => {
+          return argv.length > 0;
+        }),
+        flags: when(flags => {
+          return Object.keys(flags).length > 0;
+        })
+      }), () => {
+        return this.buildChecks(buildCmd);
       })
       .run();
 
-    this.log(output);
+    this.log(output.msg);
   }
 }
