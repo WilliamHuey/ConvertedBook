@@ -6,15 +6,14 @@ const listify = require('listify');
 import Build from '../../commands/build';
 import { buildFlags } from './build-flags';
 
-export function buildReport(this: Build, { argv }: { argv: string[] }) {
-  buildFlags({});
-
+export function buildReport(this: Build, { argv, flags }: { argv: string[]; flags: object }) {
   // Discern which is an unknown format or flag
   const recognizedFormats = intersection(Build.acceptedOutputFormats, argv);
   const unrecognizedElements = difference(argv, Build.acceptedOutputFormats);
   const unknownFlags = unrecognizedElements.filter(element => {
     return element.slice(0, 2) === '--';
   });
+  const emptyArgs = recognizedFormats.length === 0 && unknownFlags.length === argv.length;
   const unknownFormats = difference(unrecognizedElements, unknownFlags);
   const hasUnknownFormats = unknownFormats.length > 0;
 
@@ -42,18 +41,25 @@ export function buildReport(this: Build, { argv }: { argv: string[] }) {
   const argsCommaList = listify(recognizedFormats),
     noValidFormats = argsCommaList.length === 0;
 
+  // Argument flags presence check
+  const buildFlagsStatus = buildFlags.bind(this)(flags),
+    emptyArgsValidFlags = emptyArgs && buildFlagsStatus.allRequiredFlagsRecognized;
+
   return {
     conditionsHelpers: {
       argsCommaList,
       noValidFormats,
+      emptyArgs,
       unknownFormats,
-      hasUnknownFormats
+      hasUnknownFormats,
+      buildFlagsStatus
     },
     conditions: {
       exactMatchBuildOrder,
       additionalArgsOverBuildOrder,
       onlyOneBuildFormat,
-      multipleArgsNotDependentBuildOrder
+      multipleArgsNotDependentBuildOrder,
+      emptyArgsValidFlags
     }
   };
 }

@@ -20,6 +20,10 @@ export default class Build extends Command {
     '$ convertedbook build pdf',
   ]
 
+  static requiredFlags = ['input', 'output']
+
+  static optionalFlags = ['args']
+
   static flags = {
     help: flags.help({ char: 'h' }),
     input: flags.string({ char: 'i' }),
@@ -34,12 +38,12 @@ export default class Build extends Command {
   static description = `Generate output format of your choosing from these following formats: ${listify(Build.acceptedOutputFormats)}`
 
   // Rigorous checks after more simple args and flags check
-  private buildChecks = ({ argv }: { argv: string[] }) => {
+  private buildChecks = ({ argv, flags }: { argv: string[]; flags: object }) => {
     // Get the status of the arguments
     const {
       conditionsHelpers,
       conditions
-    } = this.buildReport({ argv });
+    } = this.buildReport({ argv, flags });
 
     const {
       argsCommaList,
@@ -52,11 +56,12 @@ export default class Build extends Command {
       exactMatchBuildOrder,
       additionalArgsOverBuildOrder,
       onlyOneBuildFormat,
-      multipleArgsNotDependentBuildOrder
+      multipleArgsNotDependentBuildOrder,
+      emptyArgsValidFlags
     } = conditions;
 
     // No more processing without any valid output formats
-    if (noValidFormats) {
+    if (!emptyArgsValidFlags && noValidFormats) {
       return {
         msg: this.buildLog({
           action: action.beforeStart,
@@ -76,9 +81,7 @@ export default class Build extends Command {
       }));
     }
 
-    // Build format matches where all the argument
-    // conditions share the same log format
-    const result = cond([
+    const conditionsStats = cond([
       onlyOneBuildFormat,
       additionalArgsOverBuildOrder,
       exactMatchBuildOrder,
@@ -95,7 +98,25 @@ export default class Build extends Command {
       }];
     }));
 
-    return result();
+    // Build format matches where all the argument
+    // conditions share the same log format
+    const result = cond(
+      [
+        [
+          always(emptyArgsValidFlags),
+          () => {
+            return {
+              msg: this.buildLog({
+                action: action.start,
+                buildFormats: listify(Build.acceptedOutputFormats)
+              }),
+              continue: true
+            };
+          }
+        ]
+      ]
+    );
+    return result() || conditionsStats();
   }
 
   async run() {
@@ -126,13 +147,7 @@ export default class Build extends Command {
         })
       }), () => {
         // Further checks on the flags
-        return {
-          msg: this.buildLog({
-            action: action.beforeStart,
-            log: messagesKeys.noArgsButFlags
-          }),
-          continue: true
-        };
+        return this.buildChecks(buildCmd);
       })
       .with(({
         // Arguments, but no flags
