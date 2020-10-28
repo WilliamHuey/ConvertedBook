@@ -44,7 +44,8 @@ export function buildReport(this: Build, { argv, flags }: { argv: string[]; flag
   // Argument flags presence check
   const buildFlagsStatus = buildFlags.bind(this)(flags),
     emptyArgsValidFlags = emptyArgs && buildFlagsStatus.allRequiredFlagsRecognized,
-    allRequiredFlagsRecognized = buildFlagsStatus.allRequiredFlagsRecognized;
+    allRequiredFlagsRecognized = buildFlagsStatus.allRequiredFlagsRecognized,
+    someFlagsRequiredRecognized = buildFlagsStatus.someFlagsRequiredRecognized;
 
   return {
     conditionsHelpers: {
@@ -61,7 +62,8 @@ export function buildReport(this: Build, { argv, flags }: { argv: string[]; flag
       onlyOneBuildFormat,
       multipleArgsNotDependentBuildOrder,
       emptyArgsValidFlags,
-      allRequiredFlagsRecognized
+      allRequiredFlagsRecognized,
+      someFlagsRequiredRecognized
     }
   };
 }

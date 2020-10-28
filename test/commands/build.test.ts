@@ -41,6 +41,7 @@ describe('build', () => {
     .it('runs build', ctx => {
       expect(ctx.stdout.trim()).to.contain('Ignoring unknown formats');
     });
+
   test
     .stdout()
     .command(['build'])
@@ -60,5 +61,12 @@ describe('build', () => {
     .command(['build', "--args=''"])
     .it('runs build', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: No required flags found (--input, --output)');
+    });
+
+  test
+    .stdout()
+    .command(unnest([['build', "--args=''"], flags[0]]))
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Build failed: Missing a required "--input" or "--output"');
     });
 });

@@ -19,6 +19,7 @@ export enum messagesKeys {
   argsButNoFlags = 'argsButNoFlags' as any,
   requiredFlags = 'argsButNoFlags' as any,
   noRequiredFlagsFound = 'noRequiredFlagsFound' as any,
+  someRequiredFlagsFound = 'someRequiredFlagsFound' as any,
 }
 
 const messages: { [index: string]: any } = {
@@ -28,6 +29,7 @@ const messages: { [index: string]: any } = {
   noArgsButFlags: 'No arguments but has flags.',
   argsButNoFlags: 'Build failed: Arguments provided but no flags present.',
   noRequiredFlagsFound: 'Build failed: No required flags found (--input, --output)',
+  someRequiredFlagsFound: 'Build failed: Missing a required "--input" or "--output"',
   buildingStartPrefix: 'Start building: '
 };
 

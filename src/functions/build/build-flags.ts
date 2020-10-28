@@ -9,10 +9,13 @@ export function buildFlags(this: Build, flags: any) {
     argsFlagKeys = Object.keys(flags),
     recognizedFlags = intersection(acceptedRequiredFlagKeys, argsFlagKeys),
     optionalArgsFlagKeys = intersection(Build.optionalFlags, argsFlagKeys),
-    allRequiredFlagsRecognized = recognizedFlags.length === acceptedRequiredFlagKeys.length;
+    recognizedFlagsLen = recognizedFlags.length,
+    allRequiredFlagsRecognized = recognizedFlags.length === acceptedRequiredFlagKeys.length,
+    someFlagsRequiredRecognized = recognizedFlagsLen > 0 && recognizedFlagsLen < acceptedRequiredFlagKeys.length;
 
   return {
     allRequiredFlagsRecognized,
+    someFlagsRequiredRecognized,
     optionalArgsFlagKeys,
     argsFlagKeys
   };

@@ -58,8 +58,20 @@ export default class Build extends Command {
       onlyOneBuildFormat,
       multipleArgsNotDependentBuildOrder,
       emptyArgsValidFlags,
-      allRequiredFlagsRecognized
+      allRequiredFlagsRecognized,
+      someFlagsRequiredRecognized
     } = conditions;
+
+    // Missing a required flag and can not continue
+    if (someFlagsRequiredRecognized) {
+      return {
+        msg: this.buildLog({
+          action: action.beforeStart,
+          log: messagesKeys.someRequiredFlagsFound
+        }),
+        continue: false
+      };
+    }
 
     // No required flags present and will not continue
     if (!allRequiredFlagsRecognized) {
@@ -93,7 +105,7 @@ export default class Build extends Command {
       }));
     }
 
-    const conditionsStats = cond([
+    const buildArgsConds = cond([
       onlyOneBuildFormat,
       additionalArgsOverBuildOrder,
       exactMatchBuildOrder,
@@ -112,7 +124,7 @@ export default class Build extends Command {
 
     // Build format matches where all the argument
     // conditions share the same log format
-    const result = cond(
+    const emptyArgsValidFlagsCond = cond(
       [
         [
           always(emptyArgsValidFlags),
@@ -129,7 +141,7 @@ export default class Build extends Command {
       ]
     );
 
-    return result() || conditionsStats();
+    return emptyArgsValidFlagsCond() || buildArgsConds();
   }
 
   async run() {
