@@ -9,13 +9,6 @@ describe('build', () => {
 
   test
     .stdout()
-    .command(['build'])
-    .it('runs build', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Build failed: No arguments and no flags available.');
-    });
-
-  test
-    .stdout()
     .command(unnest([['build', 'html', 'pdf'], flags]))
     .it('runs build', ctx => {
       expect(ctx.stdout.trim()).to.contain('Start building: html and pdf');
@@ -26,6 +19,13 @@ describe('build', () => {
     .command(unnest([['build', 'html', 'pdf', 'epub'], flags]))
     .it('runs build', ctx => {
       expect(ctx.stdout.trim()).to.contain('Start building: html, pdf, and epub');
+    });
+
+  test
+    .stdout()
+    .command(unnest([['build', 'pdf'], flags]))
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Start building: pdf');
     });
 
   test
@@ -44,6 +44,20 @@ describe('build', () => {
 
   test
     .stdout()
+    .command(unnest([['build', 'sdaf', 'mf'], flags]))
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Did not build as there are no valid formats');
+    });
+
+  test
+    .stdout()
+    .command(unnest([['build', "--args=''"], flags[0]]))
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Build failed: Missing a required "--input" or "--output"');
+    });
+
+  test
+    .stdout()
     .command(['build'])
     .it('runs build', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: No arguments and no flags available.');
@@ -51,9 +65,24 @@ describe('build', () => {
 
   test
     .stdout()
-    .command(unnest([['build', 'sdaf', 'mf'], flags]))
+    .command(['build', 'nsdfa', 'ce'])
     .it('runs build', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Did not build as there are no valid formats');
+      expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present.');
+    });
+
+
+  test
+    .stdout()
+    .command(['build', 'pdf'])
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present.');
+    });
+
+  test
+    .stdout()
+    .command(['build', 'sdaf', 'mf'])
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present.');
     });
 
   test
@@ -63,10 +92,4 @@ describe('build', () => {
       expect(ctx.stdout.trim()).to.contain('Build failed: No required flags found (--input, --output)');
     });
 
-  test
-    .stdout()
-    .command(unnest([['build', "--args=''"], flags[0]]))
-    .it('runs build', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Build failed: Missing a required "--input" or "--output"');
-    });
 });

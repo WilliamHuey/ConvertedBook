@@ -17,7 +17,6 @@ export enum messagesKeys {
   noArgsOrFlags = 'noArgsOrFlags' as any,
   noArgsButFlags = 'noArgsButFlags' as any,
   argsButNoFlags = 'argsButNoFlags' as any,
-  requiredFlags = 'argsButNoFlags' as any,
   noRequiredFlagsFound = 'noRequiredFlagsFound' as any,
   someRequiredFlagsFound = 'someRequiredFlagsFound' as any,
 }
