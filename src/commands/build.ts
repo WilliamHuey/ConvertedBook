@@ -3,6 +3,7 @@ import { Command, flags } from '@oclif/command';
 import { match, when } from 'ts-pattern';
 import { cond, always, unnest } from 'ramda';
 const listify = require('listify');
+const { lookpath } = require('lookpath');
 
 // Library modules
 import { buildReport } from '../functions/build/build-report';
@@ -145,6 +146,9 @@ export default class Build extends Command {
   }
 
   async run() {
+    // Check for presence of external dependencies
+
+    // Check for cli input validity
     const buildCmd = this.parse(Build);
 
     const output = match(buildCmd)
