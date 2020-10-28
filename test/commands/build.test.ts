@@ -11,7 +11,7 @@ describe('build', () => {
     .stdout()
     .command(['build'])
     .it('runs build', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Build failed: No arguments but no flags available.');
+      expect(ctx.stdout.trim()).to.contain('Build failed: No arguments and no flags available.');
     });
 
   test
@@ -40,5 +40,12 @@ describe('build', () => {
     .command(unnest([['build', 'sdaf', 'pdf'], flags]))
     .it('runs build', ctx => {
       expect(ctx.stdout.trim()).to.contain('Ignoring unknown formats');
+    });
+
+  test
+    .stdout()
+    .command(['build', "--args=''"])
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Build failed: No required flags found (--input, --output)');
     });
 });

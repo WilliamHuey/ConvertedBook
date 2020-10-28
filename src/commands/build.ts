@@ -57,8 +57,20 @@ export default class Build extends Command {
       additionalArgsOverBuildOrder,
       onlyOneBuildFormat,
       multipleArgsNotDependentBuildOrder,
-      emptyArgsValidFlags
+      emptyArgsValidFlags,
+      allRequiredFlagsRecognized
     } = conditions;
+
+    // No required flags present and will not continue
+    if (!allRequiredFlagsRecognized) {
+      return {
+        msg: this.buildLog({
+          action: action.beforeStart,
+          log: messagesKeys.noRequiredFlagsFound
+        }),
+        continue: false
+      };
+    }
 
     // No more processing without any valid output formats
     if (!emptyArgsValidFlags && noValidFormats) {
@@ -116,6 +128,7 @@ export default class Build extends Command {
         ]
       ]
     );
+
     return result() || conditionsStats();
   }
 
@@ -140,17 +153,7 @@ export default class Build extends Command {
         };
       })
       .with(({
-        // No build arguments, but has flags
-        argv: [],
-        flags: when(flags => {
-          return Object.keys(flags).length > 0;
-        })
-      }), () => {
-        // Further checks on the flags
-        return this.buildChecks(buildCmd);
-      })
-      .with(({
-        // Arguments, but no flags
+        // Build arguments, but no flags
         argv: when(argv => {
           return argv.length > 0;
         }),
@@ -168,7 +171,17 @@ export default class Build extends Command {
         };
       })
       .with(({
-        // Arguments and flags present
+        // No build arguments, but has flags
+        argv: [],
+        flags: when(flags => {
+          return Object.keys(flags).length > 0;
+        })
+      }), () => {
+        // Further checks on the flags
+        return this.buildChecks(buildCmd);
+      })
+      .with(({
+        // Build arguments and flags present
         argv: when(argv => {
           return argv.length > 0;
         }),

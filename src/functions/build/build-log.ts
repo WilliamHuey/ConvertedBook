@@ -17,14 +17,17 @@ export enum messagesKeys {
   noArgsOrFlags = 'noArgsOrFlags' as any,
   noArgsButFlags = 'noArgsButFlags' as any,
   argsButNoFlags = 'argsButNoFlags' as any,
+  requiredFlags = 'argsButNoFlags' as any,
+  noRequiredFlagsFound = 'noRequiredFlagsFound' as any,
 }
 
 const messages: { [index: string]: any } = {
   noValidFormats: 'Did not build as there are no valid formats: ',
   ignoreUnknownFormats: 'Ignoring unknown formats: ',
-  noArgsOrFlags: 'Build failed: No arguments but no flags available.',
+  noArgsOrFlags: 'Build failed: No arguments and no flags available.',
   noArgsButFlags: 'No arguments but has flags.',
-  argsButNoFlags: 'Build: failed: Arguments provided but no flags present.',
+  argsButNoFlags: 'Build failed: Arguments provided but no flags present.',
+  noRequiredFlagsFound: 'Build failed: No required flags found (--input, --output)',
   buildingStartPrefix: 'Start building: '
 };
 
