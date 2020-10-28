@@ -41,6 +41,19 @@ describe('build', () => {
     .it('runs build', ctx => {
       expect(ctx.stdout.trim()).to.contain('Ignoring unknown formats');
     });
+  test
+    .stdout()
+    .command(['build'])
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Build failed: No arguments and no flags available.');
+    });
+
+  test
+    .stdout()
+    .command(unnest([['build', 'sdaf', 'mf'], flags]))
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Did not build as there are no valid formats');
+    });
 
   test
     .stdout()
