@@ -1,17 +1,14 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { all, unnest } from 'ramda';
-import { isString, isUndefined } from 'is-what';
-import { from, forkJoin } from 'rxjs';
-import { filter, map, first } from 'rxjs/operators';
+import { unnest } from 'ramda';
 const listify = require('listify');
-const { lookpath } = require('lookpath');
 
 // Library modules
 import { buildReport } from '../functions/build/build-report';
 import { buildLog } from '../functions/build/build-log';
 import { buildCliInputsChecks } from '../functions/build/build-cli-input-checks';
 import { buildChecks } from '../functions/build/build-checks';
+import { buildDependencies } from '../functions/build/build-dependencies';
 
 export default class Build extends Command {
   // Allow any number of arguments
@@ -24,6 +21,8 @@ export default class Build extends Command {
   public buildCliInputsChecks = buildCliInputsChecks.bind(this)
 
   public buildChecks = buildChecks.bind(this)
+
+  public buildDependencies = buildDependencies.bind(this)
 
   static examples = [
     '$ convertedbook build pdf',
@@ -49,41 +48,10 @@ export default class Build extends Command {
   static requiredExternalDeps = ['pandoc', 'latex']
 
   async run() {
-    // Check for presence of external dependencies
-    const depCheckGroup$ = Build
-      .requiredExternalDeps
-      .map(extDep => {
-        return from(lookpath(extDep));
-      });
-
-    // Run checks for all external dependencies at once
-    const pathCheckResults$ = forkJoin(depCheckGroup$);
-
-    // All extenal dependencies are found
-    const allDepsSatisfied$ = pathCheckResults$
-      .pipe(
-        first(),
-        filter((result: Array<any>) => {
-          return all((resItem: string | undefined) => {
-            return isString(resItem);
-          }, result);
-        })
-      );
-
-    // Some or all of the external dependencies can not be found
-    const showDepsUnsatisfied$ = pathCheckResults$
-      .pipe(
-        first(),
-        map((result: Array<any>) => {
-          return result.map((resItem, resItemIndex) => {
-            return isUndefined(resItem) ?
-              Build.requiredExternalDeps[resItemIndex] : '';
-          });
-        }),
-        filter(res => {
-          return res.join('').length > 0;
-        })
-      );
+    const {
+      showDepsUnsatisfied$,
+      allDepsSatisfied$
+    } = this.buildDependencies();
 
     // Can not continue further, and display the error message
     showDepsUnsatisfied$
