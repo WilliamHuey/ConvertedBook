@@ -1,6 +1,5 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { match, when } from 'ts-pattern';
 import { all, cond, always, unnest } from 'ramda';
 import { isString, isUndefined } from 'is-what';
 import { from, forkJoin } from 'rxjs';
@@ -11,6 +10,7 @@ const { lookpath } = require('lookpath');
 // Library modules
 import { buildReport } from '../functions/build/build-report';
 import { buildLog, action, messagesKeys } from '../functions/build/build-log';
+import { buildCliInputsChecks } from '../functions/build/build-cli-input-checks';
 
 export default class Build extends Command {
   // Allow any number of arguments
@@ -19,6 +19,8 @@ export default class Build extends Command {
   public buildReport = buildReport.bind(this)
 
   public buildLog = buildLog.bind(this)
+
+  public buildCliInputsChecks = buildCliInputsChecks.bind(this)
 
   static examples = [
     '$ convertedbook build pdf',
@@ -45,7 +47,7 @@ export default class Build extends Command {
 
   // Rigorous checks after more simple args and flags check,
   // used by 'buildCliInputsChecks'
-  private buildChecks = ({ argv, flags }: { argv: string[]; flags: object }) => {
+  public buildChecks = ({ argv, flags }: { argv: string[]; flags: object }) => {
     // Get the status of the arguments
     const {
       conditionsHelpers,
@@ -151,70 +153,6 @@ export default class Build extends Command {
     return emptyArgsValidFlagsCond() || buildArgsConds();
   }
 
-  private buildCliInputsChecks = () => {
-    // Check for cli input validity
-    const buildCmd = this.parse(Build);
-
-    const output = match(buildCmd)
-      .with(({
-        // No build arguments and no flags
-        argv: [],
-        flags: when(flags => {
-          return Object.keys(flags).length === 0;
-        })
-      }), () => {
-        // Can not continue
-        return {
-          msg: this.buildLog({
-            action: action.beforeStart,
-            log: messagesKeys.noArgsOrFlags
-          }),
-          continue: false
-        };
-      })
-      .with(({
-        // Build arguments, but no flags
-        argv: when(argv => {
-          return argv.length > 0;
-        }),
-        flags: when(flags => {
-          return Object.keys(flags).length === 0;
-        })
-      }), () => {
-        // Can not continue
-        return {
-          msg: this.buildLog({
-            action: action.beforeStart,
-            log: messagesKeys.argsButNoFlags
-          }),
-          continue: false
-        };
-      })
-      .with(({
-        // No build arguments, but has flags
-        argv: [],
-        flags: when(flags => {
-          return Object.keys(flags).length > 0;
-        })
-      }), () => {
-        // Further checks on the flags
-        return this.buildChecks(buildCmd);
-      })
-      .with(({
-        // Build arguments and flags present
-        argv: when(argv => {
-          return argv.length > 0;
-        }),
-        flags: when(flags => {
-          return Object.keys(flags).length > 0;
-        })
-      }), () => {
-        return this.buildChecks(buildCmd);
-      })
-      .run();
-    this.log(output.msg.trim());
-  }
-
   async run() {
     // Check for presence of external dependencies
     const depCheckGroup$ = Build
@@ -262,7 +200,8 @@ export default class Build extends Command {
     // on the cli command inputs
     allDepsSatisfied$
       .subscribe(() => {
-        this.buildCliInputsChecks();
+        const output = this.buildCliInputsChecks();
+        this.log(output.msg.trim());
       });
   }
 }
