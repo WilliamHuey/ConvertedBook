@@ -3,8 +3,7 @@ import Build from '../../commands/build';
 
 // Third party modules
 import { match, when } from 'ts-pattern';
-import { isString, isBoolean } from 'is-what';
-const listify = require('listify');
+import { isString } from 'is-what';
 
 export enum action {
   beforeStart,
@@ -33,9 +32,8 @@ const messages: { [index: string]: any } = {
 };
 
 type BuildFormat = { action: action.start; buildFormats: string[] }
-type AllFormats = { action: action.start; allFormats: boolean }
 type BuildBeforeStart = { action: action.beforeStart; log: messagesKeys; data?: any }
-type BuildOptions = BuildFormat | AllFormats | BuildBeforeStart
+type BuildOptions = BuildFormat | BuildBeforeStart
 
 export function buildLog(this: Build, buildOptions: BuildOptions) {
   return match(buildOptions)
@@ -55,14 +53,6 @@ export function buildLog(this: Build, buildOptions: BuildOptions) {
       })
     }, () => {
       return `${messages.buildingStartPrefix}${(buildOptions as BuildFormat).buildFormats}`;
-    })
-    .with({
-      action: action.start,
-      allFormats: when(allFormats => {
-        return isBoolean(allFormats);
-      })
-    }, () => {
-      return `${messages.buildingStartPrefix}${listify(Build.acceptedOutputFormats)}`;
     })
     .run();
 }

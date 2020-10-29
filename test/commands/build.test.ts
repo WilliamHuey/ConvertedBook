@@ -24,16 +24,30 @@ describe('build', () => {
 
   retryTest()
     .stdout()
-    .command(unnest([['build', 'html', 'pdf', 'epub'], flags]))
+    .command(unnest([['build', 'pdf'], flags]))
     .it('runs build', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Start building: html, pdf, and epub');
+      expect(ctx.stdout.trim()).to.contain('Start building: html and pdf');
     });
 
   retryTest()
     .stdout()
-    .command(unnest([['build', 'pdf'], flags]))
+    .command(unnest([['build', 'epub'], flags]))
     .it('runs build', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Start building: pdf');
+      expect(ctx.stdout.trim()).to.contain('Start building: epub');
+    });
+
+  retryTest()
+    .stdout()
+    .command(unnest([['build', 'epub', 'html'], flags]))
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Start building: epub and html');
+    });
+
+  retryTest()
+    .stdout()
+    .command(unnest([['build', 'html', 'pdf', 'epub'], flags]))
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Start building: html, pdf, and epub');
     });
 
   retryTest()
@@ -55,6 +69,13 @@ describe('build', () => {
     .command(unnest([['build', 'sdaf', 'mf'], flags]))
     .it('runs build', ctx => {
       expect(ctx.stdout.trim()).to.contain('Did not build as there are no valid formats');
+    });
+
+  retryTest()
+    .stdout()
+    .command(unnest([['build'], flags]))
+    .it('runs build', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Start building: html, pdf, and epub');
     });
 
   retryTest()
