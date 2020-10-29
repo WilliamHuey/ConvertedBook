@@ -13,6 +13,7 @@
     "@oclif/plugin-help": "^3.2.0",
     "@types/ramda": "^0.27.23",
     "file-type": "^15.0.1",
+    "is-there": "^4.5.1",
     "is-what": "^3.11.2",
     "listify": "^1.0.3",
     "lookpath": "^1.1.0",

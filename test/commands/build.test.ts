@@ -10,7 +10,7 @@ describe('build', () => {
   const retryTest = function () {
     return test
       .retries(10);
-  }
+  };
 
   // Unsure why a /n character was introduce, but
   // need to remove it to perform a proper comparison from ctx.stdout
@@ -78,7 +78,6 @@ describe('build', () => {
       expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present.');
     });
 
-
   retryTest()
     .stdout()
     .command(['build', 'pdf'])
@@ -99,5 +98,4 @@ describe('build', () => {
     .it('runs build', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: No required flags found (--input, --output)');
     });
-
 });

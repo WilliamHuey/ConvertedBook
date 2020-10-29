@@ -4,7 +4,7 @@ import { match, when } from 'ts-pattern';
 import { all, cond, always, unnest } from 'ramda';
 import { isString, isUndefined } from 'is-what';
 import { from, forkJoin } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, first } from 'rxjs/operators';
 const listify = require('listify');
 const { lookpath } = require('lookpath');
 
@@ -219,7 +219,7 @@ export default class Build extends Command {
     // Check for presence of external dependencies
     const depCheckGroup$ = Build
       .requiredExternalDeps
-      .map((extDep) => {
+      .map(extDep => {
         return from(lookpath(extDep));
       });
 
@@ -229,6 +229,7 @@ export default class Build extends Command {
     // All extenal dependencies are found
     const allDepsSatisfied$ = pathCheckResults$
       .pipe(
+        first(),
         filter((result: Array<any>) => {
           return all((resItem: string | undefined) => {
             return isString(resItem);
@@ -239,21 +240,22 @@ export default class Build extends Command {
     // Some or all of the external dependencies can not be found
     const showDepsUnsatisfied$ = pathCheckResults$
       .pipe(
+        first(),
         map((result: Array<any>) => {
           return result.map((resItem, resItemIndex) => {
             return isUndefined(resItem) ?
               Build.requiredExternalDeps[resItemIndex] : '';
-          })
+          });
         }),
-        filter((res) => {
-          return res.join("").length > 0;
+        filter(res => {
+          return res.join('').length > 0;
         })
       );
 
     // Can not continue further, and display the error message
     showDepsUnsatisfied$
-      .subscribe((res) => {
-        this.log(`Build failed: These dependencies were not found in your path: ${res}`)
+      .subscribe(res => {
+        this.log(`Build failed: These dependencies were not found in your path: ${res.join('')}`);
       });
 
     // All dependencies found, and can perform further checks
