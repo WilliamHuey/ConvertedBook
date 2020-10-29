@@ -4,6 +4,7 @@ import { match, when } from 'ts-pattern';
 import { cond, always, unnest } from 'ramda';
 const listify = require('listify');
 const { lookpath } = require('lookpath');
+import { from, forkJoin } from 'rxjs';
 
 // Library modules
 import { buildReport } from '../functions/build/build-report';
@@ -37,6 +38,8 @@ export default class Build extends Command {
   static acceptedOutputFormats = unnest([Build.BuildWithOrder, 'epub'])
 
   static description = `Generate output format of your choosing from these following formats: ${listify(Build.acceptedOutputFormats)}`
+
+  static requiredExternalDeps = ['pandoc', 'latex']
 
   // Rigorous checks after more simple args and flags check
   private buildChecks = ({ argv, flags }: { argv: string[]; flags: object }) => {
@@ -147,6 +150,18 @@ export default class Build extends Command {
 
   async run() {
     // Check for presence of external dependencies
+    const depCheckGroup$ = Build.requiredExternalDeps
+      .map((extDep) => {
+        return from(lookpath(extDep));
+      });
+    const pathCheckGroup$ = forkJoin(depCheckGroup$);
+
+    pathCheckGroup$
+      .subscribe((thing) => {
+        console.log(thing)
+      });
+    // forkJoin
+
 
     // Check for cli input validity
     const buildCmd = this.parse(Build);
