@@ -1,12 +1,12 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { match, when } from 'ts-pattern';
-import { all, any, cond, always, unnest } from 'ramda';
+import { all, cond, always, unnest } from 'ramda';
 import { isString, isUndefined } from 'is-what';
-const listify = require('listify');
-const { lookpath } = require('lookpath');
 import { from, forkJoin } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
+const listify = require('listify');
+const { lookpath } = require('lookpath');
 
 // Library modules
 import { buildReport } from '../functions/build/build-report';
@@ -43,7 +43,8 @@ export default class Build extends Command {
 
   static requiredExternalDeps = ['pandoc', 'latex']
 
-  // Rigorous checks after more simple args and flags check
+  // Rigorous checks after more simple args and flags check,
+  // used by 'buildCliInputsChecks'
   private buildChecks = ({ argv, flags }: { argv: string[]; flags: object }) => {
     // Get the status of the arguments
     const {
@@ -150,44 +151,7 @@ export default class Build extends Command {
     return emptyArgsValidFlagsCond() || buildArgsConds();
   }
 
-  async run() {
-    // Check for presence of external dependencies
-    const depCheckGroup$ = Build
-      .requiredExternalDeps
-      .map((extDep) => {
-        return from(lookpath(extDep));
-      });
-    const pathCheckResults$ = forkJoin(depCheckGroup$);
-
-    const allDepsSatisfied$ = pathCheckResults$
-      .pipe(
-        filter((result: Array<any>) => {
-          return all((resItem: string | undefined) => {
-            return isString(resItem);
-          }, result);
-        })
-      );
-
-    const showDepsUnsatisfied$ = pathCheckResults$
-      .pipe(
-        map((result: Array<any>) => {
-          return result.map((resItem, resItemIndex) => {
-            return isUndefined(resItem) ?
-              Build.requiredExternalDeps[resItemIndex] : '';
-          })
-        })
-      );
-
-    showDepsUnsatisfied$
-      .subscribe((res) => {
-        this.log(`Build failed: These dependencies were not found in your path: ${res.join("")}`)
-      });
-
-    allDepsSatisfied$
-      .subscribe(() => {
-        this.log('All dependencies found')
-      });
-
+  private buildCliInputsChecks = () => {
     // Check for cli input validity
     const buildCmd = this.parse(Build);
 
@@ -248,7 +212,55 @@ export default class Build extends Command {
         return this.buildChecks(buildCmd);
       })
       .run();
+    this.log(output.msg.trim());
+  }
 
-    this.log(output.msg);
+  async run() {
+    // Check for presence of external dependencies
+    const depCheckGroup$ = Build
+      .requiredExternalDeps
+      .map((extDep) => {
+        return from(lookpath(extDep));
+      });
+
+    // Run checks for all external dependencies at once
+    const pathCheckResults$ = forkJoin(depCheckGroup$);
+
+    // All extenal dependencies are found
+    const allDepsSatisfied$ = pathCheckResults$
+      .pipe(
+        filter((result: Array<any>) => {
+          return all((resItem: string | undefined) => {
+            return isString(resItem);
+          }, result);
+        })
+      );
+
+    // Some or all of the external dependencies can not be found
+    const showDepsUnsatisfied$ = pathCheckResults$
+      .pipe(
+        map((result: Array<any>) => {
+          return result.map((resItem, resItemIndex) => {
+            return isUndefined(resItem) ?
+              Build.requiredExternalDeps[resItemIndex] : '';
+          })
+        }),
+        filter((res) => {
+          return res.join("").length > 0;
+        })
+      );
+
+    // Can not continue further, and display the error message
+    showDepsUnsatisfied$
+      .subscribe((res) => {
+        this.log(`Build failed: These dependencies were not found in your path: ${res}`)
+      });
+
+    // All dependencies found, and can perform further checks
+    // on the cli command inputs
+    allDepsSatisfied$
+      .subscribe(() => {
+        this.buildCliInputsChecks();
+      });
   }
 }
