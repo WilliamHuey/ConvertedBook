@@ -1,6 +1,6 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { all, cond, always, unnest } from 'ramda';
+import { all, unnest } from 'ramda';
 import { isString, isUndefined } from 'is-what';
 import { from, forkJoin } from 'rxjs';
 import { filter, map, first } from 'rxjs/operators';
@@ -9,8 +9,9 @@ const { lookpath } = require('lookpath');
 
 // Library modules
 import { buildReport } from '../functions/build/build-report';
-import { buildLog, action, messagesKeys } from '../functions/build/build-log';
+import { buildLog } from '../functions/build/build-log';
 import { buildCliInputsChecks } from '../functions/build/build-cli-input-checks';
+import { buildChecks } from '../functions/build/build-checks';
 
 export default class Build extends Command {
   // Allow any number of arguments
@@ -21,6 +22,8 @@ export default class Build extends Command {
   public buildLog = buildLog.bind(this)
 
   public buildCliInputsChecks = buildCliInputsChecks.bind(this)
+
+  public buildChecks = buildChecks.bind(this)
 
   static examples = [
     '$ convertedbook build pdf',
@@ -44,114 +47,6 @@ export default class Build extends Command {
   static description = `Generate output format of your choosing from these following formats: ${listify(Build.acceptedOutputFormats)}`
 
   static requiredExternalDeps = ['pandoc', 'latex']
-
-  // Rigorous checks after more simple args and flags check,
-  // used by 'buildCliInputsChecks'
-  public buildChecks = ({ argv, flags }: { argv: string[]; flags: object }) => {
-    // Get the status of the arguments
-    const {
-      conditionsHelpers,
-      conditions
-    } = this.buildReport({ argv, flags });
-
-    const {
-      argsCommaList,
-      noValidFormats,
-      unknownFormats,
-      hasUnknownFormats
-    } = conditionsHelpers;
-
-    const {
-      exactMatchBuildOrder,
-      additionalArgsOverBuildOrder,
-      onlyOneBuildFormat,
-      multipleArgsNotDependentBuildOrder,
-      emptyArgsValidFlags,
-      allRequiredFlagsRecognized,
-      someFlagsRequiredRecognized
-    } = conditions;
-
-    // Missing a required flag and can not continue
-    if (someFlagsRequiredRecognized) {
-      return {
-        msg: this.buildLog({
-          action: action.beforeStart,
-          log: messagesKeys.someRequiredFlagsFound
-        }),
-        continue: false
-      };
-    }
-
-    // No required flags present and will not continue
-    if (!allRequiredFlagsRecognized) {
-      return {
-        msg: this.buildLog({
-          action: action.beforeStart,
-          log: messagesKeys.noRequiredFlagsFound
-        }),
-        continue: false
-      };
-    }
-
-    // No more processing without any valid output formats
-    if (!emptyArgsValidFlags && noValidFormats) {
-      return {
-        msg: this.buildLog({
-          action: action.beforeStart,
-          log: messagesKeys.noValidFormats,
-          data: unknownFormats
-        }),
-        continue: false
-      };
-    }
-
-    // Unknown format warning
-    if (hasUnknownFormats) {
-      console.log(this.buildLog({
-        action: action.beforeStart,
-        log: messagesKeys.ignoreUnknownFormats,
-        data: unknownFormats
-      }));
-    }
-
-    const buildArgsConds = cond([
-      onlyOneBuildFormat,
-      additionalArgsOverBuildOrder,
-      exactMatchBuildOrder,
-      multipleArgsNotDependentBuildOrder
-    ].map(argsCond => {
-      return [always(argsCond), () => {
-        return {
-          msg: this.buildLog({
-            action: action.start,
-            buildFormats: argsCommaList
-          }),
-          continue: true
-        };
-      }];
-    }));
-
-    // Build format matches where all the argument
-    // conditions share the same log format
-    const emptyArgsValidFlagsCond = cond(
-      [
-        [
-          always(emptyArgsValidFlags),
-          () => {
-            return {
-              msg: this.buildLog({
-                action: action.start,
-                buildFormats: listify(Build.acceptedOutputFormats)
-              }),
-              continue: true
-            };
-          }
-        ]
-      ]
-    );
-
-    return emptyArgsValidFlagsCond() || buildArgsConds();
-  }
 
   async run() {
     // Check for presence of external dependencies
