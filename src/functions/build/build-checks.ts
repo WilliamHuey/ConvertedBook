@@ -75,6 +75,10 @@ export function buildChecks(this: Build, { argv, flags }: { argv: string[]; flag
     }));
   }
 
+  // Supply the information after making checks on the build command
+  const conditionsFlagsArgv = { ...conditions, flags, argv };
+
+  // Valid scenarios for building
   const buildArgsConds = cond([
     onlyOneBuildFormat,
     additionalArgsOverBuildOrder,
@@ -87,11 +91,13 @@ export function buildChecks(this: Build, { argv, flags }: { argv: string[]; flag
           action: action.start,
           buildFormats: argsCommaList
         }),
+        conditions: conditionsFlagsArgv,
         continue: true
       };
     }];
   }));
 
+  // Also a valid scenario:
   // Build format matches where all the argument
   // conditions share the same log format
   const emptyArgsValidFlagsCond = cond(
@@ -104,6 +110,7 @@ export function buildChecks(this: Build, { argv, flags }: { argv: string[]; flag
               action: action.start,
               buildFormats: listify(Build.acceptedOutputFormats)
             }),
+            conditions: conditionsFlagsArgv,
             continue: true
           };
         }

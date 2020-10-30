@@ -1,6 +1,7 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { unnest } from 'ramda';
+import { map } from 'rxjs/operators';
 const listify = require('listify');
 
 // Library modules
@@ -61,9 +62,13 @@ export default class Build extends Command {
 
     // All dependencies found, and can perform further checks
     // on the cli command inputs
-    allDepsSatisfied$
-      .subscribe(() => {
-        const output = this.buildCliInputsChecks();
+    const buildCliResults$ = allDepsSatisfied$
+      .pipe(map(() => {
+        return this.buildCliInputsChecks();
+      }));
+
+    buildCliResults$
+      .subscribe((output) => {
         this.log(output.msg.trim());
       });
   }
