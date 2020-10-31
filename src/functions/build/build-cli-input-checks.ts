@@ -4,14 +4,9 @@ import { match, when } from 'ts-pattern';
 // Library modules
 import Build from '../../commands/build';
 import { action, messagesKeys } from './build-log';
+import { BuildCheckResults, BuildCheckBadResults } from './build-checks';
 
-export type BuildCheckConditions = {
-  msg: string;
-  conditions?: object;
-  continue?: boolean;
-}
-
-export function buildCliInputsChecks(this: Build): BuildCheckConditions {
+export function buildCliInputsChecks(this: Build): BuildCheckResults {
   // Check for cli input validity
   const buildCmd = this.parse(Build);
 
@@ -22,7 +17,7 @@ export function buildCliInputsChecks(this: Build): BuildCheckConditions {
       flags: when(flags => {
         return Object.keys(flags).length === 0;
       })
-    }), () => {
+    }), (): BuildCheckBadResults => {
       // Can not continue
       return {
         msg: this.buildLog({
@@ -40,7 +35,7 @@ export function buildCliInputsChecks(this: Build): BuildCheckConditions {
       flags: when(flags => {
         return Object.keys(flags).length === 0;
       })
-    }), () => {
+    }), (): BuildCheckBadResults => {
       // Can not continue
       return {
         msg: this.buildLog({
@@ -58,7 +53,7 @@ export function buildCliInputsChecks(this: Build): BuildCheckConditions {
       })
     }), () => {
       // Further checks on the flags
-      return this.buildChecks(buildCmd);
+      return (this.buildChecks(buildCmd) as BuildCheckResults);
     })
     .with(({
       // Build arguments and flags present
@@ -69,12 +64,13 @@ export function buildCliInputsChecks(this: Build): BuildCheckConditions {
         return Object.keys(flags).length > 0;
       })
     }), () => {
-      return this.buildChecks(buildCmd);
+      return (this.buildChecks(buildCmd) as BuildCheckResults);
     })
     .run();
   return output;
 }
 
-export function buildCliInputsAsyncChecks(this: Build, output: BuildCheckConditions) {
-  console.log(output.conditions);
+export function buildCliInputsAsyncChecks(this: Build, conditions: any) {
+  console.log(conditions);
+
 }

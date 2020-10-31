@@ -8,7 +8,7 @@ const listify = require('listify');
 import { buildReport } from '../functions/build/build-report';
 import { buildLog } from '../functions/build/build-log';
 import { buildCliInputsChecks, buildCliInputsAsyncChecks } from '../functions/build/build-cli-input-checks';
-import { buildChecks } from '../functions/build/build-checks';
+import { BuildCheckResults, BuildCheckGoodResults, buildChecks } from '../functions/build/build-checks';
 import { buildDependencies } from '../functions/build/build-dependencies';
 
 export default class Build extends Command {
@@ -69,14 +69,14 @@ export default class Build extends Command {
         map(() => {
           return this.buildCliInputsChecks();
         },
-          filter((result: any) => {
-            return result.conditions;
+          filter((result: BuildCheckResults) => {
+            return result.continue;
           })
         ));
 
     buildCliResults$
-      .subscribe(output => {
-        this.buildCliInputsAsyncChecks(output);
+      .subscribe((output) => {
+        this.buildCliInputsAsyncChecks((output as BuildCheckGoodResults).conditions);
         this.log(output.msg.trim());
       });
   }

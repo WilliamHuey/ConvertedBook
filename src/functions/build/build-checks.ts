@@ -1,14 +1,28 @@
 // Third party modules
 import { cond, always } from 'ramda';
+import { XOR } from 'ts-xor'
 const listify = require('listify');
 
 // Library modules
 import Build from '../../commands/build';
 import { action, messagesKeys } from './build-log';
 
+export type BuildCheckBadResults = {
+  msg: string;
+  continue: boolean;
+}
+
+export type BuildCheckGoodResults = {
+  msg: string;
+  continue: boolean;
+  conditions: object;
+}
+
+export type BuildCheckResults = XOR<BuildCheckBadResults, BuildCheckGoodResults>
+
 // Rigorous checks after more simple args and flags check,
 // used by 'buildCliInputsChecks'
-export function buildChecks(this: Build, { argv, flags }: { argv: string[]; flags: object }) {
+export function buildChecks(this: Build, { argv, flags }: { argv: string[]; flags: object }): BuildCheckResults {
   // Get the status of the arguments
   const {
     conditionsHelpers,

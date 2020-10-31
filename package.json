@@ -20,6 +20,7 @@
     "ramda": "^0.27.1",
     "rxjs": "^6.6.3",
     "ts-pattern": "^1.1.0",
+    "ts-xor": "^1.0.8",
     "tslib": "^1.14.0"
   },
   "devDependencies": {
