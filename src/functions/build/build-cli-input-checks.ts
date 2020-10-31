@@ -5,7 +5,13 @@ import { match, when } from 'ts-pattern';
 import Build from '../../commands/build';
 import { action, messagesKeys } from './build-log';
 
-export function buildCliInputsChecks(this: Build) {
+export type BuildCheckConditions = {
+  msg: string;
+  conditions?: object;
+  continue?: boolean;
+}
+
+export function buildCliInputsChecks(this: Build): BuildCheckConditions {
   // Check for cli input validity
   const buildCmd = this.parse(Build);
 
@@ -67,4 +73,8 @@ export function buildCliInputsChecks(this: Build) {
     })
     .run();
   return output;
+}
+
+export function buildCliInputsAsyncChecks(this: Build, output: BuildCheckConditions) {
+  console.log(output.conditions);
 }

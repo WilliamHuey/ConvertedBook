@@ -1,13 +1,13 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { unnest } from 'ramda';
-import { map } from 'rxjs/operators';
+import { map, filter } from 'rxjs/operators';
 const listify = require('listify');
 
 // Library modules
 import { buildReport } from '../functions/build/build-report';
 import { buildLog } from '../functions/build/build-log';
-import { buildCliInputsChecks } from '../functions/build/build-cli-input-checks';
+import { buildCliInputsChecks, buildCliInputsAsyncChecks } from '../functions/build/build-cli-input-checks';
 import { buildChecks } from '../functions/build/build-checks';
 import { buildDependencies } from '../functions/build/build-dependencies';
 
@@ -20,6 +20,8 @@ export default class Build extends Command {
   public buildLog = buildLog.bind(this)
 
   public buildCliInputsChecks = buildCliInputsChecks.bind(this)
+
+  public buildCliInputsAsyncChecks = buildCliInputsAsyncChecks.bind(this)
 
   public buildChecks = buildChecks.bind(this)
 
@@ -63,12 +65,18 @@ export default class Build extends Command {
     // All dependencies found, and can perform further checks
     // on the cli command inputs
     const buildCliResults$ = allDepsSatisfied$
-      .pipe(map(() => {
-        return this.buildCliInputsChecks();
-      }));
+      .pipe(
+        map(() => {
+          return this.buildCliInputsChecks();
+        },
+          filter((result: any) => {
+            return result.conditions;
+          })
+        ));
 
     buildCliResults$
-      .subscribe((output) => {
+      .subscribe(output => {
+        this.buildCliInputsAsyncChecks(output);
         this.log(output.msg.trim());
       });
   }
