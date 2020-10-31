@@ -6,6 +6,7 @@ const listify = require('listify');
 // Library modules
 import Build from '../../commands/build';
 import { action, messagesKeys } from './build-log';
+import { BuildReportResults } from './build-report';
 
 export type BuildCheckBadResults = {
   msg: string;
@@ -15,14 +16,18 @@ export type BuildCheckBadResults = {
 export type BuildCheckGoodResults = {
   msg: string;
   continue: boolean;
-  conditions: object;
+  conditions: CondsFlagsArgv;
 }
 
 export type BuildCheckResults = XOR<BuildCheckBadResults, BuildCheckGoodResults>
 
+export type CommandArgsFlags = { argv: string[]; flags: object }
+
+type CondsFlagsArgv = BuildReportResults & CommandArgsFlags;
+
 // Rigorous checks after more simple args and flags check,
 // used by 'buildCliInputsChecks'
-export function buildChecks(this: Build, { argv, flags }: { argv: string[]; flags: object }): BuildCheckResults {
+export function buildChecks(this: Build, { argv, flags }: CommandArgsFlags): BuildCheckResults {
   // Get the status of the arguments
   const {
     conditionsHelpers,

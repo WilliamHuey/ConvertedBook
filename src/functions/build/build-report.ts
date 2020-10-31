@@ -5,8 +5,9 @@ const listify = require('listify');
 // Library modules
 import Build from '../../commands/build';
 import { buildFlags } from './build-flags';
+import { CommandArgsFlags } from './build-checks';
 
-interface BuildReport {
+export interface BuildReportResults {
   conditionsHelpers: {
     argsCommaList: Array<string>;
     noValidFormats: boolean;
@@ -26,7 +27,7 @@ interface BuildReport {
   };
 }
 
-export function buildReport(this: Build, { argv, flags }: { argv: string[]; flags: object }): BuildReport {
+export function buildReport(this: Build, { argv, flags }: CommandArgsFlags): BuildReportResults {
   // Discern which is an unknown format or flag
   const recognizedFormats = intersection(Build.acceptedOutputFormats, argv);
   const unrecognizedElements = difference(argv, Build.acceptedOutputFormats);
