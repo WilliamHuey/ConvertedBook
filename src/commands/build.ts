@@ -5,11 +5,11 @@ import { map, filter } from 'rxjs/operators';
 const listify = require('listify');
 
 // Library modules
-import { buildReport } from '../functions/build/build-report';
-import { buildLog } from '../functions/build/build-log';
-import { buildCliInputsChecks, buildCliInputsAsyncChecks } from '../functions/build/build-cli-input-checks';
-import { BuildCheckResults, BuildCheckGoodResults, buildChecks } from '../functions/build/build-checks';
-import { buildDependencies } from '../functions/build/build-dependencies';
+import {
+  buildReport, buildLog, buildCliInputsChecks,
+  buildCliInputsAsyncChecks, BuildCheckResults,
+  BuildCheckGoodResults, buildChecks, buildDependencies
+} from '../functions/build/build-import';
 
 export default class Build extends Command {
   // Allow any number of arguments
