@@ -1,6 +1,6 @@
 // Third party modules
 import { cond, always } from 'ramda';
-import { XOR } from 'ts-xor'
+import { XOR } from 'ts-xor';
 const listify = require('listify');
 
 // Library modules

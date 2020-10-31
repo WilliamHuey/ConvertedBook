@@ -4,7 +4,7 @@ import { match, when } from 'ts-pattern';
 // Library modules
 import Build from '../../commands/build';
 import { action, messagesKeys } from './build-log';
-import { BuildCheckResults, BuildCheckBadResults } from './build-checks';
+import { BuildCheckResults, BuildCheckBadResults, BuildCheckGoodResults } from './build-checks';
 
 export function buildCliInputsChecks(this: Build): BuildCheckResults {
   // Check for cli input validity
@@ -70,7 +70,7 @@ export function buildCliInputsChecks(this: Build): BuildCheckResults {
   return output;
 }
 
-export function buildCliInputsAsyncChecks(this: Build, conditions: any) {
-  console.log(conditions);
-
+export function buildCliInputsAsyncChecks(this: Build, _output: BuildCheckGoodResults) {
+  // console.log(output);
+  // const { argv, flags } = output.conditions;
 }

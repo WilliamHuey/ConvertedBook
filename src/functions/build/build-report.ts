@@ -6,7 +6,27 @@ const listify = require('listify');
 import Build from '../../commands/build';
 import { buildFlags } from './build-flags';
 
-export function buildReport(this: Build, { argv, flags }: { argv: string[]; flags: object }) {
+interface BuildReport {
+  conditionsHelpers: {
+    argsCommaList: Array<string>;
+    noValidFormats: boolean;
+    emptyArgs: boolean;
+    unknownFormats: Array<string>;
+    hasUnknownFormats: boolean;
+    buildFlagsStatus: Record<string, any>;
+  };
+  conditions: {
+    exactMatchBuildOrder: boolean;
+    additionalArgsOverBuildOrder: boolean;
+    onlyOneBuildFormat: boolean;
+    multipleArgsNotDependentBuildOrder: boolean;
+    emptyArgsValidFlags: boolean;
+    allRequiredFlagsRecognized: boolean;
+    someFlagsRequiredRecognized: boolean;
+  };
+}
+
+export function buildReport(this: Build, { argv, flags }: { argv: string[]; flags: object }): BuildReport {
   // Discern which is an unknown format or flag
   const recognizedFormats = intersection(Build.acceptedOutputFormats, argv);
   const unrecognizedElements = difference(argv, Build.acceptedOutputFormats);

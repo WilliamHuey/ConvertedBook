@@ -56,7 +56,7 @@ export default class Build extends Command {
       allDepsSatisfied$
     } = this.buildDependencies();
 
-    // Can not continue further, and display the error message
+    // Can not continue further, and display the dependencies error message
     showDepsUnsatisfied$
       .subscribe(res => {
         this.log(`Build failed: These dependencies were not found in your path: ${res.join('')}`);
@@ -66,17 +66,37 @@ export default class Build extends Command {
     // on the cli command inputs
     const buildCliResults$ = allDepsSatisfied$
       .pipe(
-        map(() => {
-          return this.buildCliInputsChecks();
-        },
-          filter((result: BuildCheckResults) => {
-            return result.continue;
+        map(
+          () => {
+            return this.buildCliInputsChecks();
           })
-        ));
+      );
 
-    buildCliResults$
-      .subscribe((output) => {
-        this.buildCliInputsAsyncChecks((output as BuildCheckGoodResults).conditions);
+    // End the checks early as critical problems are found
+    // or required flags not satisfied
+    const errorMessage$ = buildCliResults$
+      .pipe(
+        filter((result: BuildCheckResults) => {
+          return !result.continue;
+        })
+      );
+
+    errorMessage$
+      .subscribe(output => {
+        this.log(output.msg.trim());
+      });
+
+    // Continue with the async checks as required flags are found
+    const buildCliAsyncCheck$ = buildCliResults$
+      .pipe(
+        filter((result: BuildCheckResults) => {
+          return result.continue;
+        })
+      );
+
+    buildCliAsyncCheck$
+      .subscribe(output => {
+        this.buildCliInputsAsyncChecks((output as BuildCheckGoodResults));
         this.log(output.msg.trim());
       });
   }
