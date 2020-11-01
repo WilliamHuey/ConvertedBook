@@ -5,7 +5,7 @@ describe('build', () => {
   const flags = ['--input="/a/directory/with-file.latex"', '--output="/a/directory/output-file"'];
 
   // Observables resolution is slow and the
-  // tests need retries to prevent correct
+  // tests need retries to prevent incorrect
   // readings
   const retryTest = function () {
     return test
@@ -26,7 +26,7 @@ describe('build', () => {
     .stdout()
     .command(unnest([['build', 'pdf'], flags]))
     .it('runs build', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Start building: html and pdf');
+      expect(ctx.stdout.trim()).to.contain('Start building: pdf');
     });
 
   retryTest()

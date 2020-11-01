@@ -1,5 +1,6 @@
 // Third party modules
 import { match, when } from 'ts-pattern';
+// const IsThere = require('is-there');
 
 // Library modules
 import Build from '../../commands/build';
@@ -9,7 +10,6 @@ import { BuildCheckResults, BuildCheckBadResults, BuildCheckGoodResults } from '
 export function buildCliInputsChecks(this: Build): BuildCheckResults {
   // Check for cli input validity
   const buildCmd = this.parse(Build);
-
   const output = match(buildCmd)
     .with(({
       // No build arguments and no flags
@@ -70,7 +70,10 @@ export function buildCliInputsChecks(this: Build): BuildCheckResults {
   return output;
 }
 
-export function buildCliInputsAsyncChecks(this: Build, _output: BuildCheckGoodResults) {
+export function buildCliInputsAsyncChecks(this: Build, _buildCli: BuildCheckGoodResults) {
   // console.log(output);
-  // const { argv, flags } = output.conditions;
+  // const { argv, flags } = buildCli.conditions;
+  // const { input, output } = flags;
+
+  // IsThere
 }

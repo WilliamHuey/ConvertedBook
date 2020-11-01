@@ -21,13 +21,16 @@ export type BuildCheckGoodResults = {
 
 export type BuildCheckResults = XOR<BuildCheckBadResults, BuildCheckGoodResults>
 
-export type CommandArgsFlags = { argv: string[]; flags: object }
+type CommandFlagKeys = { input: string; output: string }
+
+export type CommandArgsFlags = { argv: string[]; flags: CommandFlagKeys }
 
 type CondsFlagsArgv = BuildReportResults & CommandArgsFlags;
 
 // Rigorous checks after more simple args and flags check,
 // used by 'buildCliInputsChecks'
-export function buildChecks(this: Build, { argv, flags }: CommandArgsFlags): BuildCheckResults {
+export function buildChecks(this: Build, buildCmd: Record<string, any>): BuildCheckResults {
+  const { argv, flags }: Partial<Record<string, any>> = buildCmd;
   // Get the status of the arguments
   const {
     conditionsHelpers,
