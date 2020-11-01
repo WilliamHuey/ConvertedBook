@@ -1,6 +1,8 @@
 // Third party modules
 import { match, when } from 'ts-pattern';
-// const IsThere = require('is-there');
+import { from } from 'rxjs';
+import { init } from 'ramda';
+const IsThere = require('is-there');
 
 // Library modules
 import Build from '../../commands/build';
@@ -70,10 +72,57 @@ export function buildCliInputsChecks(this: Build): BuildCheckResults {
   return output;
 }
 
-export function buildCliInputsAsyncChecks(this: Build, _buildCli: BuildCheckGoodResults) {
+export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults) {
   // console.log(output);
-  // const { argv, flags } = buildCli.conditions;
-  // const { input, output } = flags;
+  const { argv, flags } = buildCli.conditions;
+  const { input, output } = flags;
 
-  // IsThere
+  const checkInputFile$ = from(IsThere.promises.file(input));
+  const supposeOutputFolderName = init(output.split('/')),
+    outputFolder = supposeOutputFolderName.join('/');
+
+  // File does not exists, means that is the new file
+  // for the directory that is to be created
+  const checkOutputFile$ = from(IsThere.promises.file(output));
+
+  // Assumed that output given is an actual valid folder path
+  const checkOutputFolder$ = from(IsThere.promises.directory(output));
+
+  // Another check for the actual output folder, by removing the
+  // last portion of the path item from the initial output
+  const truncatedOutputFolder$ = from(IsThere.promises.directory(outputFolder));
+
+
+  //   const f = (a: number, b: {a: string}) => b // here types are set
+  // makeFunction(f)({a: 'some value'}) // makeFunction is able to infer the types by f
+
+
+
+
+
+  checkOutputFile$
+    .subscribe((checkOutputFile) => {
+      console.log("buildCliInputsAsyncChecks -> checkOutputFile", checkOutputFile)
+
+
+    });
+
+  checkOutputFolder$
+    .subscribe((checkOutputFolder) => {
+      console.log("buildCliInputsAsyncChecks -> checkOutputFolder", checkOutputFolder)
+
+    });
+
+
+  truncatedOutputFolder$
+    .subscribe((truncatedOutputFolder) => {
+      console.log("buildCliInputsAsyncChecks -> truncatedOutputFolder", truncatedOutputFolder)
+
+    });
+
+  checkInputFile$
+    .subscribe((stuff) => {
+      console.log(stuff)
+
+    });
 }
