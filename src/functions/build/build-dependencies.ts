@@ -13,7 +13,8 @@ export function buildDependencies(this: Build) {
   const depCheckGroup$ = Build
     .requiredExternalDeps
     .map(extDep => {
-      return from(lookpath(extDep));
+      const stuff = lookpath(extDep);
+      return from(stuff);
     });
 
   // Run checks for all external dependencies at once

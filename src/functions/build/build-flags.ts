@@ -4,7 +4,7 @@ import { intersection } from 'ramda';
 // Library modules
 import Build from '../../commands/build';
 
-export function buildFlags(this: Build, flags: any) {
+export function buildFlags(this: Build, flags: Record<string, any>) {
   const acceptedRequiredFlagKeys = Build.requiredFlags,
     argsFlagKeys = Object.keys(flags),
     recognizedFlags = intersection(acceptedRequiredFlagKeys, argsFlagKeys),

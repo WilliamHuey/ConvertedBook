@@ -20,7 +20,7 @@ export enum messagesKeys {
   someRequiredFlagsFound = 'someRequiredFlagsFound' as any,
 }
 
-const messages: { [index: string]: any } = {
+const messages: { [index: string]: string } = {
   noValidFormats: 'Did not build as there are no valid formats: ',
   ignoreUnknownFormats: 'Ignoring unknown formats: ',
   noArgsOrFlags: 'Build failed: No arguments and no flags available.',
@@ -32,7 +32,7 @@ const messages: { [index: string]: any } = {
 };
 
 type BuildFormat = { action: action.start; buildFormats: string[] }
-type BuildBeforeStart = { action: action.beforeStart; log: messagesKeys; data?: any }
+type BuildBeforeStart = { action: action.beforeStart; log: messagesKeys; data?: Record<string, any> }
 type BuildOptions = BuildFormat | BuildBeforeStart
 
 export function buildLog(this: Build, buildOptions: BuildOptions) {
