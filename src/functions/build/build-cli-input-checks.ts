@@ -1,6 +1,6 @@
 // Third party modules
 import { match, when } from 'ts-pattern';
-import { from } from 'rxjs';
+import { from, forkJoin } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { init } from 'ramda';
 const IsThere = require('is-there');
@@ -78,44 +78,128 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
   const { flags } = buildCli.conditions;
   const { input, output } = flags;
 
-  const checkInputFile$ = from(IsThere.promises.file(input) as Promise<boolean>);
   const supposeOutputFolderName = init(output.split('/')),
     outputFolder = supposeOutputFolderName.join('/');
 
+  const checkInputFile$ = from(IsThere.promises.file(input) as Promise<boolean>);
+
+  const inputFileExists$ = checkInputFile$
+    .pipe(
+      filter(inputFile => {
+        return inputFile;
+      })
+    );
+
+  const inputFileNonExistent$ = checkInputFile$
+    .pipe(
+      filter(inputFile => {
+        return !inputFile;
+      })
+    );
+
+  const checkOutputFile$ = from(IsThere.promises.file(output) as Promise<boolean>);
+
+  // Ouput file name points to existing file
+  const outputFileExist$ = checkOutputFile$
+    .pipe(
+      filter(outputFile => {
+        return outputFile;
+      })
+    );
+
   // File does not exists, means that is the new file
   // for the directory that is to be created
-  const checkOutputFile$ = from(IsThere.promises.file(output) as Promise<boolean>);
+  const outputFileNonExistent$ = checkOutputFile$
+    .pipe(
+      filter(outputFile => {
+        return !outputFile;
+      })
+    );
+
+  // File will be written regardless if its current
+  // directory exists
 
   // Assumed that output given is an actual valid folder path
   const checkOutputFolder$ = from(IsThere.promises.directory(output) as Promise<boolean>);
+
+  const outputFolderExists$ = checkOutputFolder$
+    .pipe(
+      filter(outputFolder => {
+        return outputFolder;
+      })
+    );
 
   // Another check for the actual output folder, by removing the
   // last portion of the path item from the initial output
   const truncatedOutputFolder$ = from(IsThere.promises.directory(outputFolder) as Promise<boolean>);
 
-  checkOutputFile$
+  const truncatedOutputFolderExists$ = truncatedOutputFolder$
     .pipe(
-      filter(result => {
-        return result;
+      filter(truncatedOutputFolder => {
+        return truncatedOutputFolder;
       })
-    )
-    .subscribe(checkOutputFile => {
-      console.log("buildCliInputsAsyncChecks -> checkOutputFile", checkOutputFile)
+    );
+
+  const truncatedOutputFolderNonexistent$ = truncatedOutputFolder$
+    .pipe(
+      filter(truncatedOutputFolder => {
+        return !truncatedOutputFolder;
+      })
+    );
+
+  // Truncated folder invalid is a direct invalidation
+  // since the file generated can not find a suitable folder
+  // to reside in
+  const nonExistingOutputFileAndTruncatedFolder$ = forkJoin([
+    outputFileNonExistent$,
+    truncatedOutputFolderNonexistent$
+  ]);
+
+  nonExistingOutputFileAndTruncatedFolder$
+    .subscribe(() => {
+      return {
+        validOutput: false,
+        continue: false
+      };
+
     });
 
-  checkOutputFolder$
-    .subscribe(checkOutputFolder => {
-      console.log("buildCliInputsAsyncChecks -> checkOutputFolder", checkOutputFolder)
+  // Truncated folder exists means, that the output file
+  // provides points to a new file intended to be made
+  const nonExistingOutputFileAndExistingTruncatedFolder$ = forkJoin([
+    outputFileNonExistent$,
+    truncatedOutputFolderExists$
+  ]);
+
+  nonExistingOutputFileAndExistingTruncatedFolder$
+    .subscribe(() => {
+      return {
+        validOutput: true,
+        continue: true
+      };
+
     });
 
-  truncatedOutputFolder$
-    .subscribe(truncatedOutputFolder => {
-      console.log("buildCliInputsAsyncChecks -> truncatedOutputFolder", truncatedOutputFolder)
+  // Existing folder means the file creation can continue
+  outputFolderExists$
+    .subscribe(() => {
+      return {
+        validOutput: true,
+        continue: true
+      };
 
     });
 
-  checkInputFile$
-    .subscribe(stuff => {
-      console.log(stuff)
+  // Existing file means the file creation can continue
+  outputFileExist$
+    .subscribe(() => {
+      return {
+        validOutput: true,
+        continue: true
+      };
+
     });
+
+
+
 }
