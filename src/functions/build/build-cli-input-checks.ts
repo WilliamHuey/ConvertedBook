@@ -1,7 +1,7 @@
 // Third party modules
 import { match, when } from 'ts-pattern';
-import { from, forkJoin } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { from, forkJoin, combineLatest } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import { init } from 'ramda';
 const IsThere = require('is-there');
 
@@ -74,7 +74,6 @@ export function buildCliInputsChecks(this: Build): BuildCheckResults {
 }
 
 export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults) {
-  // console.log(output);
   const { flags } = buildCli.conditions;
   const { input, output } = flags;
 
@@ -153,16 +152,16 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
   const nonExistingOutputFileAndTruncatedFolder$ = forkJoin([
     outputFileNonExistent$,
     truncatedOutputFolderNonexistent$
-  ]);
-
-  nonExistingOutputFileAndTruncatedFolder$
-    .subscribe(() => {
-      return {
-        validOutput: false,
-        continue: false
-      };
-
-    });
+  ])
+    .pipe(map(
+      () => {
+        return {
+          log: messagesKeys.nonExistingOutputFileAndTruncatedFolder,
+          validOutput: false,
+          continue: false
+        };
+      }
+    ));
 
   // Truncated folder exists means, that the output file
   // provides points to a new file intended to be made
@@ -171,35 +170,32 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     truncatedOutputFolderExists$
   ]);
 
-  nonExistingOutputFileAndExistingTruncatedFolder$
-    .subscribe(() => {
-      return {
-        validOutput: true,
-        continue: true
-      };
+  // All valid output scenarios
+  const validOutput$ = combineLatest([
+    nonExistingOutputFileAndExistingTruncatedFolder$,
+    // Existing folder means the file creation can continue
+    outputFolderExists$,
+    // Existing file means the file creation can continue
+    outputFileExist$
+  ])
+    .pipe(map(
+      () => {
+        return {
+          log: messagesKeys.createOutputFile,
+          validOutput: true,
+          continue: true
+        };
+      }
+    ));
 
-    });
-
-  // Existing folder means the file creation can continue
-  outputFolderExists$
-    .subscribe(() => {
-      return {
-        validOutput: true,
-        continue: true
-      };
-
-    });
-
-  // Existing file means the file creation can continue
-  outputFileExist$
-    .subscribe(() => {
-      return {
-        validOutput: true,
-        continue: true
-      };
-
-    });
+  const outputResult$ = combineLatest([
+    nonExistingOutputFileAndTruncatedFolder$,
+    validOutput$
+  ]);
 
 
+  return {
+    outputResult$
+  };
 
 }

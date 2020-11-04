@@ -18,6 +18,8 @@ export enum messagesKeys {
   argsButNoFlags = 'argsButNoFlags' as any,
   noRequiredFlagsFound = 'noRequiredFlagsFound' as any,
   someRequiredFlagsFound = 'someRequiredFlagsFound' as any,
+  nonExistingOutputFileAndTruncatedFolder = 'nonExistingOutputFileAndTruncatedFolder' as any,
+  createOutputFile = 'createOutputFile' as any
 }
 
 const messages: { [index: string]: string } = {
@@ -28,7 +30,9 @@ const messages: { [index: string]: string } = {
   argsButNoFlags: 'Build failed: Arguments provided but no flags present.',
   noRequiredFlagsFound: 'Build failed: No required flags found (--input, --output)',
   someRequiredFlagsFound: 'Build failed: Missing a required "--input" or "--output"',
-  buildingStartPrefix: 'Start building: '
+  buildingStartPrefix: 'Start building: ',
+  nonExistingOutputFileAndTruncatedFolder: 'Output path is invalid path for output file',
+  createOutputFile: 'Creating output file'
 };
 
 type BuildFormat = { action: action.start; buildFormats: string[] }
