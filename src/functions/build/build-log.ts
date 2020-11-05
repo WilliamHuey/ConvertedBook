@@ -19,7 +19,10 @@ export enum messagesKeys {
   noRequiredFlagsFound = 'noRequiredFlagsFound' as any,
   someRequiredFlagsFound = 'someRequiredFlagsFound' as any,
   nonExistingOutputFileAndTruncatedFolder = 'nonExistingOutputFileAndTruncatedFolder' as any,
-  createOutputFile = 'createOutputFile' as any
+  createOutputFile = 'createOutputFile' as any,
+  invalidInputFile = 'invalidInputFile' as any,
+  invalidOutputFolderOrFile = 'invalidOutputFolderOrFile' as any,
+  invalidInputAndOutput = 'invalidInputAndOutput' as any,
 }
 
 const messages: { [index: string]: string } = {
@@ -32,7 +35,10 @@ const messages: { [index: string]: string } = {
   someRequiredFlagsFound: 'Build failed: Missing a required "--input" or "--output"',
   buildingStartPrefix: 'Start building: ',
   nonExistingOutputFileAndTruncatedFolder: 'Output path is invalid path for output file',
-  createOutputFile: 'Creating output file'
+  createOutputFile: 'Creating output file',
+  invalidInputFile: 'Invalid input file',
+  invalidOutputFolderOrFile: 'Invalid output folder/file',
+  invalidInputAndOutput: 'Invalid input file and invalid output folder/file'
 };
 
 type BuildFormat = { action: action.start; buildFormats: string[] }

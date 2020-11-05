@@ -1,7 +1,7 @@
 // Third party modules
 import { match, when } from 'ts-pattern';
-import { from, forkJoin, combineLatest } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { from, forkJoin, merge } from 'rxjs';
+import { filter, map, takeLast } from 'rxjs/operators';
 import { init } from 'ramda';
 const IsThere = require('is-there');
 
@@ -163,6 +163,9 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
       }
     ));
 
+  // 'nonExistingOutputFileAndTruncatedFolder' is the only invalid output
+  const invalidOutput$ = nonExistingOutputFileAndTruncatedFolder$;
+
   // Truncated folder exists means, that the output file
   // provides points to a new file intended to be made
   const nonExistingOutputFileAndExistingTruncatedFolder$ = forkJoin([
@@ -171,12 +174,17 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
   ]);
 
   // All valid output scenarios
-  const validOutput$ = combineLatest([
+  const validOutput$ = merge([
     nonExistingOutputFileAndExistingTruncatedFolder$,
     // Existing folder means the file creation can continue
     outputFolderExists$,
     // Existing file means the file creation can continue
     outputFileExist$
+  ]);
+
+  const validInputOutput$ = forkJoin([
+    inputFileExists$,
+    validOutput$
   ])
     .pipe(map(
       () => {
@@ -188,14 +196,59 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
       }
     ));
 
-  const outputResult$ = combineLatest([
-    nonExistingOutputFileAndTruncatedFolder$,
+  const invalidInputValidOutput$ = forkJoin([
+    inputFileNonExistent$,
     validOutput$
-  ]);
+  ])
+    .pipe(map(
+      () => {
+        return {
+          log: messagesKeys.invalidInputFile,
+          validInput: false,
+          validOutput: true,
+          continue: false
+        };
+      }
+    ));
 
+  const validInputInvalidOutput$ = forkJoin([
+    inputFileExists$,
+    invalidOutput$
+  ])
+    .pipe(map(
+      () => {
+        return {
+          log: messagesKeys.invalidOutputFolderOrFile,
+          validInput: true,
+          validOutput: false,
+          continue: false
+        };
+      }
+    ));
 
-  return {
-    outputResult$
-  };
+  const invalidInputInvalidOutput$ = forkJoin([
+    inputFileNonExistent$,
+    invalidOutput$
+  ])
+    .pipe(map(
+      () => {
+        return {
+          log: messagesKeys.invalidInputAndOutput,
+          validInput: false,
+          validOutput: false,
+          continue: false
+        };
+      }
+    ));
 
+  merge(
+    invalidInputInvalidOutput$,
+    validInputInvalidOutput$,
+    invalidInputValidOutput$,
+    validInputOutput$
+  )
+    .pipe(takeLast(1))
+    .subscribe(_result => {
+      // console.log(result);
+    });
 }

@@ -1,7 +1,7 @@
 // Third party modules
 import { all } from 'ramda';
 import { isString, isUndefined } from 'is-what';
-import { from, forkJoin } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { filter, map, first } from 'rxjs/operators';
 const { lookpath } = require('lookpath');
 
