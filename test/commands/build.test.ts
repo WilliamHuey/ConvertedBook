@@ -24,12 +24,31 @@ describe('build', () => {
   retryTest()
     .stdout()
     .command(unnest([['build'], [validInputFlag, invalidOutputFlag]]))
-    .it('runs build with valid input and invalid output flag', ctx => {
+    .it('with valid input and invalid output flag', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: Invalid output folder/file.');
     });
 
-  // Unsure why a /n character was introduce, but
-  // need to remove it to perform a proper comparison from ctx.stdout
+  retryTest()
+    .stdout()
+    .command(unnest([['build'], [invalidInputFlag, validOutputFlag]]))
+    .it('with invalid input and valid output flag', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Build failed: Invalid input file.');
+    });
+
+  retryTest()
+    .stdout()
+    .command(unnest([['build'], [invalidInputFlag, invalidOutputFlag]]))
+    .it('with invalid input and valid output flag', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Build failed: Invalid input file and invalid output folder/file.');
+    });
+
+  retryTest()
+    .stdout()
+    .command(unnest([['build', 'html', 'pdf'], flags]))
+    .it('with valid input and output', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Creating output file.');
+    });
+
   retryTest()
     .stdout()
     .command(unnest([['build', 'html', 'pdf'], flags]))

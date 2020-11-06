@@ -135,6 +135,5 @@ export default class Build extends Command {
       .subscribe(([_, buildAsyncResults]) => {
         this.log(buildAsyncResults.msg.trim());
       });
-
   }
 }

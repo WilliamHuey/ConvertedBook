@@ -152,19 +152,7 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
   const nonExistingOutputFileAndTruncatedFolder$ = forkJoin([
     outputFileNonExistent$,
     truncatedOutputFolderNonexistent$
-  ])
-    .pipe(map(
-      () => {
-        return {
-          msg: buildLog({
-            action: action.check,
-            log: messagesKeys.nonExistingOutputFileAndTruncatedFolder
-          }),
-          validOutput: false,
-          continue: false
-        };
-      }
-    ));
+  ]);
 
   // 'nonExistingOutputFileAndTruncatedFolder' is the only invalid output
   const invalidOutput$ = nonExistingOutputFileAndTruncatedFolder$;
