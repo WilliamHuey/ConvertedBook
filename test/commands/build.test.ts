@@ -1,8 +1,11 @@
 import { expect, test } from '@oclif/test';
 import { unnest } from 'ramda';
 
+const path = require('path');
+
 describe('build', () => {
-  const flags = ['--input="/a/directory/with-file.latex"', '--output="/a/directory/output-file"'];
+  const testDataDirectory = path.join(__dirname, '../', 'data/');
+  const flags = [`--input=${testDataDirectory}input.latex`, `--output=${testDataDirectory}`];
 
   // Observables resolution is slow and the
   // tests need retries to prevent incorrect
@@ -14,7 +17,6 @@ describe('build', () => {
 
   // Unsure why a /n character was introduce, but
   // need to remove it to perform a proper comparison from ctx.stdout
-
   retryTest()
     .stdout()
     .command(unnest([['build', 'html', 'pdf'], flags]))

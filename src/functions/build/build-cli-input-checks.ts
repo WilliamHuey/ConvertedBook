@@ -190,6 +190,7 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
       () => {
         return {
           log: messagesKeys.createOutputFile,
+          validInput: true,
           validOutput: true,
           continue: true
         };
@@ -241,14 +242,10 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
       }
     ));
 
-  merge(
+  return merge(
     invalidInputInvalidOutput$,
     validInputInvalidOutput$,
     invalidInputValidOutput$,
     validInputOutput$
-  )
-    .pipe(takeLast(1))
-    .subscribe(_result => {
-      // console.log(result);
-    });
+  ).pipe(takeLast(1));
 }

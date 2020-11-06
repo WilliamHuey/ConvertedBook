@@ -1,7 +1,8 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { unnest } from 'ramda';
-import { map, filter } from 'rxjs/operators';
+import { zip } from 'rxjs';
+import { map, filter, mergeMap } from 'rxjs/operators';
 const listify = require('listify');
 
 // Library modules
@@ -82,8 +83,8 @@ export default class Build extends Command {
       );
 
     errorMessage$
-      .subscribe(output => {
-        this.log(output.msg.trim());
+      .subscribe(buildCli => {
+        this.log(buildCli.msg.trim());
       });
 
     // Continue with the async checks as required flags are found
@@ -94,10 +95,29 @@ export default class Build extends Command {
         })
       );
 
-    buildCliAsyncCheck$
-      .subscribe(output => {
-        this.buildCliInputsAsyncChecks((output as BuildCheckGoodResults));
-        this.log(output.msg.trim());
+    const buildCliAsyncResults$ = buildCliAsyncCheck$
+      .pipe(
+        mergeMap(buildCli => {
+          const buildAsyncResults = this
+            .buildCliInputsAsyncChecks((buildCli as BuildCheckGoodResults));
+          return buildAsyncResults;
+        })
+      );
+
+    // Valid input and output means file conversion can happen
+    const buildCliContinueGeneration$ = zip(
+      buildCliAsyncCheck$,
+      buildCliAsyncResults$
+        .pipe(
+          filter(buildAsyncResults => {
+            return buildAsyncResults.continue;
+          })
+        )
+    );
+
+    buildCliContinueGeneration$
+      .subscribe(([buildCli, buildAsyncResults]) => {
+        this.log(buildCli.msg.trim());
       });
   }
 }
