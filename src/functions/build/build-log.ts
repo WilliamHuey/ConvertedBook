@@ -6,8 +6,8 @@ import { match, when } from 'ts-pattern';
 import { isString } from 'is-what';
 
 export enum action {
-  beforeStart,
-  start
+  check,
+  ready
 }
 
 export enum messagesKeys {
@@ -41,23 +41,23 @@ const messages: { [index: string]: string } = {
   invalidInputAndOutput: 'Invalid input file and invalid output folder/file'
 };
 
-type BuildFormat = { action: action.start; buildFormats: string[] }
-type BuildBeforeStart = { action: action.beforeStart; log: messagesKeys; data?: Record<string, any> }
-type BuildOptions = BuildFormat | BuildBeforeStart
+type BuildFormat = { action: action.ready; buildFormats: string[] }
+type Check = { action: action.check; log: messagesKeys; data?: Record<string, any> }
+type BuildOptions = BuildFormat | Check
 
 export function buildLog(this: Build, buildOptions: BuildOptions) {
   return match(buildOptions)
     .with({
-      action: action.beforeStart,
+      action: action.check,
       log: when(log => {
         return isString(log);
       })
     }, () => {
-      const { log, data } = buildOptions as BuildBeforeStart;
+      const { log, data } = buildOptions as Check;
       return `${messages[log]}${data || ''}`;
     })
     .with({
-      action: action.start,
+      action: action.ready,
       buildFormats: when(buildFormats => {
         return isString(buildFormats);
       })

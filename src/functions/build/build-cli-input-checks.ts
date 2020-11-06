@@ -24,7 +24,7 @@ export function buildCliInputsChecks(this: Build): BuildCheckResults {
       // Can not continue
       return {
         msg: this.buildLog({
-          action: action.beforeStart,
+          action: action.check,
           log: messagesKeys.noArgsOrFlags
         }),
         continue: false
@@ -42,7 +42,7 @@ export function buildCliInputsChecks(this: Build): BuildCheckResults {
       // Can not continue
       return {
         msg: this.buildLog({
-          action: action.beforeStart,
+          action: action.check,
           log: messagesKeys.argsButNoFlags
         }),
         continue: false

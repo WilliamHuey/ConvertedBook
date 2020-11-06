@@ -58,7 +58,7 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>): BuildCh
   if (someFlagsRequiredRecognized) {
     return {
       msg: this.buildLog({
-        action: action.beforeStart,
+        action: action.check,
         log: messagesKeys.someRequiredFlagsFound
       }),
       continue: false
@@ -69,7 +69,7 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>): BuildCh
   if (!allRequiredFlagsRecognized) {
     return {
       msg: this.buildLog({
-        action: action.beforeStart,
+        action: action.check,
         log: messagesKeys.noRequiredFlagsFound
       }),
       continue: false
@@ -80,7 +80,7 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>): BuildCh
   if (!emptyArgsValidFlags && noValidFormats) {
     return {
       msg: this.buildLog({
-        action: action.beforeStart,
+        action: action.check,
         log: messagesKeys.noValidFormats,
         data: unknownFormats
       }),
@@ -91,7 +91,7 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>): BuildCh
   // Unknown format warning
   if (hasUnknownFormats) {
     console.log(this.buildLog({
-      action: action.beforeStart,
+      action: action.check,
       log: messagesKeys.ignoreUnknownFormats,
       data: unknownFormats
     }));
@@ -110,7 +110,7 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>): BuildCh
     return [always(argsCond), () => {
       return {
         msg: this.buildLog({
-          action: action.start,
+          action: action.ready,
           buildFormats: argsCommaList
         }),
         conditions: conditionsFlagsArgv,
@@ -129,7 +129,7 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>): BuildCh
         () => {
           return {
             msg: this.buildLog({
-              action: action.start,
+              action: action.ready,
               buildFormats: listify(Build.acceptedOutputFormats)
             }),
             conditions: conditionsFlagsArgv,
