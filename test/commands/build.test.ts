@@ -1,11 +1,17 @@
+// Native modules
+const path = require('path');
+
+// Third party modules
 import { expect, test } from '@oclif/test';
 import { unnest } from 'ramda';
 
-const path = require('path');
-
 describe('build', () => {
   const testDataDirectory = path.join(__dirname, '../', 'data/');
-  const flags = [`--input=${testDataDirectory}input.latex`, `--output=${testDataDirectory}`];
+  const invalidInputFlag = `--input=${testDataDirectory}zz`;
+  const invalidOutputFlag = `--output=${testDataDirectory}jkl/hlkj/`;
+  const validInputFlag = `--input=${testDataDirectory}input.latex`;
+  const validOutputFlag = `--output=${testDataDirectory}`;
+  const flags = [validInputFlag, validOutputFlag];
 
   // Observables resolution is slow and the
   // tests need retries to prevent incorrect
@@ -14,6 +20,13 @@ describe('build', () => {
     return test
       .retries(10);
   };
+
+  retryTest()
+    .stdout()
+    .command(unnest([['build'], [validInputFlag, invalidOutputFlag]]))
+    .it('runs build with valid input and invalid output flag', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Build failed: Invalid output folder/file.');
+    });
 
   // Unsure why a /n character was introduce, but
   // need to remove it to perform a proper comparison from ctx.stdout

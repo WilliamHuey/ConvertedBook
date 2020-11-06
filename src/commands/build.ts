@@ -118,6 +118,23 @@ export default class Build extends Command {
     buildCliContinueGeneration$
       .subscribe(([buildCli, buildAsyncResults]) => {
         this.log(buildCli.msg.trim());
+        this.log(buildAsyncResults.msg.trim());
       });
+
+    const buildCliFlagProblems$ = zip(
+      buildCliAsyncCheck$,
+      buildCliAsyncResults$
+        .pipe(
+          filter(buildAsyncResults => {
+            return !buildAsyncResults.continue;
+          })
+        )
+    );
+
+    buildCliFlagProblems$
+      .subscribe(([_, buildAsyncResults]) => {
+        this.log(buildAsyncResults.msg.trim());
+      });
+
   }
 }

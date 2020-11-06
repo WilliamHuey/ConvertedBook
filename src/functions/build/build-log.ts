@@ -34,17 +34,18 @@ const messages: { [index: string]: string } = {
   noRequiredFlagsFound: 'Build failed: No required flags found (--input, --output)',
   someRequiredFlagsFound: 'Build failed: Missing a required "--input" or "--output"',
   buildingStartPrefix: 'Start building: ',
-  nonExistingOutputFileAndTruncatedFolder: 'Output path is invalid path for output file',
-  createOutputFile: 'Creating output file',
-  invalidInputFile: 'Invalid input file',
-  invalidOutputFolderOrFile: 'Invalid output folder/file',
-  invalidInputAndOutput: 'Invalid input file and invalid output folder/file'
+  nonExistingOutputFileAndTruncatedFolder: 'Output path is invalid path for output file.',
+  createOutputFile: 'Creating output file.',
+  invalidInputFile: 'Build failed: Invalid input file.',
+  invalidOutputFolderOrFile: 'Build failed: Invalid output folder/file.',
+  invalidInputAndOutput: 'Build failed: Invalid input file and invalid output folder/file.'
 };
 
 type BuildFormat = { action: action.ready; buildFormats: string[] }
 type Check = { action: action.check; log: messagesKeys; data?: Record<string, any> }
 type BuildOptions = BuildFormat | Check
 
+export function buildLog(buildOptions: BuildOptions): string
 export function buildLog(this: Build, buildOptions: BuildOptions) {
   return match(buildOptions)
     .with({

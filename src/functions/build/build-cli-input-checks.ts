@@ -7,7 +7,7 @@ const IsThere = require('is-there');
 
 // Library modules
 import Build from '../../commands/build';
-import { action, messagesKeys } from './build-log';
+import { buildLog, action, messagesKeys } from './build-log';
 import { BuildCheckResults, BuildCheckBadResults, BuildCheckGoodResults } from './build-checks';
 
 export function buildCliInputsChecks(this: Build): BuildCheckResults {
@@ -156,7 +156,10 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     .pipe(map(
       () => {
         return {
-          log: messagesKeys.nonExistingOutputFileAndTruncatedFolder,
+          msg: buildLog({
+            action: action.check,
+            log: messagesKeys.nonExistingOutputFileAndTruncatedFolder
+          }),
           validOutput: false,
           continue: false
         };
@@ -189,7 +192,10 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     .pipe(map(
       () => {
         return {
-          log: messagesKeys.createOutputFile,
+          msg: buildLog({
+            action: action.check,
+            log: messagesKeys.createOutputFile
+          }),
           validInput: true,
           validOutput: true,
           continue: true
@@ -204,7 +210,10 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     .pipe(map(
       () => {
         return {
-          log: messagesKeys.invalidInputFile,
+          msg: buildLog({
+            action: action.check,
+            log: messagesKeys.invalidInputFile
+          }),
           validInput: false,
           validOutput: true,
           continue: false
@@ -219,7 +228,10 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     .pipe(map(
       () => {
         return {
-          log: messagesKeys.invalidOutputFolderOrFile,
+          msg: buildLog({
+            action: action.check,
+            log: messagesKeys.invalidOutputFolderOrFile
+          }),
           validInput: true,
           validOutput: false,
           continue: false
@@ -234,7 +246,10 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     .pipe(map(
       () => {
         return {
-          log: messagesKeys.invalidInputAndOutput,
+          msg: buildLog({
+            action: action.check,
+            log: messagesKeys.invalidInputAndOutput
+          }),
           validInput: false,
           validOutput: false,
           continue: false
