@@ -9,7 +9,8 @@ const listify = require('listify');
 import {
   buildReport, buildLog, buildCliInputsChecks,
   buildCliInputsAsyncChecks, BuildCheckResults,
-  BuildCheckGoodResults, buildChecks, buildDependencies
+  BuildCheckGoodResults, buildChecks, buildDependencies,
+  buildGenerate
 } from '../functions/build/build-import';
 
 export default class Build extends Command {
@@ -27,6 +28,8 @@ export default class Build extends Command {
   public buildChecks = buildChecks.bind(this)
 
   public buildDependencies = buildDependencies.bind(this)
+
+  public buildGenerate = buildGenerate.bind(this)
 
   static examples = [
     '$ convertedbook build pdf',
@@ -121,6 +124,7 @@ export default class Build extends Command {
       .subscribe(([buildCli, buildAsyncResults]) => {
         this.log(buildCli.msg.trim());
         this.log(buildAsyncResults.msg.trim());
+        this.buildGenerate(buildCli as BuildCheckGoodResults);
       });
 
     // Log additional errors with flags
