@@ -2,7 +2,7 @@
 import { Command, flags } from '@oclif/command';
 import { unnest } from 'ramda';
 import { zip } from 'rxjs';
-import { map, filter, mergeMap } from 'rxjs/operators';
+import { map, filter, mergeMap, first } from 'rxjs/operators';
 const listify = require('listify');
 
 // Library modules
@@ -77,6 +77,7 @@ export default class Build extends Command {
     // or required flags not satisfied
     const errorMessage$ = buildCliResults$
       .pipe(
+        first(),
         filter((result: BuildCheckResults) => {
           return !result.continue;
         })
@@ -109,6 +110,7 @@ export default class Build extends Command {
       buildCliAsyncCheck$,
       buildCliAsyncResults$
         .pipe(
+          first(),
           filter(buildAsyncResults => {
             return buildAsyncResults.continue;
           })
@@ -121,10 +123,12 @@ export default class Build extends Command {
         this.log(buildAsyncResults.msg.trim());
       });
 
+    // Log additional errors with flags
     const buildCliFlagProblems$ = zip(
       buildCliAsyncCheck$,
       buildCliAsyncResults$
         .pipe(
+          first(),
           filter(buildAsyncResults => {
             return !buildAsyncResults.continue;
           })
