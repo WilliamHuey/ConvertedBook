@@ -38,119 +38,112 @@ describe('build', () => {
   retryTest()
     .stdout()
     .command(unnest([['build'], [invalidInputFlag, invalidOutputFlag]]))
-    .it('with invalid input and valid output flag', ctx => {
+    .it('with invalid input and invalid output flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: Invalid input file and invalid output folder/file.');
     });
 
   retryTest()
     .stdout()
     .command(unnest([['build', 'html', 'pdf'], flags]))
-    .it('with valid input and output', ctx => {
+    .it('with valid input and output flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Creating output file.');
     });
 
   retryTest()
     .stdout()
-    .command(unnest([['build', 'html', 'pdf'], flags]))
-    .it('runs build', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Start building: html and pdf');
-    });
-
-  retryTest()
-    .stdout()
     .command(unnest([['build', 'pdf'], flags]))
-    .it('runs build', ctx => {
+    .it('with pdf format and valid flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Start building: pdf');
     });
 
   retryTest()
     .stdout()
     .command(unnest([['build', 'epub'], flags]))
-    .it('runs build', ctx => {
+    .it('with epub format and valid flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Start building: epub');
     });
 
   retryTest()
     .stdout()
     .command(unnest([['build', 'epub', 'html'], flags]))
-    .it('runs build', ctx => {
+    .it('with epub and html format and valid flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Start building: epub and html');
     });
 
   retryTest()
     .stdout()
     .command(unnest([['build', 'html', 'pdf', 'epub'], flags]))
-    .it('runs build', ctx => {
+    .it('with html, pdf, and epub format with valid flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Start building: html, pdf, and epub');
     });
 
   retryTest()
     .stdout()
     .command(unnest([['build', 'sdaf'], flags]))
-    .it('runs build', ctx => {
+    .it('with invalid format and valid flags', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Did not build as there are no valid formats');
+    });
+
+  retryTest()
+    .stdout()
+    .command(unnest([['build', 'sdaf', 'mf'], flags]))
+    .it('with multiple invalid formats and valid flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Did not build as there are no valid formats');
     });
 
   retryTest()
     .stdout()
     .command(unnest([['build', 'sdaf', 'pdf'], flags]))
-    .it('runs build', ctx => {
+    .it('with valid and invalid formats with valid flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Ignoring unknown formats');
     });
 
   retryTest()
     .stdout()
-    .command(unnest([['build', 'sdaf', 'mf'], flags]))
-    .it('runs build', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Did not build as there are no valid formats');
-    });
-
-  retryTest()
-    .stdout()
     .command(unnest([['build'], flags]))
-    .it('runs build', ctx => {
+    .it('with no formats specified, defaults to all formats and with valid flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Start building: html, pdf, and epub');
     });
 
   retryTest()
     .stdout()
     .command(unnest([['build', "--args=''"], flags[0]]))
-    .it('runs build', ctx => {
+    .it('with no formats and empty args flag and valid input', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: Missing a required "--input" or "--output"');
     });
 
   retryTest()
     .stdout()
     .command(['build'])
-    .it('runs build', ctx => {
+    .it('with no formats and no flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: No arguments and no flags available.');
     });
 
   retryTest()
     .stdout()
     .command(['build', 'nsdfa', 'ce'])
-    .it('runs build', ctx => {
+    .it('with only invalid formats and no flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present.');
     });
 
   retryTest()
     .stdout()
     .command(['build', 'pdf'])
-    .it('runs build', ctx => {
+    .it('with pdf format and no flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present.');
     });
 
   retryTest()
     .stdout()
     .command(['build', 'sdaf', 'mf'])
-    .it('runs build', ctx => {
+    .it('with all invalid formats and no flags', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present.');
     });
 
   retryTest()
     .stdout()
     .command(['build', "--args=''"])
-    .it('runs build', ctx => {
+    .it('with no formats and empty args flag', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: No required flags found (--input, --output)');
     });
 });
