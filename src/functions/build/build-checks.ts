@@ -21,7 +21,7 @@ export type BuildCheckGoodResults = {
 
 export type BuildCheckResults = XOR<BuildCheckBadResults, BuildCheckGoodResults>
 
-type CommandFlagKeys = { input: string; output: string }
+type CommandFlagKeys = { input: string; output: string, 'dry-run': string };
 
 export type CommandArgsFlags = { argv: string[]; flags: CommandFlagKeys }
 

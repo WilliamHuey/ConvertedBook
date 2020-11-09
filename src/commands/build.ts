@@ -2,7 +2,7 @@
 import { Command, flags } from '@oclif/command';
 import { unnest } from 'ramda';
 import { zip } from 'rxjs';
-import { map, filter, mergeMap, first } from 'rxjs/operators';
+import { map, filter, mergeMap, first, takeUntil } from 'rxjs/operators';
 const listify = require('listify');
 
 // Library modules
@@ -43,7 +43,8 @@ export default class Build extends Command {
     help: flags.help({ char: 'h' }),
     input: flags.string({ char: 'i' }),
     output: flags.string({ char: 'o' }),
-    args: flags.string({ char: 'a' })
+    args: flags.string({ char: 'a' }),
+    'dry-run': flags.string({ char: 'd' })
   }
 
   static BuildWithOrder = ['html', 'pdf']
@@ -113,18 +114,35 @@ export default class Build extends Command {
       buildCliAsyncCheck$,
       buildCliAsyncResults$
         .pipe(
-          first(),
           filter(buildAsyncResults => {
             return buildAsyncResults.continue;
           })
         )
     );
 
+    const dryRunBuild$ = buildCliContinueGeneration$
+      .pipe(
+        filter(([buildCli, _]) => {
+          return (buildCli as BuildCheckGoodResults)
+            .conditions.flags['dry-run'] === 'true';
+        })
+      );
+
+    // Default build with file generation
     buildCliContinueGeneration$
+      .pipe(takeUntil(dryRunBuild$))
       .subscribe(([buildCli, buildAsyncResults]) => {
         this.log(buildCli.msg.trim());
         this.log(buildAsyncResults.msg.trim());
         this.buildGenerate(buildCli as BuildCheckGoodResults);
+      });
+
+    // Dry run will only log out from console
+    // meaning no file generation will occur
+    dryRunBuild$
+      .subscribe(([buildCli, buildAsyncResults]) => {
+        this.log(buildCli.msg.trim());
+        this.log(buildAsyncResults.msg.trim());
       });
 
     // Log additional errors with flags

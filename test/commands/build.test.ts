@@ -5,7 +5,7 @@ const path = require('path');
 import { expect, test } from '@oclif/test';
 import { unnest } from 'ramda';
 
-describe('build', () => {
+describe('Build', () => {
   const testDataDirectory = path.join(__dirname, '../', 'data/');
   const invalidInputFlag = `--input=${testDataDirectory}zz`;
   const invalidOutputFlag = `--output=${testDataDirectory}jkl/hlkj/`;
