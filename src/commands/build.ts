@@ -1,8 +1,8 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { unnest } from 'ramda';
-import { zip } from 'rxjs';
-import { map, filter, mergeMap, first, takeUntil } from 'rxjs/operators';
+import { unnest, difference } from 'ramda';
+import { zip, merge } from 'rxjs';
+import { map, filter, mergeMap, first, takeLast } from 'rxjs/operators';
 const listify = require('listify');
 
 // Library modules
@@ -128,21 +128,43 @@ export default class Build extends Command {
         })
       );
 
-    // Default build with file generation
-    buildCliContinueGeneration$
-      .pipe(takeUntil(dryRunBuild$))
-      .subscribe(([buildCli, buildAsyncResults]) => {
+    const buildRunMap: Record<string, any> = {
+      'dry-run': ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, any]) => {
+        // Dry run will only log out from console
+        // meaning no file generation will occur
+        this.log(buildCli.msg.trim());
+        this.log(buildAsyncResults.msg.trim());
+      },
+      default: ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, any]) => {
+        // Default build with file generation
         this.log(buildCli.msg.trim());
         this.log(buildAsyncResults.msg.trim());
         this.buildGenerate(buildCli as BuildCheckGoodResults);
-      });
+      }
+    };
 
-    // Dry run will only log out from console
-    // meaning no file generation will occur
-    dryRunBuild$
+    const buildRunScenarios$ = merge(
+      dryRunBuild$,
+      buildCliContinueGeneration$
+    )
+      .pipe(takeLast(1));
+
+    buildRunScenarios$
       .subscribe(([buildCli, buildAsyncResults]) => {
-        this.log(buildCli.msg.trim());
-        this.log(buildAsyncResults.msg.trim());
+        const flagOptions = (buildCli as BuildCheckGoodResults).conditions.flags;
+        const options = difference(Object.keys(flagOptions), Build.requiredFlags);
+
+        // Apply any flags selectively one at a time,
+        // for custom changes for each flag other than 'input' and 'output'
+        if (options.length > 0) {
+          options.forEach((opt) => {
+            buildRunMap[opt]([buildCli, buildAsyncResults]);
+          });
+        } else {
+
+          // Basic build command for generation
+          buildRunMap.default([buildCli, buildAsyncResults]);
+        }
       });
 
     // Log additional errors with flags
