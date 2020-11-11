@@ -2,7 +2,7 @@
 import { Command, flags } from '@oclif/command';
 import { unnest, difference } from 'ramda';
 import { zip, merge } from 'rxjs';
-import { map, filter, mergeMap, first, takeLast } from 'rxjs/operators';
+import { map, filter, mergeMap, take, takeLast } from 'rxjs/operators';
 const listify = require('listify');
 
 // Library modules
@@ -81,10 +81,10 @@ export default class Build extends Command {
     // or required flags not satisfied
     const errorMessage$ = buildCliResults$
       .pipe(
-        first(),
         filter((result: BuildCheckResults) => {
           return !result.continue;
-        })
+        }),
+        take(1)
       );
 
     errorMessage$
@@ -150,6 +150,7 @@ export default class Build extends Command {
       .pipe(takeLast(1));
 
     buildRunScenarios$
+      .pipe(take(1))
       .subscribe(([buildCli, buildAsyncResults]) => {
         const flagOptions = (buildCli as BuildCheckGoodResults).conditions.flags;
         const options = difference(Object.keys(flagOptions), Build.requiredFlags);
@@ -171,10 +172,10 @@ export default class Build extends Command {
       buildCliAsyncCheck$,
       buildCliAsyncResults$
         .pipe(
-          first(),
           filter(buildAsyncResults => {
             return !buildAsyncResults.continue;
-          })
+          }),
+          take(1)
         )
     );
 

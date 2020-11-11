@@ -2,7 +2,7 @@
 import { all } from 'ramda';
 import { isString, isUndefined } from 'is-what';
 import { forkJoin } from 'rxjs';
-import { filter, map, first } from 'rxjs/operators';
+import { filter, map, take } from 'rxjs/operators';
 const { lookpath } = require('lookpath');
 
 // Library modules
@@ -22,7 +22,6 @@ export function buildDependencies(this: Build) {
   // All extenal dependencies are found
   const allDepsSatisfied$ = pathCheckResults$
     .pipe(
-      first(),
       filter((result: Array<any>) => {
         return all((resItem: string | undefined) => {
           return isString(resItem);
@@ -33,7 +32,6 @@ export function buildDependencies(this: Build) {
   // Some or all of the external dependencies can not be found
   const showDepsUnsatisfied$ = pathCheckResults$
     .pipe(
-      first(),
       map((result: Array<any>) => {
         return result.map((resItem, resItemIndex) => {
           return isUndefined(resItem) ?
@@ -42,7 +40,8 @@ export function buildDependencies(this: Build) {
       }),
       filter(res => {
         return res.join('').length > 0;
-      })
+      }),
+      take(1)
     );
 
   return {
