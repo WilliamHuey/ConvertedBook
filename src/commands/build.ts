@@ -157,11 +157,10 @@ export default class Build extends Command {
         // Apply any flags selectively one at a time,
         // for custom changes for each flag other than 'input' and 'output'
         if (options.length > 0) {
-          options.forEach((opt) => {
+          options.forEach(opt => {
             buildRunMap[opt]([buildCli, buildAsyncResults]);
           });
         } else {
-
           // Basic build command for generation
           buildRunMap.default([buildCli, buildAsyncResults]);
         }
