@@ -1,25 +1,32 @@
 // Native modules
 import { spawn } from 'child_process';
 
+// Third party modules
+import { bindCallback } from 'rxjs';
+
 // Library modules
 import Build from '../../commands/build';
 import { BuildCheckGoodResults } from './build-checks';
 
-export function buildGenerate(this: Build, results: BuildCheckGoodResults) {
+export function buildGenerate(this: Build,
+  results: BuildCheckGoodResults) {
   const { conditions } = results,
     { input, output } = conditions.flags;
 
-  // const pandocService = spawn('pandoc', [input, '-o', `${output}content.pdf`, '--from', 'markdown']);
+  const pandocService = spawn('pandoc',
+    ['-o', `${output}content.pdf`, input]);
 
-  // pandocService.stdout
-  //   .on('data', (data) => {
-  //     console.log(`${data}`);
-  //   })
-  //   .on('close', (code: any) => {
-  //     console.log('Complete.');
-  //   });
+  const pandocOnComplete$ = bindCallback(
+    pandocService.stdout.on);
 
-  // pandocService.stderr.on('data', (data) => {
-  //   console.error(`stderr: ${data}`);
-  // });
+  pandocOnComplete$
+    .call(pandocService, 'close')
+    .subscribe({
+      next: () => {
+        console.log('Complete generation.');
+      },
+      error: e => {
+        console.log('Error', e);
+      }
+    });
 }
