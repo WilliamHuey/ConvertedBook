@@ -12,10 +12,14 @@ export function buildGenerate(this: Build,
   results: BuildCheckGoodResults) {
   const { conditions } = results,
     { input, output } = conditions.flags;
+  console.log("results", results)
 
   const pandocService = spawn('pandoc',
     ['-o', `${output}content.pdf`, input]);
 
+  // Convert callback into observable for the
+  // 'complete' signal. The observable can also be
+  // converted for use as a promise for testing.
   const pandocOnComplete$ = bindCallback(
     pandocService.stdout.on);
 

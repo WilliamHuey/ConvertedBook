@@ -5,8 +5,11 @@ const path = require('path');
 import { expect, test } from '@oclif/test';
 import { unnest } from 'ramda';
 
+// Library modules
+import { buildGenerate } from '../../src/functions/build/build-generate';
+
 describe('Build', () => {
-  const testDataDirectory = path.join(__dirname, '../', 'data/');
+  const testDataDirectory = path.join(__dirname, '../', 'fixtures/io/');
   const invalidInputFlag = `--input=${testDataDirectory}zz`;
   const invalidOutputFlag = `--output=${testDataDirectory}jkl/hlkj/`;
   const validInputFlag = `--input=${testDataDirectory}input.latex`;
