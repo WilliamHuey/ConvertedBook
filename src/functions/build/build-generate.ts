@@ -19,8 +19,12 @@ export function buildGenerate(this: Build,
   const pandocOnComplete$ = bindCallback(
     pandocService.stdout.on);
 
-  pandocOnComplete$
-    .call(pandocService, 'close')
+  const pandocClose$ = pandocOnComplete$
+    .call(pandocService, 'close');
+
+  const pandocCompletePromise = pandocClose$.toPromise();
+
+  pandocClose$
     .subscribe({
       next: () => {
         console.log('Complete generation.');
@@ -29,4 +33,8 @@ export function buildGenerate(this: Build,
         console.log('Error', e);
       }
     });
+
+  return {
+    pandocCompletePromise
+  };
 }
