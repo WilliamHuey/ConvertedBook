@@ -8,6 +8,7 @@ import { bindCallback } from 'rxjs';
 import Build from '../../commands/build';
 import { BuildCheckGoodResults } from './build-checks';
 
+export function buildGenerate(results: BuildCheckGoodResults): any
 export function buildGenerate(this: Build,
   results: BuildCheckGoodResults) {
   const { conditions } = results,

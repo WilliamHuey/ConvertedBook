@@ -1,6 +1,11 @@
-export const checkResults = {
-    msg: 'Start building: html, pdf, and epub',
-    conditions: {
+// Native modules
+const path = require('path');
+
+export default class CheckResults {
+  constructor() {
+    Object.assign(this, {
+      msg: 'Start building: html, pdf, and epub',
+      conditions: {
         exactMatchBuildOrder: false,
         additionalArgsOverBuildOrder: true,
         onlyOneBuildFormat: false,
@@ -9,10 +14,12 @@ export const checkResults = {
         allRequiredFlagsRecognized: true,
         someFlagsRequiredRecognized: false,
         flags: {
-            input: '/home/williamhuey/Contentss/Code/JavaScript/ConvertedBook/README.md',
-            output: '/home/williamhuey/Downloads/'
+          input: path.join(__dirname, '../../../README.md'),
+          output: path.join(__dirname, '../../temp/')
         },
         argv: ['html', 'pdf', 'epub']
-    },
-    continue: true
+      },
+      continue: true
+    })
+  }
 }

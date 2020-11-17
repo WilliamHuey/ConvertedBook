@@ -4,6 +4,9 @@
 /dist
 /lib
 /tmp
+/temp/*.pdf
+/temp/*.html
+/temp/*.epub
 /yarn.lock
 node_modules
 /report

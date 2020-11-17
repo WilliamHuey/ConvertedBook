@@ -6,7 +6,9 @@ import { expect, test } from '@oclif/test';
 import { unnest } from 'ramda';
 
 // Library modules
+import { BuildCheckGoodResults } from '../../src/functions/build/build-checks';
 import { buildGenerate } from '../../src/functions/build/build-generate';
+import CheckResults from '../fixtures/objects/check-results';
 
 describe('Build', () => {
   const testDataDirectory = path.join(__dirname, '../', 'fixtures/io/');
@@ -24,6 +26,13 @@ describe('Build', () => {
     return test
       .retries(10);
   };
+
+  // test
+  //   .it('generate function produces a "complete" promise', async (ctx) => {
+  //     const checkResults = new CheckResults();
+  //     await (buildGenerate(checkResults as BuildCheckGoodResults))
+  //       .pandocCompletePromise;
+  //   });
 
   retryTest()
     .stdout()
