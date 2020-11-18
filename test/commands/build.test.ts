@@ -27,13 +27,6 @@ describe('Build', () => {
       .retries(10);
   };
 
-  // test
-  //   .it('generate function produces a "complete" promise', async (ctx) => {
-  //     const checkResults = new CheckResults();
-  //     await (buildGenerate(checkResults as BuildCheckGoodResults))
-  //       .pandocCompletePromise;
-  //   });
-
   retryTest()
     .stdout()
     .command(unnest([['build'], [validInputFlag, invalidOutputFlag], dryFlag]))
@@ -159,4 +152,22 @@ describe('Build', () => {
     .it('with no formats and empty args flag', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: No required flags found (--input, --output)');
     });
+
+  it('generate function goes to "completion" status', (ctx) => {
+    const checkResults = new CheckResults();
+    const pd = buildGenerate(checkResults as BuildCheckGoodResults)
+      .pandocClose$;
+
+    pd
+      .subscribe({
+        next: (val) => {
+          console.log("val", val)
+          // Able to reach completion is a good sign
+          ctx();
+        },
+        error: (e: any) => {
+          console.log('Error', e);
+        }
+      });
+  });
 });

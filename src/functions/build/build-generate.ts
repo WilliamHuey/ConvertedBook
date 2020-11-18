@@ -13,7 +13,6 @@ export function buildGenerate(this: Build,
   results: BuildCheckGoodResults) {
   const { conditions } = results,
     { input, output } = conditions.flags;
-  console.log("results", results)
 
   const pandocService = spawn('pandoc',
     ['-o', `${output}content.pdf`, input]);
@@ -27,19 +26,17 @@ export function buildGenerate(this: Build,
   const pandocClose$ = pandocOnComplete$
     .call(pandocService, 'close');
 
-  const pandocCompletePromise = pandocClose$.toPromise();
-
   pandocClose$
     .subscribe({
       next: () => {
         console.log('Complete generation.');
       },
-      error: e => {
+      error: (e: any) => {
         console.log('Error', e);
       }
     });
 
   return {
-    pandocCompletePromise
+    pandocClose$
   };
 }
