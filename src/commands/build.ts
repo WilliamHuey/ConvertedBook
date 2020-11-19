@@ -7,7 +7,7 @@ const listify = require('listify');
 
 // Library modules
 import {
-  buildReport, buildLog, buildCliInputsChecks,
+  buildReport, buildLog, buildCliInputsChecks, AsyncCheckResults,
   buildCliInputsAsyncChecks, BuildCheckResults,
   BuildCheckGoodResults, buildChecks, buildDependencies,
   buildGenerate
@@ -139,7 +139,7 @@ export default class Build extends Command {
         // Default build with file generation
         this.log(buildCli.msg.trim());
         this.log(buildAsyncResults.msg.trim());
-        this.buildGenerate(buildCli as BuildCheckGoodResults);
+        this.buildGenerate(buildCli as BuildCheckGoodResults, buildAsyncResults);
       }
     };
 

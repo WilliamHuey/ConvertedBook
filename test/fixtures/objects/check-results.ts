@@ -20,6 +20,6 @@ export default class CheckResults {
         argv: ['html', 'pdf', 'epub']
       },
       continue: true
-    })
+    });
   }
 }

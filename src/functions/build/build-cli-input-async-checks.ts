@@ -1,7 +1,8 @@
 // Third party modules
 import { from, forkJoin, merge } from 'rxjs';
 import { filter, map, takeLast } from 'rxjs/operators';
-import { init } from 'ramda';
+import { init, head, last } from 'ramda';
+import { isArray } from 'is-what';
 const IsThere = require('is-there');
 
 // Library modules
@@ -9,12 +10,37 @@ import Build from '../../commands/build';
 import { buildLog, action, messagesKeys } from './build-log';
 import { BuildCheckGoodResults } from './build-checks';
 
+export interface AsyncCheckResults {
+  msg: string,
+  validInput: false;
+  validOutput: false;
+  outputFilename: string;
+  continue: false;
+}
+
+function getFileNameFromParts(supposeFileParts: string[] | undefined): string |
+  undefined {
+  return isArray(supposeFileParts) ?
+    head(supposeFileParts) : '';
+}
+
 export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults) {
   const { flags } = buildCli.conditions;
   const { input, output } = flags;
 
-  const supposeOutputFolderName = init(output.split('/')),
-    outputFolder = supposeOutputFolderName.join('/');
+  const inputSplit = input.split('/'),
+    outputSplit = output.split('/'),
+    supposeOutputFolderName = init(outputSplit),
+    outputFolder = supposeOutputFolderName.join('/'),
+    supposeFileOutputParts = last(outputSplit)?.split('.'),
+    supposeFileInputParts = last(inputSplit)?.split('.');
+
+  // Get the file output name from the input file
+  // when there is no output file name specified
+  const supposeFileInputName = getFileNameFromParts(supposeFileInputParts);
+  let supposeFileOutputName = getFileNameFromParts(supposeFileOutputParts);
+  supposeFileOutputName = supposeFileOutputName?.length === 0 ?
+    supposeFileInputName : supposeFileOutputName
 
   const checkInputFile$ = from(IsThere.promises.file(input) as Promise<boolean>);
 
@@ -61,6 +87,13 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     .pipe(
       filter(outputFolder => {
         return outputFolder;
+      })
+    );
+
+  const outputFolderNonExistent$ = checkOutputFolder$
+    .pipe(
+      filter(outputFolder => {
+        return !outputFolder;
       })
     );
 
@@ -122,6 +155,7 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
           }),
           validInput: true,
           validOutput: true,
+          outputFilename: supposeFileOutputName,
           continue: true
         };
       }
@@ -140,6 +174,7 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
           }),
           validInput: false,
           validOutput: true,
+          outputFilename: supposeFileOutputName,
           continue: false
         };
       }
@@ -158,6 +193,7 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
           }),
           validInput: true,
           validOutput: false,
+          outputFilename: supposeFileOutputName,
           continue: false
         };
       }
@@ -176,6 +212,7 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
           }),
           validInput: false,
           validOutput: false,
+          outputFilename: supposeFileOutputName,
           continue: false
         };
       }

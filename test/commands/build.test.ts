@@ -7,8 +7,10 @@ import { unnest } from 'ramda';
 
 // Library modules
 import { BuildCheckGoodResults } from '../../src/functions/build/build-checks';
+import { AsyncCheckResults } from '../../src/functions/build/build-cli-input-async-checks';
 import { buildGenerate } from '../../src/functions/build/build-generate';
 import CheckResults from '../fixtures/objects/check-results';
+import AsyncCheckRes from '../fixtures/objects/async-check-results';
 
 describe('Build', () => {
   const testDataDirectory = path.join(__dirname, '../', 'fixtures/io/');
@@ -155,13 +157,14 @@ describe('Build', () => {
 
   it('generate function goes to "completion" status', (ctx) => {
     const checkResults = new CheckResults();
-    const pd = buildGenerate(checkResults as BuildCheckGoodResults)
+    const asyncCheckRes = new AsyncCheckRes();
+
+    const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
       .pandocClose$;
 
     pd
       .subscribe({
-        next: (val) => {
-          console.log("val", val)
+        next: () => {
           // Able to reach completion is a good sign
           ctx();
         },

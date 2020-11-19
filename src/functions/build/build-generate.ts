@@ -7,15 +7,17 @@ import { bindCallback } from 'rxjs';
 // Library modules
 import Build from '../../commands/build';
 import { BuildCheckGoodResults } from './build-checks';
+import { AsyncCheckResults } from './build-cli-input-async-checks';
 
-export function buildGenerate(results: BuildCheckGoodResults): any
+export function buildGenerate(results: BuildCheckGoodResults, asyncResults: AsyncCheckResults): any
 export function buildGenerate(this: Build,
-  results: BuildCheckGoodResults) {
+  results: BuildCheckGoodResults, asyncResults: AsyncCheckResults) {
   const { conditions } = results,
-    { input, output } = conditions.flags;
+    { input, output: outputPath } = conditions.flags,
+    { outputFilename } = asyncResults;
 
   const pandocService = spawn('pandoc',
-    ['-o', `${output}content.pdf`, input]);
+    ['-o', `${outputPath}${outputFilename}.html`, input]);
 
   // Convert callback into observable for the
   // 'complete' signal. The observable can also be
