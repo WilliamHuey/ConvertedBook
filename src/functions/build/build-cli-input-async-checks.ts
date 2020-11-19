@@ -1,6 +1,6 @@
 // Third party modules
 import { from, forkJoin, merge } from 'rxjs';
-import { filter, map, takeLast } from 'rxjs/operators';
+import { filter, map, takeLast, withLatestFrom, mapTo } from 'rxjs/operators';
 import { init, head, last } from 'ramda';
 import { isArray } from 'is-what';
 const IsThere = require('is-there');
@@ -11,11 +11,12 @@ import { buildLog, action, messagesKeys } from './build-log';
 import { BuildCheckGoodResults } from './build-checks';
 
 export interface AsyncCheckResults {
-  msg: string,
-  validInput: false;
-  validOutput: false;
+  msg: string;
+  validInput: boolean;
+  validOutput: boolean;
   outputFilename: string;
-  continue: false;
+  continue: boolean;
+  truncateOutput: boolean;
 }
 
 function getFileNameFromParts(supposeFileParts: string[] | undefined): string |
@@ -24,15 +25,29 @@ function getFileNameFromParts(supposeFileParts: string[] | undefined): string |
     head(supposeFileParts) : '';
 }
 
+export function truncateFilePath(filePath: string) {
+  const filePathSplit = filePath.split('/'),
+    supposeFilePathFolderName = init(filePathSplit),
+    filePathFolder = supposeFilePathFolderName.join('/');
+
+  return {
+    filePathSplit,
+    filePathFolder
+  };
+}
+
 export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults) {
   const { flags } = buildCli.conditions;
   const { input, output } = flags;
 
-  const inputSplit = input.split('/'),
-    outputSplit = output.split('/'),
-    supposeOutputFolderName = init(outputSplit),
-    outputFolder = supposeOutputFolderName.join('/'),
-    supposeFileOutputParts = last(outputSplit)?.split('.'),
+  const inputSplit = input.split('/');
+
+  const {
+    filePathSplit: outputSplit,
+    filePathFolder: outputFolder
+  } = truncateFilePath(output);
+
+  const supposeFileOutputParts = last(outputSplit)?.split('.'),
     supposeFileInputParts = last(inputSplit)?.split('.');
 
   // Get the file output name from the input file
@@ -40,7 +55,7 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
   const supposeFileInputName = getFileNameFromParts(supposeFileInputParts);
   let supposeFileOutputName = getFileNameFromParts(supposeFileOutputParts);
   supposeFileOutputName = supposeFileOutputName?.length === 0 ?
-    supposeFileInputName : supposeFileOutputName
+    supposeFileInputName : supposeFileOutputName;
 
   const checkInputFile$ = from(IsThere.promises.file(input) as Promise<boolean>);
 
@@ -218,10 +233,73 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
       }
     ));
 
-  return merge(
+  // Output file name selection conditions:
+
+  // The output file name actually exists,
+  // and can proceed with the file name creation
+  const existingOutputFolderAndOutputFile$ = truncatedOutputFolderExists$
+    .pipe(
+      withLatestFrom(outputFileExist$),
+      mapTo({
+        truncateOutput: true
+      })
+    );
+
+  // Folder non existent, because the last portion
+  // of the path is desired to be the new file name
+  const intoOutputFolderNewFile$ = truncatedOutputFolderExists$
+    .pipe(
+      withLatestFrom(outputFolderNonExistent$),
+      mapTo({
+        truncateOutput: true
+      })
+    );
+
+  // Refer to just the folder which exist, and
+  // can create the file directly in this folder
+  const inputAndOutputExists$ = outputFolderExists$
+    .pipe(
+      withLatestFrom(inputFileExists$),
+      mapTo({
+        truncateOutput: false
+      })
+    );
+
+  // Invalid input or output still needs to provide
+  // a truncate flag since it needs to combine with
+  // the input and output check
+  const invalidInputOrOutput$ = merge(
+    inputFileNonExistent$,
+    truncatedOutputFolderNonexistent$
+      .pipe(
+        withLatestFrom(outputFolderNonExistent$),
+        mapTo({
+          truncateOutput: false
+        })
+      )
+  );
+
+  const outputFileName$ = merge(
+    inputAndOutputExists$,
+    intoOutputFolderNewFile$,
+    existingOutputFolderAndOutputFile$,
+    invalidInputOrOutput$
+  ).pipe(takeLast(1));
+
+  const inputOutputChecks$ = merge(
     invalidInputInvalidOutput$,
     validInputInvalidOutput$,
     invalidInputValidOutput$,
     validInputOutput$
   ).pipe(takeLast(1));
+
+  const inputOutputWithOutputFileName$ = inputOutputChecks$
+    .pipe(
+      withLatestFrom(outputFileName$),
+      map(([inputOput, outputPath]) => {
+        return Object.assign({}, outputPath, inputOput);
+      })
+    );
+
+  return inputOutputWithOutputFileName$;
 }

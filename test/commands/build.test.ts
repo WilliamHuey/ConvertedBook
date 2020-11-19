@@ -155,7 +155,7 @@ describe('Build', () => {
       expect(ctx.stdout.trim()).to.contain('Build failed: No required flags found (--input, --output)');
     });
 
-  it('generate function goes to "completion" status', (ctx) => {
+  it('generate function goes to "completion" status', ctx => {
     const checkResults = new CheckResults();
     const asyncCheckRes = new AsyncCheckRes();
 

@@ -7,7 +7,7 @@ const listify = require('listify');
 
 // Library modules
 import {
-  buildReport, buildLog, buildCliInputsChecks, AsyncCheckResults,
+  buildReport, buildLog, buildCliInputsChecks,
   buildCliInputsAsyncChecks, BuildCheckResults,
   BuildCheckGoodResults, buildChecks, buildDependencies,
   buildGenerate

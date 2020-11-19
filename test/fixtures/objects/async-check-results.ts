@@ -5,7 +5,8 @@ export default class AsyncCheckResults {
       validInput: true,
       validOutput: true,
       outputFilename: 'stuff',
-      continue: true
+      continue: true,
+      truncateOutput: true
     });
   }
 }
