@@ -2,7 +2,7 @@
 import { Command, flags } from '@oclif/command';
 import { unnest, difference } from 'ramda';
 import { zip, merge } from 'rxjs';
-import { map, filter, mergeMap, take, takeLast } from 'rxjs/operators';
+import { map, filter, mergeMap, take, takeLast, mapTo } from 'rxjs/operators';
 const listify = require('listify');
 
 // Library modules
@@ -71,10 +71,7 @@ export default class Build extends Command {
     // on the cli command inputs
     const buildCliResults$ = allDepsSatisfied$
       .pipe(
-        map(
-          () => {
-            return this.buildCliInputsChecks();
-          })
+        mapTo(this.buildCliInputsChecks())
       );
 
     // End the checks early as critical problems are found
