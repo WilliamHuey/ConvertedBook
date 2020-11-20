@@ -14,13 +14,13 @@ export function buildGenerate(this: Build,
   results: BuildCheckGoodResults, asyncResults: AsyncCheckResults) {
   const { conditions } = results,
     { input, output: outputPath } = conditions.flags,
-    { truncateOutput, outputFilename } = asyncResults;
-
-  const normalizedOutputPath = truncateOutput ?
-    truncateFilePath(outputPath).filePathFolder : outputFilename;
+    { truncateOutput, outputFilename } = asyncResults,
+    normalizedOutputPath = truncateOutput ?
+      `${truncateFilePath(outputPath).filePathFolder}/${outputFilename}` :
+      `${outputPath}${outputFilename}`;
 
   const pandocService = spawn('pandoc',
-    ['-o', `${normalizedOutputPath}/${outputFilename}.html`, input]);
+    ['-o', `${normalizedOutputPath}.html`, input]);
 
   // Convert callback into observable for the
   // 'complete' signal. The observable can also be

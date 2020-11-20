@@ -24,6 +24,7 @@ export interface BuildReportResults {
     emptyArgsValidFlags: boolean;
     allRequiredFlagsRecognized: boolean;
     someFlagsRequiredRecognized: boolean;
+    recognizedFormats: Array<string>;
   };
 }
 
@@ -84,7 +85,8 @@ export function buildReport(this: Build, { argv, flags }: CommandArgsFlags): Bui
       multipleArgsNotDependentBuildOrder,
       emptyArgsValidFlags,
       allRequiredFlagsRecognized,
-      someFlagsRequiredRecognized
+      someFlagsRequiredRecognized,
+      recognizedFormats
     }
   };
 }
