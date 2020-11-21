@@ -6,7 +6,7 @@ const listify = require('listify');
 // Library modules
 import Build from '../../commands/build';
 import { action, messagesKeys } from './build-log';
-import { BuildReportResults } from './build-report';
+import { BuildReportConditions } from './build-report';
 
 export type BuildCheckBadResults = {
   msg: string;
@@ -25,7 +25,7 @@ type CommandFlagKeys = { input: string; output: string; 'dry-run': string };
 
 export type CommandArgsFlags = { argv: string[]; flags: CommandFlagKeys }
 
-type CondsFlagsArgv = BuildReportResults & CommandArgsFlags;
+type CondsFlagsArgv = BuildReportConditions & CommandArgsFlags;
 
 // Rigorous checks after more simple args and flags check,
 // used by 'buildCliInputsChecks'
@@ -98,7 +98,7 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>): BuildCh
   }
 
   // Supply the information after making checks on the build command
-  const conditionsFlagsArgv = { ...conditions, flags, argv };
+  const conditionsFlagsArgv: CondsFlagsArgv = { ...conditions, flags, argv };
 
   // Valid scenarios for building
   const buildArgsConds = cond([

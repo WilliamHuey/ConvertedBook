@@ -14,6 +14,7 @@ export function buildGenerate(this: Build,
   results: BuildCheckGoodResults, asyncResults: AsyncCheckResults) {
   const { conditions } = results,
     { input, output: outputPath } = conditions.flags,
+    { recognizedFormats } = conditions,
     { truncateOutput, outputFilename } = asyncResults,
     normalizedOutputPath = truncateOutput ?
       `${truncateFilePath(outputPath).filePathFolder}/${outputFilename}` :

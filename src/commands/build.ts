@@ -2,7 +2,7 @@
 import { Command, flags } from '@oclif/command';
 import { unnest, difference } from 'ramda';
 import { zip, merge } from 'rxjs';
-import { map, filter, mergeMap, take, takeLast, mapTo } from 'rxjs/operators';
+import { filter, mergeMap, take, takeLast, mapTo } from 'rxjs/operators';
 const listify = require('listify');
 
 // Library modules

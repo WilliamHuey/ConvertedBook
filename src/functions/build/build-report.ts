@@ -7,6 +7,17 @@ import Build from '../../commands/build';
 import { buildFlags } from './build-flags';
 import { CommandArgsFlags } from './build-checks';
 
+export interface BuildReportConditions {
+  exactMatchBuildOrder: boolean;
+  additionalArgsOverBuildOrder: boolean;
+  onlyOneBuildFormat: boolean;
+  multipleArgsNotDependentBuildOrder: boolean;
+  emptyArgsValidFlags: boolean;
+  allRequiredFlagsRecognized: boolean;
+  someFlagsRequiredRecognized: boolean;
+  recognizedFormats: Array<string>;
+}
+
 export interface BuildReportResults {
   conditionsHelpers: {
     argsCommaList: Array<string>;
@@ -16,16 +27,7 @@ export interface BuildReportResults {
     hasUnknownFormats: boolean;
     buildFlagsStatus: Record<string, any>;
   };
-  conditions: {
-    exactMatchBuildOrder: boolean;
-    additionalArgsOverBuildOrder: boolean;
-    onlyOneBuildFormat: boolean;
-    multipleArgsNotDependentBuildOrder: boolean;
-    emptyArgsValidFlags: boolean;
-    allRequiredFlagsRecognized: boolean;
-    someFlagsRequiredRecognized: boolean;
-    recognizedFormats: Array<string>;
-  };
+  conditions: BuildReportConditions;
 }
 
 export function buildReport(this: Build, { argv, flags }: CommandArgsFlags): BuildReportResults {

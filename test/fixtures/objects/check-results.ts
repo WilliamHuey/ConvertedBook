@@ -13,6 +13,7 @@ export default class CheckResults {
         emptyArgsValidFlags: false,
         allRequiredFlagsRecognized: true,
         someFlagsRequiredRecognized: false,
+        recognizedFormats: ['html', 'pdf', 'epub'],
         flags: {
           input: path.join(__dirname, '../../../README.md'),
           output: path.join(__dirname, '../../temp/')
