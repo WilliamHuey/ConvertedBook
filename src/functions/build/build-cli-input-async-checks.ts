@@ -273,13 +273,14 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     validInputOutput$
   ).pipe(takeLast(1));
 
-  const inputOutputWithOutputFileName$ = inputOutputChecks$
-    .pipe(
-      withLatestFrom(outputFileName$),
-      map(([inputOput, outputPath]) => {
-        return Object.assign({}, outputPath, inputOput);
-      })
-    );
+  const inputOutputWithOutputFileName$ =
+    outputFileName$
+      .pipe(
+        withLatestFrom(inputOutputChecks$),
+        map(([inputOput, outputPath]) => {
+          return Object.assign({}, outputPath, inputOput);
+        })
+      );
 
   return inputOutputWithOutputFileName$;
 }
