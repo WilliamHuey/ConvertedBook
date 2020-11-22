@@ -27,16 +27,16 @@ export enum messagesKeys {
 const messages: { [index: string]: string } = {
   noValidFormats: 'Did not build as there are no valid formats: ',
   ignoreUnknownFormats: 'Ignoring unknown formats: ',
-  noArgsOrFlags: 'Build failed: No arguments and no flags available.',
-  noArgsButFlags: 'No arguments but has flags.',
-  argsButNoFlags: 'Build failed: Arguments provided but no flags present.',
+  noArgsOrFlags: 'Build failed: No arguments and no flags available',
+  noArgsButFlags: 'No arguments but has flags',
+  argsButNoFlags: 'Build failed: Arguments provided but no flags present',
   noRequiredFlagsFound: 'Build failed: No required flags found (--input, --output)',
   someRequiredFlagsFound: 'Build failed: Missing a required "--input" or "--output"',
   buildingStartPrefix: 'Start building: ',
-  createOutputFile: 'Creating output file.',
-  invalidInputFile: 'Build failed: Invalid input file.',
-  invalidOutputFolderOrFile: 'Build failed: Invalid output folder/file.',
-  invalidInputAndOutput: 'Build failed: Invalid input file and invalid output folder/file.'
+  createOutputFile: 'Creating output file',
+  invalidInputFile: 'Build failed: Invalid input file',
+  invalidOutputFolderOrFile: 'Build failed: Invalid output folder/file',
+  invalidInputAndOutput: 'Build failed: Invalid input file and invalid output folder/file'
 };
 
 type BuildFormat = { action: action.ready; buildFormats: string[] }

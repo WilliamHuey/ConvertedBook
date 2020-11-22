@@ -33,28 +33,28 @@ describe('Build', () => {
     .stdout()
     .command(unnest([['build'], [validInputFlag, invalidOutputFlag], dryFlag]))
     .it('dry run with valid input and invalid output flag', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Build failed: Invalid output folder/file.');
+      expect(ctx.stdout.trim()).to.contain('Build failed: Invalid output folder/file');
     });
 
   retryTest()
     .stdout()
     .command(unnest([['build'], [invalidInputFlag, validOutputFlag], dryFlag]))
     .it('dry run with invalid input and valid output flag', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Build failed: Invalid input file.');
+      expect(ctx.stdout.trim()).to.contain('Build failed: Invalid input file');
     });
 
   retryTest()
     .stdout()
     .command(unnest([['build'], [invalidInputFlag, invalidOutputFlag], dryFlag]))
     .it('dry run with invalid input and invalid output flags', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Build failed: Invalid input file and invalid output folder/file.');
+      expect(ctx.stdout.trim()).to.contain('Build failed: Invalid input file and invalid output folder/file');
     });
 
   retryTest()
     .stdout()
     .command(unnest([['build', 'html', 'pdf'], flags, dryFlag]))
     .it('dry run with valid input and output flags', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Creating output file.');
+      expect(ctx.stdout.trim()).to.contain('Creating output file');
     });
 
   retryTest()
@@ -124,28 +124,28 @@ describe('Build', () => {
     .stdout()
     .command(['build'])
     .it('with no formats and no flags', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Build failed: No arguments and no flags available.');
+      expect(ctx.stdout.trim()).to.contain('Build failed: No arguments and no flags available');
     });
 
   retryTest()
     .stdout()
     .command(['build', 'nsdfa', 'ce'])
     .it('with only invalid formats and no flags', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present.');
+      expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present');
     });
 
   retryTest()
     .stdout()
     .command(['build', 'pdf'])
     .it('with pdf format and no flags', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present.');
+      expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present');
     });
 
   retryTest()
     .stdout()
     .command(['build', 'sdaf', 'mf'])
     .it('with all invalid formats and no flags', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present.');
+      expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present');
     });
 
   retryTest()
@@ -166,6 +166,8 @@ describe('Build', () => {
       .subscribe({
         next: () => {
           // Able to reach completion is a good sign
+          // and use this as a marker for a
+          // successful file generation
           ctx();
         },
         error: (e: any) => {

@@ -27,7 +27,7 @@ function generateFormat(input: string,
   pandocClose$
     .subscribe({
       next: () => {
-        console.log(`Generated ${format}.`);
+        console.log(`Generated ${format}`);
       },
       error: (e: any) => {
         console.log('Error', e);
@@ -49,10 +49,10 @@ export function buildGenerate(this: Build,
       `${outputPath}${outputFilename}`;
 
   const generated = recognizedFormats
-    .map((format) => {
+    .map(format => {
       return generateFormat(input, normalizedOutputPath, format);
     })
-    .map((pandocClose$) => {
+    .map(pandocClose$ => {
       return pandocClose$;
     });
 
@@ -61,7 +61,7 @@ export function buildGenerate(this: Build,
   const groupFormatsGenerated$ = forkJoin(generated);
   groupFormatsGenerated$
     .subscribe(() => {
-      console.log('Complete format generation.')
+      console.log('Complete file format generation');
     });
 
   return {
