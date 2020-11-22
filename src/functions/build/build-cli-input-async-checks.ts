@@ -1,14 +1,14 @@
 // Third party modules
 import { from, forkJoin, merge } from 'rxjs';
 import { filter, map, takeLast, withLatestFrom, mapTo } from 'rxjs/operators';
-import { init, head, last } from 'ramda';
-import { isArray } from 'is-what';
+import { last } from 'ramda';
 const IsThere = require('is-there');
 
 // Library modules
 import Build from '../../commands/build';
 import { buildLog, action, messagesKeys } from './build-log';
 import { BuildCheckGoodResults } from './build-checks';
+import { supposedFileName, getFileNameFromParts, truncateFilePath } from './build-utilities';
 
 export interface AsyncCheckResults {
   msg: string;
@@ -19,36 +19,16 @@ export interface AsyncCheckResults {
   truncateOutput: boolean;
 }
 
-function getFileNameFromParts(supposeFileParts: string[] | undefined): string |
-  undefined {
-  return isArray(supposeFileParts) ?
-    head(supposeFileParts) : '';
-}
-
-export function truncateFilePath(filePath: string) {
-  const filePathSplit = filePath.split('/'),
-    supposeFilePathFolderName = init(filePathSplit),
-    filePathFolder = supposeFilePathFolderName.join('/');
-
-  return {
-    filePathSplit,
-    filePathFolder
-  };
-}
-
 export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults) {
   const { flags } = buildCli.conditions;
   const { input, output } = flags;
-
-  const inputSplit = input.split('/');
-
   const {
     filePathSplit: outputSplit,
     filePathFolder: outputFolder
   } = truncateFilePath(output);
 
   const supposeFileOutputParts = last(outputSplit)?.split('.'),
-    supposeFileInputParts = last(inputSplit)?.split('.');
+    supposeFileInputParts = supposedFileName(input);
 
   // Get the file output name from the input file
   // when there is no output file name specified

@@ -7,7 +7,8 @@ import { bindCallback, forkJoin } from 'rxjs';
 // Library modules
 import Build from '../../commands/build';
 import { BuildCheckGoodResults } from './build-checks';
-import { AsyncCheckResults, truncateFilePath } from './build-cli-input-async-checks';
+import { AsyncCheckResults } from './build-cli-input-async-checks';
+import { truncateFilePath } from './build-utilities';
 
 function generateFormat(input: string,
   normalizedOutputPath: string,
