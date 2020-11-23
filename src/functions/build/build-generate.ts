@@ -50,8 +50,8 @@ export function buildGenerate(this: Build,
       `${outputPath}${outputFilename}`;
 
   outputFileExist$
-    .subscribe((outputFileExist) => {
-      console.log(`Output file already exists: ${outputFilename}`)
+    .subscribe(() => {
+      console.log(`Output file already exists: ${outputFilename}`);
     });
 
   const generated = recognizedFormats
