@@ -1,5 +1,5 @@
 // Third party modules
-import { from, forkJoin, merge } from 'rxjs';
+import { from, forkJoin, merge, Observable } from 'rxjs';
 import { filter, map, takeLast, withLatestFrom, mapTo } from 'rxjs/operators';
 import { last } from 'ramda';
 const IsThere = require('is-there');
@@ -17,6 +17,7 @@ export interface AsyncCheckResults {
   outputFilename: string;
   continue: boolean;
   truncateOutput: boolean;
+  outputFileExist$: Observable<boolean>;
 }
 
 export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults) {
@@ -278,7 +279,7 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
       .pipe(
         withLatestFrom(inputOutputChecks$),
         map(([inputOput, outputPath]) => {
-          return Object.assign({}, outputPath, inputOput);
+          return Object.assign({ outputFileExist$ }, outputPath, inputOput);
         })
       );
 

@@ -44,10 +44,15 @@ export function buildGenerate(this: Build,
   const { conditions } = results,
     { input, output: outputPath } = conditions.flags,
     { recognizedFormats } = conditions,
-    { truncateOutput, outputFilename } = asyncResults,
+    { truncateOutput, outputFilename, outputFileExist$ } = asyncResults,
     normalizedOutputPath = truncateOutput ?
       `${truncateFilePath(outputPath).filePathFolder}/${outputFilename}` :
       `${outputPath}${outputFilename}`;
+
+  outputFileExist$
+    .subscribe((outputFileExist) => {
+      console.log(`Output file already exists: ${outputFilename}`)
+    });
 
   const generated = recognizedFormats
     .map(format => {
