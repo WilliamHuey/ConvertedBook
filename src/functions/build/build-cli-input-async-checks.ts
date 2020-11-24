@@ -1,5 +1,5 @@
 // Third party modules
-import { from, forkJoin, merge, Observable } from 'rxjs';
+import { from, forkJoin, merge, race } from 'rxjs';
 import { filter, map, takeLast, withLatestFrom, mapTo } from 'rxjs/operators';
 import { last } from 'ramda';
 const IsThere = require('is-there');
@@ -17,11 +17,11 @@ export interface AsyncCheckResults {
   outputFilename: string;
   continue: boolean;
   truncateOutput: boolean;
-  outputFileExist$: Observable<boolean>;
+  fileOutputExistence: Record<string, boolean>;
 }
 
 export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults) {
-  const { flags } = buildCli.conditions;
+  const { flags, recognizedFormats } = buildCli.conditions;
   const { input, output } = flags;
   const {
     filePathSplit: outputSplit,
@@ -92,6 +92,13 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
         return !outputFolder;
       })
     );
+
+  // Check against the existence of all the formats
+  // specified in the build arguments
+  const checkOutputFileFormatsPresence$ = forkJoin(recognizedFormats
+    .reduce((formatAcc, format) => {
+      return { ...formatAcc, [format]: from(IsThere.promises.file(`${outputFolder}/${supposeFileOutputName}.${format}`) as Promise<boolean>) };
+    }, {}));
 
   // Another check for the actual output folder, by removing the
   // last portion of the path item from the initial output
@@ -274,14 +281,22 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     validInputOutput$
   ).pipe(takeLast(1));
 
-  const inputOutputWithOutputFileName$ =
+  const inputOutputWithOutputFileName$ = race(
     outputFileName$
       .pipe(
         withLatestFrom(inputOutputChecks$),
-        map(([inputOput, outputPath]) => {
-          return Object.assign({ outputFileExist$ }, outputPath, inputOput);
+        map(([inputOutput, outputPath]) => {
+          return Object.assign({}, outputPath, inputOutput);
         })
-      );
+      ),
+    outputFileName$
+      .pipe(
+        withLatestFrom(inputOutputChecks$),
+        withLatestFrom(checkOutputFileFormatsPresence$),
+        map(([[inputOutput, outputPath], fileOutputExistence]) => {
+          return Object.assign({ fileOutputExistence }, outputPath, inputOutput);
+        })
+      ));
 
   return inputOutputWithOutputFileName$;
 }

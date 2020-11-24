@@ -1,7 +1,3 @@
-// Third party modules
-import { NEVER } from 'rxjs';
-import { startWith } from 'rxjs/operators';
-
 export default class AsyncCheckResults {
   constructor() {
     Object.assign(this, {
@@ -11,7 +7,7 @@ export default class AsyncCheckResults {
       outputFilename: 'stuff',
       continue: true,
       truncateOutput: true,
-      outputFileExist$: NEVER.pipe(startWith(false))
+      fileOutputExistence: { html: false, pdf: false, epub: false }
     });
   }
 }
