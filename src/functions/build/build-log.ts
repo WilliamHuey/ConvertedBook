@@ -3,7 +3,8 @@ import Build from '../../commands/build';
 
 // Third party modules
 import { match, when } from 'ts-pattern';
-import { isString } from 'is-what';
+import { isString, isFunction } from 'is-what';
+const plur = require('plur');
 
 export enum action {
   check,
@@ -23,7 +24,7 @@ export enum messagesKeys {
   invalidInputAndOutput = 'invalidInputAndOutput' as any,
 }
 
-const messages: { [index: string]: string } = {
+const messages: { [index: string]: string | ((options: { data: { quantity: number } }) => string) } = {
   noValidFormats: 'Did not build as there are no valid formats: ',
   ignoreUnknownFormats: 'Ignoring unknown formats: ',
   noArgsOrFlags: 'Build failed: No arguments and no flags available',
@@ -31,7 +32,9 @@ const messages: { [index: string]: string } = {
   noRequiredFlagsFound: 'Build failed: No required flags found (--input, --output)',
   someRequiredFlagsFound: 'Build failed: Missing a required "--input" or "--output"',
   buildingStartPrefix: 'Start building: ',
-  createOutputFile: 'Creating output file',
+  createOutputFile: (options) => {
+    return `Creating output ${plur('file', options?.data?.quantity)}`;
+  },
   invalidInputFile: 'Build failed: Invalid input file',
   invalidOutputFolderOrFile: 'Build failed: Invalid output folder/file',
   invalidInputAndOutput: 'Build failed: Invalid input file and invalid output folder/file'
@@ -51,7 +54,9 @@ export function buildLog(this: Build, buildOptions: BuildOptions) {
       })
     }, () => {
       const { log, data } = buildOptions as Check;
-      return `${messages[log]}${data || ''}`;
+      return isFunction(messages[log]) ?
+        (messages[log] as Function)({ data }) :
+        `${messages[log]}${data || ''}`
     })
     .with({
       action: action.ready,

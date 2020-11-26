@@ -30,9 +30,6 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     filePathFolder: outputFolder
   } = truncateFilePath(output);
 
-  // No build arguments that all formats will be created as the default
-  // const normalizedFormats = emptyArgsValidFlags && recognizedFormats.length === 0 ? Build.acceptedOutputFormats : recognizedFormats;
-
   const supposeFileOutputParts = last(outputSplit)?.split('.'),
     supposeFileInputParts = supposedFileName(input);
 
@@ -159,7 +156,10 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
         return {
           msg: buildLog({
             action: action.check,
-            log: messagesKeys.createOutputFile
+            log: messagesKeys.createOutputFile,
+            data: {
+              quantity: normalizedFormats.length
+            }
           }),
           validInput: true,
           validOutput: true,
