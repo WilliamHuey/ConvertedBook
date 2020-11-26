@@ -16,6 +16,7 @@ export interface BuildReportConditions {
   allRequiredFlagsRecognized: boolean;
   someFlagsRequiredRecognized: boolean;
   recognizedFormats: Array<string>;
+  normalizedFormats: Array<string>;
 }
 
 export interface BuildReportResults {
@@ -68,6 +69,8 @@ export function buildReport(this: Build, { argv, flags }: CommandArgsFlags): Bui
   // Argument flags presence check
   const buildFlagsStatus = buildFlags.bind(this)(flags),
     emptyArgsValidFlags = emptyArgs && buildFlagsStatus.allRequiredFlagsRecognized,
+    normalizedFormats = emptyArgsValidFlags && recognizedFormats.length === 0 ?
+      Build.acceptedOutputFormats : recognizedFormats,
     allRequiredFlagsRecognized = buildFlagsStatus.allRequiredFlagsRecognized,
     someFlagsRequiredRecognized = buildFlagsStatus.someFlagsRequiredRecognized;
 
@@ -88,7 +91,8 @@ export function buildReport(this: Build, { argv, flags }: CommandArgsFlags): Bui
       emptyArgsValidFlags,
       allRequiredFlagsRecognized,
       someFlagsRequiredRecognized,
-      recognizedFormats
+      recognizedFormats,
+      normalizedFormats
     }
   };
 }

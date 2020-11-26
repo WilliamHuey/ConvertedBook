@@ -10,6 +10,8 @@ import { buildLog, action, messagesKeys } from './build-log';
 import { BuildCheckGoodResults } from './build-checks';
 import { supposedFileName, getFileNameFromParts, truncateFilePath } from './build-utilities';
 
+export type FileOutputExistence = Record<string, boolean>
+
 export interface AsyncCheckResults {
   msg: string;
   validInput: boolean;
@@ -17,16 +19,19 @@ export interface AsyncCheckResults {
   outputFilename: string;
   continue: boolean;
   truncateOutput: boolean;
-  fileOutputExistence: Record<string, boolean>;
+  fileOutputExistence: FileOutputExistence;
 }
 
 export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults) {
-  const { flags, recognizedFormats } = buildCli.conditions;
+  const { flags, normalizedFormats } = buildCli.conditions;
   const { input, output } = flags;
   const {
     filePathSplit: outputSplit,
     filePathFolder: outputFolder
   } = truncateFilePath(output);
+
+  // No build arguments that all formats will be created as the default
+  // const normalizedFormats = emptyArgsValidFlags && recognizedFormats.length === 0 ? Build.acceptedOutputFormats : recognizedFormats;
 
   const supposeFileOutputParts = last(outputSplit)?.split('.'),
     supposeFileInputParts = supposedFileName(input);
@@ -95,7 +100,7 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
 
   // Check against the existence of all the formats
   // specified in the build arguments
-  const checkOutputFileFormatsPresence$ = forkJoin(recognizedFormats
+  const checkOutputFileFormatsPresence$ = forkJoin(normalizedFormats
     .reduce((formatAcc, format) => {
       return { ...formatAcc, [format]: from(IsThere.promises.file(`${outputFolder}/${supposeFileOutputName}.${format}`) as Promise<boolean>) };
     }, {}));
@@ -285,18 +290,19 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     outputFileName$
       .pipe(
         withLatestFrom(inputOutputChecks$),
-        map(([inputOutput, outputPath]) => {
-          return Object.assign({}, outputPath, inputOutput);
+        withLatestFrom(checkOutputFileFormatsPresence$),
+        map(([[inputOutput, outputPath], fileOutputExistence]) => {
+          return Object.assign({ fileOutputExistence }, outputPath, inputOutput);
         })
       ),
     outputFileName$
       .pipe(
         withLatestFrom(inputOutputChecks$),
-        withLatestFrom(checkOutputFileFormatsPresence$),
-        map(([[inputOutput, outputPath], fileOutputExistence]) => {
-          return Object.assign({ fileOutputExistence }, outputPath, inputOutput);
+        map(([inputOutput, outputPath]) => {
+          return Object.assign({}, outputPath, inputOutput);
         })
-      ));
+      )
+  );
 
   return inputOutputWithOutputFileName$;
 }

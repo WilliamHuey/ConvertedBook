@@ -14,6 +14,7 @@ export default class CheckResults {
         allRequiredFlagsRecognized: true,
         someFlagsRequiredRecognized: false,
         recognizedFormats: ['html', 'pdf', 'epub'],
+        normalizedFormats: ['html', 'pdf', 'epub'],
         flags: {
           input: path.join(__dirname, '../../../README.md'),
           output: path.join(__dirname, '../../temp/')

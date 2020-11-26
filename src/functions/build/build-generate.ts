@@ -7,14 +7,19 @@ import { bindCallback, forkJoin } from 'rxjs';
 // Library modules
 import Build from '../../commands/build';
 import { BuildCheckGoodResults } from './build-checks';
-import { AsyncCheckResults } from './build-cli-input-async-checks';
+import { AsyncCheckResults, FileOutputExistence } from './build-cli-input-async-checks';
 import { truncateFilePath } from './build-utilities';
 
 function generateFormat(input: string,
   normalizedOutputPath: string,
-  format: string) {
+  format: string,
+  fileOutputExistence: FileOutputExistence) {
   const pandocService = spawn('pandoc',
     ['-o', `${normalizedOutputPath}.${format}`, input]);
+
+  // Warn on existing file format with the name of the output path
+  if (fileOutputExistence[format])
+    console.log(`Warning: ${format} file type exists`);
 
   // Convert callback into observable for the
   // 'complete' signal. The observable can also be
@@ -43,15 +48,15 @@ export function buildGenerate(this: Build,
   results: BuildCheckGoodResults, asyncResults: AsyncCheckResults) {
   const { conditions } = results,
     { input, output: outputPath } = conditions.flags,
-    { recognizedFormats } = conditions,
-    { truncateOutput, outputFilename } = asyncResults,
+    { normalizedFormats } = conditions,
+    { truncateOutput, outputFilename, fileOutputExistence } = asyncResults,
     normalizedOutputPath = truncateOutput ?
       `${truncateFilePath(outputPath).filePathFolder}/${outputFilename}` :
       `${outputPath}${outputFilename}`;
 
-  const generated = recognizedFormats
+  const generated = normalizedFormats
     .map(format => {
-      return generateFormat(input, normalizedOutputPath, format);
+      return generateFormat(input, normalizedOutputPath, format, fileOutputExistence);
     })
     .map(pandocClose$ => {
       return pandocClose$;
