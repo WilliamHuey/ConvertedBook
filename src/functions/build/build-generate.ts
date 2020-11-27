@@ -3,6 +3,7 @@ import { spawn } from 'child_process';
 
 // Third party modules
 import { bindCallback, forkJoin } from 'rxjs';
+import { first } from 'rxjs/operators';
 
 // Library modules
 import Build from '../../commands/build';
@@ -64,7 +65,9 @@ export function buildGenerate(this: Build,
 
   // Treat the inpout file types as a group even though
   // one might only be present for easier processing
-  const groupFormatsGenerated$ = forkJoin(generated);
+  const groupFormatsGenerated$ = forkJoin(generated)
+    .pipe(first());
+
   groupFormatsGenerated$
     .subscribe(() => {
       console.log('Complete file format generation');
