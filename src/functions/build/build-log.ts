@@ -32,7 +32,7 @@ const messages: { [index: string]: string | ((options: { data: { quantity: numbe
   noRequiredFlagsFound: 'Build failed: No required flags found (--input, --output)',
   someRequiredFlagsFound: 'Build failed: Missing a required "--input" or "--output"',
   buildingStartPrefix: 'Start building: ',
-  createOutputFile: (options) => {
+  createOutputFile: options => {
     return `Creating output ${plur('file', options?.data?.quantity)}`;
   },
   invalidInputFile: 'Build failed: Invalid input file',
@@ -56,7 +56,7 @@ export function buildLog(this: Build, buildOptions: BuildOptions) {
       const { log, data } = buildOptions as Check;
       return isFunction(messages[log]) ?
         (messages[log] as Function)({ data }) :
-        `${messages[log]}${data || ''}`
+        `${messages[log]}${data || ''}`;
     })
     .with({
       action: action.ready,

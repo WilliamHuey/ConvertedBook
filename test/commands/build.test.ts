@@ -4,6 +4,7 @@ const path = require('path');
 // Third party modules
 import { expect, test } from '@oclif/test';
 import { unnest } from 'ramda';
+const del = require('del');
 
 // Library modules
 import { BuildCheckGoodResults } from '../../src/functions/build/build-checks';
@@ -20,6 +21,14 @@ describe('Build', () => {
   const validOutputFlag = `--output=${testDataDirectory}`;
   const flags = [validInputFlag, validOutputFlag];
   const dryFlag = ['-d=true'];
+
+  // Remove generated testing files
+  // after the set of tests have completed
+  const baseTempFolder = path.join(__dirname, '../temp/');
+
+  after(() => {
+    del([`${baseTempFolder}*`, `!${baseTempFolder}.gitkeep`]);
+  });
 
   // Observables resolution is slow and the
   // tests need retries to prevent incorrect
