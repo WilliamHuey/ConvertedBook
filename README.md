@@ -15,11 +15,11 @@ Convert latex to different ebook formats
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g ConvertedBook
+$ npm install -g convertedbook
 $ convertedbook COMMAND
 running command...
 $ convertedbook (-v|--version|version)
-ConvertedBook/1.0.0 linux-x64 node-v14.11.0
+convertedbook/1.0.0 linux-x64 node-v15.0.0
 $ convertedbook --help [COMMAND]
 USAGE
   $ convertedbook COMMAND
@@ -28,28 +28,46 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`convertedbook build [FILE]`](#convertedbook-build-file)
+* [`convertedbook build`](#convertedbook-build)
+* [`convertedbook generate [FILE]`](#convertedbook-generate-file)
 * [`convertedbook help [COMMAND]`](#convertedbook-help-command)
 
-## `convertedbook build [FILE]`
+## `convertedbook build`
+
+Generate output format of your choosing from these following formats: html, pdf, and epub
+
+```
+USAGE
+  $ convertedbook build
+
+OPTIONS
+  -a, --args=args
+  -d, --dry-run=dry-run
+  -h, --help             show CLI help
+  -i, --input=input
+  -o, --output=output
+
+EXAMPLE
+  $ convertedbook build pdf
+```
+
+_See code: [src/commands/build.ts](https://github.com/WilliamHuey/ConvertedBook/blob/v1.0.0/src/commands/build.ts)_
+
+## `convertedbook generate [FILE]`
 
 describe the command here
 
 ```
 USAGE
-  $ convertedbook build [FILE]
+  $ convertedbook generate [FILE]
 
 OPTIONS
   -f, --force
   -h, --help       show CLI help
   -n, --name=name  name to print
-
-EXAMPLE
-  $ convertedbook build
-  build
 ```
 
-_See code: [src/commands/build.ts](https://github.com/WilliamHuey/ConvertedBook/blob/v1.0.0/src/commands/build.ts)_
+_See code: [src/commands/generate.ts](https://github.com/WilliamHuey/ConvertedBook/blob/v1.0.0/src/commands/generate.ts)_
 
 ## `convertedbook help [COMMAND]`
 
