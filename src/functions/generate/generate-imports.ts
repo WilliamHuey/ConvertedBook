@@ -1,0 +1,1 @@
+export { generatePackageJson } from './generate-packagejson';

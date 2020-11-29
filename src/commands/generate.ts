@@ -1,4 +1,8 @@
+// Third party modules
 import { Command, flags } from '@oclif/command';
+
+// Libraries modules
+import { generatePackageJson } from '../functions/generate/generate-imports';
 
 export default class Generate extends Command {
   static description = 'Create a "convertedbook" project folder.'
@@ -15,6 +19,9 @@ export default class Generate extends Command {
 
   async run() {
     const { args, flags } = this.parse(Generate);
+
+    generatePackageJson();
+
 
 
   }
