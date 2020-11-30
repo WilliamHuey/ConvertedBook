@@ -3,6 +3,7 @@ const path = require('path');
 
 // Third party modules
 import { concat } from 'rxjs';
+import { share } from 'rxjs/operators';
 import { mkdir, writeFile } from '@rxnode/fs';
 import Generate from '../../commands/generate';
 
@@ -27,10 +28,12 @@ export function generatePackageJson(this: Generate) {
 
   // Create project folder
   const createProjectFolder$ = mkdir(path.join(executionPath,
-    '/', 'folder'));
+    '/', 'folder'))
+    .pipe(share());
   const createPackageJSON$ = writeFile(path.join(executionPath,
     '/', 'folder', '/', 'package.json'),
-    JSON.stringify(new ProjectPackageJson(), null, 4));
+    JSON.stringify(new ProjectPackageJson(), null, 4))
+    .pipe(share());
 
   // Create package.json
   const generatePackageJSON$ = concat(
@@ -38,15 +41,20 @@ export function generatePackageJson(this: Generate) {
     createPackageJSON$
   );
 
-  generatePackageJSON$
+  createProjectFolder$
     .subscribe({
       error: (e: any) => {
         console.log(`Error: Did not create folder as it already exists`, e.errno);
-      },
+      }
+    });
+
+  generatePackageJSON$
+    .subscribe({
+      error: (e: any) => { },
       complete: () => {
         console.log('Complete finished creating project folder');
       }
     });
 
-
+  return generatePackageJSON$;
 }
