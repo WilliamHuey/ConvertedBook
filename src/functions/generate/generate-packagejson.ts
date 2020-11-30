@@ -2,7 +2,9 @@
 const path = require('path');
 
 // Third party modules
-import { mkdir } from '@rxnode/fs';
+import { concat } from 'rxjs';
+import { mkdir, writeFile } from '@rxnode/fs';
+import Generate from '../../commands/generate';
 
 class ProjectPackageJson {
   constructor() {
@@ -20,21 +22,31 @@ class ProjectPackageJson {
   }
 }
 
-export function generatePackageJson() {
+export function generatePackageJson(this: Generate) {
   const executionPath = process.cwd();
 
   // Create project folder
-  mkdir(path.join(executionPath, '/', 'folder'))
+  const createProjectFolder$ = mkdir(path.join(executionPath,
+    '/', 'folder'));
+  const createPackageJSON$ = writeFile(path.join(executionPath,
+    '/', 'folder', '/', 'package.json'),
+    JSON.stringify(new ProjectPackageJson(), null, 4));
 
+  // Create package.json
+  const generatePackageJSON$ = concat(
+    createProjectFolder$,
+    createPackageJSON$
+  );
+
+  generatePackageJSON$
     .subscribe({
-      next: () => {
-        console.log('Finished creating folder')
-      },
       error: (e: any) => {
-        console.log(`Error: Did not create folder as it already exists`);
+        console.log(`Error: Did not create folder as it already exists`, e.errno);
+      },
+      complete: () => {
+        console.log('Complete finished creating project folder');
       }
     });
 
 
-  // Create package.json
 }

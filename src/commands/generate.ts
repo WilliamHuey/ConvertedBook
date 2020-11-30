@@ -17,10 +17,12 @@ export default class Generate extends Command {
 
   static args = [{ name: 'file' }]
 
+  public generatePackageJson = generatePackageJson.bind(this)
+
   async run() {
     const { args, flags } = this.parse(Generate);
 
-    generatePackageJson();
+    this.generatePackageJson();
 
 
 
