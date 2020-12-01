@@ -44,15 +44,17 @@ export function generatePackageJson(this: Generate) {
   createProjectFolder$
     .subscribe({
       error: (e: any) => {
-        console.log(`Error: Did not create folder as it already exists`, e.errno);
+        console.log(`Error: Did not create folder as it already exists`);
       }
     });
 
   generatePackageJSON$
     .subscribe({
-      error: (e: any) => { },
+      error: (e: any) => {
+        // Error logging will be done
+      },
       complete: () => {
-        console.log('Complete finished creating project folder');
+        console.log('Create project folder');
       }
     });
 

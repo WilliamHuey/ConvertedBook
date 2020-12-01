@@ -1,5 +1,7 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
+import { concat, of } from 'rxjs';
+import { takeLast } from 'rxjs/operators';
 
 // Libraries modules
 import { generatePackageJson } from '../functions/generate/generate-imports';
@@ -22,9 +24,28 @@ export default class Generate extends Command {
   async run() {
     const { args, flags } = this.parse(Generate);
 
-    this.generatePackageJson();
+    const generatePackageJSON$ = this.generatePackageJson();
 
+    const furtherProcessing$ = of('process some more');
 
+    furtherProcessing$
+      .subscribe(() => {
+        console.log('Further processing')
+      });
+
+    concat(
+      generatePackageJSON$,
+      furtherProcessing$
+    )
+      .pipe(takeLast(1))
+      .subscribe({
+        error: (e: any) => {
+          // Error logging will be done
+        },
+        complete: () => {
+          console.log('Complete creation of project folder');
+        }
+      });
 
   }
 }
