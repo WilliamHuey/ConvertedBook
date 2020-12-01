@@ -17,14 +17,15 @@ export default class Generate extends Command {
     force: flags.boolean({ char: 'f' }),
   }
 
-  static args = [{ name: 'file' }]
+  static args = [{ name: 'folderName' }]
 
   public generatePackageJson = generatePackageJson.bind(this)
 
   async run() {
-    const { args, flags } = this.parse(Generate);
+    const { args } = this.parse(Generate),
+      { folderName } = args;
 
-    const generatePackageJSON$ = this.generatePackageJson();
+    const generatePackageJSON$ = this.generatePackageJson({ folderName });
 
     const furtherProcessing$ = of('process some more');
 
@@ -40,7 +41,8 @@ export default class Generate extends Command {
       .pipe(takeLast(1))
       .subscribe({
         error: (e: any) => {
-          // Error logging will be done
+          // Ignore the error logging here as this is an
+          // aggregate
         },
         complete: () => {
           console.log('Complete creation of project folder');

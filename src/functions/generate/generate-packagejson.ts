@@ -23,7 +23,13 @@ class ProjectPackageJson {
   }
 }
 
-export function generatePackageJson(this: Generate) {
+interface GeneratePackageJsonOptions {
+  folderName: string;
+}
+
+export function generatePackageJson(options: GeneratePackageJsonOptions) {
+
+  console.log("🚀 ~ file: generate-packagejson.ts ~ line 33 ~ generatePackageJson ~ options", options)
   const executionPath = process.cwd();
 
   // Create project folder
@@ -51,7 +57,8 @@ export function generatePackageJson(this: Generate) {
   generatePackageJSON$
     .subscribe({
       error: (e: any) => {
-        // Error logging will be done
+        // Ignore the error logging here as this is an
+        // aggregate
       },
       complete: () => {
         console.log('Create project folder');
