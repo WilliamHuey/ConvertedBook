@@ -1,7 +1,7 @@
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { concat, of } from 'rxjs';
-import { takeLast } from 'rxjs/operators';
+import { takeLast, mergeMap } from 'rxjs/operators';
 
 // Libraries modules
 import { generatePackageJson } from '../functions/generate/generate-imports';
@@ -15,6 +15,7 @@ export default class Generate extends Command {
     name: flags.string({ char: 'n', description: 'Generate' }),
     // flag with no value (-f, --force)
     force: flags.boolean({ char: 'f' }),
+    'project-name': flags.string({ char: 'p' })
   }
 
   static args = [{ name: 'folderName' }]
@@ -22,16 +23,23 @@ export default class Generate extends Command {
   public generatePackageJson = generatePackageJson.bind(this)
 
   async run() {
-    const { args } = this.parse(Generate),
+    const { args, flags } = this.parse(Generate),
       { folderName } = args;
 
-    const generatePackageJSON$ = this.generatePackageJson({ folderName });
+    const generatePackageJSON$ = this.generatePackageJson({ folderName, flags })
+      .pipe(takeLast(1));
 
     const furtherProcessing$ = of('process some more');
+    const anotherFurtherProcessing$ = of('further');
 
-    furtherProcessing$
-      .subscribe(() => {
-        console.log('Further processing')
+    generatePackageJSON$
+      .pipe(mergeMap(() => {
+        return furtherProcessing$;
+      }), mergeMap(() => {
+        return anotherFurtherProcessing$;
+      }))
+      .subscribe((thing) => {
+        console.log('Further processing', thing);
       });
 
     concat(
@@ -45,7 +53,7 @@ export default class Generate extends Command {
           // aggregate
         },
         complete: () => {
-          console.log('Complete generation');
+          console.log('Complete project generation');
         }
       });
 

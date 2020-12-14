@@ -8,9 +8,9 @@ import { mkdir, writeFile } from '@rxnode/fs';
 import { isUndefined } from 'is-what';
 
 class ProjectPackageJson {
-  constructor() {
+  constructor(name: string) {
     Object.assign(this, {
-      "name": '<from cli input name>',
+      "name": name || '<from cli input name>',
       "version": "1.0.0",
       "description": "",
       "main": "index.js",
@@ -25,10 +25,12 @@ class ProjectPackageJson {
 
 interface GeneratePackageJsonOptions {
   folderName: string;
+  flags: Record<string, string>
 }
 
 export function generatePackageJson(options: GeneratePackageJsonOptions) {
-  const { folderName } = options;
+  const { folderName, flags } = options;
+  const { 'project-name': projectName } = flags;
   const normalizedFolder = isUndefined(folderName) || folderName?.length === 0 ?
     'New Folder' : folderName;
   const executionPath = process.cwd();
@@ -39,13 +41,17 @@ export function generatePackageJson(options: GeneratePackageJsonOptions) {
     .pipe(share());
   const createPackageJSON$ = writeFile(path.join(executionPath,
     '/', normalizedFolder, '/', 'package.json'),
-    JSON.stringify(new ProjectPackageJson(), null, 4))
+    JSON.stringify(new ProjectPackageJson(projectName), null, 4))
+    .pipe(share());
+  const createConfigFolder$ = mkdir(path.join(executionPath,
+    '/', normalizedFolder, '/', 'config'))
     .pipe(share());
 
   // Create package.json
   const generatePackageJSON$ = concat(
     createProjectFolder$,
-    createPackageJSON$
+    createPackageJSON$,
+    createConfigFolder$
   );
 
   createProjectFolder$
