@@ -5,7 +5,6 @@ const path = require('path');
 import { concat } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { mkdir, writeFile } from '@rxnode/fs';
-import Generate from '../../commands/generate';
 
 class ProjectPackageJson {
   constructor() {

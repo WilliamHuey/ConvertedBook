@@ -8,7 +8,8 @@ const IsThere = require('is-there');
 import Build from '../../commands/build';
 import { buildLog, action, messagesKeys } from './build-log';
 import { BuildCheckGoodResults } from './build-checks';
-import { supposedFileName, getFileNameFromParts, truncateFilePath } from './build-utilities';
+import { supposedFileName, getFileNameFromParts, truncateFilePath }
+  from './build-utilities';
 
 export type FileOutputExistence = Record<string, boolean>
 
@@ -40,7 +41,8 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
   supposeFileOutputName = supposeFileOutputName?.length === 0 ?
     supposeFileInputName : supposeFileOutputName;
 
-  const checkInputFile$ = from(IsThere.promises.file(input) as Promise<boolean>);
+  const checkInputFile$ = from(IsThere.promises.file(input) as
+    Promise<boolean>);
 
   const inputFileExists$ = checkInputFile$
     .pipe(
