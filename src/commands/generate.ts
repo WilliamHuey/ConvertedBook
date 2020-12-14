@@ -45,7 +45,7 @@ export default class Generate extends Command {
           // aggregate
         },
         complete: () => {
-          console.log('Complete creation of project folder');
+          console.log('Complete generation');
         }
       });
 

@@ -5,6 +5,7 @@ const path = require('path');
 import { concat } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { mkdir, writeFile } from '@rxnode/fs';
+import { isUndefined } from 'is-what';
 
 class ProjectPackageJson {
   constructor() {
@@ -27,16 +28,17 @@ interface GeneratePackageJsonOptions {
 }
 
 export function generatePackageJson(options: GeneratePackageJsonOptions) {
-
-  console.log("🚀 ~ file: generate-packagejson.ts ~ line 33 ~ generatePackageJson ~ options", options)
+  const { folderName } = options;
+  const normalizedFolder = isUndefined(folderName) || folderName?.length === 0 ?
+    'New Folder' : folderName;
   const executionPath = process.cwd();
 
   // Create project folder
   const createProjectFolder$ = mkdir(path.join(executionPath,
-    '/', 'folder'))
+    '/', normalizedFolder))
     .pipe(share());
   const createPackageJSON$ = writeFile(path.join(executionPath,
-    '/', 'folder', '/', 'package.json'),
+    '/', normalizedFolder, '/', 'package.json'),
     JSON.stringify(new ProjectPackageJson(), null, 4))
     .pipe(share());
 
@@ -60,7 +62,7 @@ export function generatePackageJson(options: GeneratePackageJsonOptions) {
         // aggregate
       },
       complete: () => {
-        console.log('Create project folder');
+        console.log(`Create project folder: ${normalizedFolder}`);
       }
     });
 
