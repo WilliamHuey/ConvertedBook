@@ -35,7 +35,7 @@ describe('Build', () => {
   // readings
   const retryTest = function () {
     return test
-      .retries(10);
+      .retries(100);
   };
 
   retryTest()
