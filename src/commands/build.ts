@@ -64,7 +64,7 @@ export default class Build extends Command {
     // Can not continue further, and display the dependencies error message
     showDepsUnsatisfied$
       .subscribe(res => {
-        this.log(`Build failed: These dependencies were not found in your path: ${res.join('')}`);
+        this.log(`Build failed: These dependencies were not found in your path: ${res.join(', ')}`);
       });
 
     // All dependencies found, and can perform further checks

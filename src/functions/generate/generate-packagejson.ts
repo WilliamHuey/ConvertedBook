@@ -25,7 +25,7 @@ class ProjectPackageJson {
 
 interface GeneratePackageJsonOptions {
   folderName: string;
-  flags: Record<string, string>
+  flags: Record<any, any>
 }
 
 export function generatePackageJson(options: GeneratePackageJsonOptions) {
@@ -36,6 +36,11 @@ export function generatePackageJson(options: GeneratePackageJsonOptions) {
   const executionPath = process.cwd();
 
   // Create project folder
+  /*
+    /project-name
+      package.json
+      /config
+  */
   const createProjectFolder$ = mkdir(path.join(executionPath,
     '/', normalizedFolder))
     .pipe(share());
