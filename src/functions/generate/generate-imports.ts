@@ -1,1 +1,1 @@
-export { generatePackageJson } from './generate-packagejson';
+export { generateProject } from './generate-project';

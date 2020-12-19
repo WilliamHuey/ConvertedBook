@@ -9,7 +9,7 @@ import { tap, takeLast, mergeMap } from 'rxjs/operators';
 import { isUndefined } from 'is-what';
 
 // Libraries modules
-import { generatePackageJson } from '../functions/generate/generate-imports';
+import { generateProject } from '../functions/generate/generate-imports';
 
 export default class Generate extends Command {
   static description = 'Create a "convertedbook" project folder.'
@@ -23,15 +23,17 @@ export default class Generate extends Command {
     'project-name': flags.string({ char: 'p' })
   }
 
+  static aliases = ['g']
+
   static args = [{ name: 'folderName' }]
 
-  public generatePackageJson = generatePackageJson.bind(this)
+  public generateProject = generateProject.bind(this)
 
   async run() {
     const { args, flags } = this.parse(Generate),
       { folderName } = args;
 
-    const generatePackageJSON$ = this.generatePackageJson({ folderName, flags })
+    const generateProject$ = this.generateProject({ folderName, flags })
       .pipe(takeLast(1));
 
     const normalizedFolder = isUndefined(folderName) || folderName?.length === 0 ?
@@ -55,7 +57,7 @@ export default class Generate extends Command {
         }
       });
 
-    generatePackageJSON$
+    generateProject$
       .pipe(
         tap(() => console.log('Downloading node modules...')),
         mergeMap(() => {

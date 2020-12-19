@@ -23,12 +23,12 @@ class ProjectPackageJson {
   }
 }
 
-interface GeneratePackageJsonOptions {
+interface GenerateProjectOptions {
   folderName: string;
   flags: Record<any, any>
 }
 
-export function generatePackageJson(options: GeneratePackageJsonOptions) {
+export function generateProject(options: GenerateProjectOptions) {
   const { folderName, flags } = options;
   const { 'project-name': projectName } = flags;
   const normalizedFolder = isUndefined(folderName) || folderName?.length === 0 ?
@@ -53,7 +53,7 @@ export function generatePackageJson(options: GeneratePackageJsonOptions) {
     .pipe(share());
 
   // Create package.json
-  const generatePackageJSON$ = concat(
+  const generateProject$ = concat(
     createProjectFolder$,
     createPackageJSON$,
     createConfigFolder$
@@ -66,7 +66,7 @@ export function generatePackageJson(options: GeneratePackageJsonOptions) {
       }
     });
 
-  generatePackageJSON$
+  generateProject$
     .subscribe({
       error: (e: any) => {
         // Ignore the error logging here as this is an
@@ -77,5 +77,5 @@ export function generatePackageJson(options: GeneratePackageJsonOptions) {
       }
     });
 
-  return generatePackageJSON$;
+  return generateProject$;
 }
