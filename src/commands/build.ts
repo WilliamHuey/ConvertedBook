@@ -47,6 +47,8 @@ export default class Build extends Command {
     'dry-run': flags.string({ char: 'd' })
   }
 
+  static aliases = ['b']
+
   static BuildWithOrder = ['html', 'pdf']
 
   static acceptedOutputFormats = unnest([Build.BuildWithOrder, 'epub'])

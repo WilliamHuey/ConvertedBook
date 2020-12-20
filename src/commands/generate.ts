@@ -5,7 +5,7 @@ const path = require('path');
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { bindCallback } from 'rxjs';
-import { tap, takeLast, mergeMap } from 'rxjs/operators';
+import { takeLast, takeUntil, mergeMap } from 'rxjs/operators';
 import { isUndefined } from 'is-what';
 
 // Libraries modules
@@ -47,29 +47,37 @@ export default class Generate extends Command {
     const npmClose$ = npmOnComplete$
       .call(npmService, 'close');
 
-    npmClose$
+    generateProject$
+      .pipe(takeLast(1))
       .subscribe({
+        error: () => { },
         next: () => {
-          console.log(`Node modules downloaded`);
-        },
-        error: (e: any) => {
-          console.log('Error', e);
+          console.log(`Downloading node modules...`);
         }
       });
 
-    generateProject$
+    const completeGenerateProject$ = generateProject$
       .pipe(
-        tap(() => console.log('Downloading node modules...')),
         mergeMap(() => {
           return npmClose$;
-        }))
+        }),
+        takeLast(1)
+      );
+
+    completeGenerateProject$
       .subscribe({
-        error: (e: any) => {
-          // Ignore the error logging here as this is an
-          // aggregate
-        },
+        error: () => { },
         complete: () => {
           console.log('Complete project generation');
+        }
+      });
+
+    npmClose$
+      .pipe(takeUntil(completeGenerateProject$))
+      .subscribe({
+        error: () => { },
+        next: () => {
+          console.log(`Node modules downloaded`);
         }
       });
 
