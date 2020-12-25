@@ -12,6 +12,7 @@
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.0",
     "@rxnode/fs": "^0.4.1",
+    "@rxnode/core": "^0.5.1",
     "@types/ramda": "^0.27.23",
     "file-type": "^15.0.1",
     "is-there": "^4.5.1",

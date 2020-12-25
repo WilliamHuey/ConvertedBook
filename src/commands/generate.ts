@@ -5,7 +5,7 @@ const path = require('path');
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { bindCallback } from 'rxjs';
-import { takeLast, takeUntil, mergeMap } from 'rxjs/operators';
+import { takeLast, tap, mergeMap } from 'rxjs/operators';
 import { isUndefined } from 'is-what';
 
 // Libraries modules
@@ -36,48 +36,29 @@ export default class Generate extends Command {
     const generateProject$ = this.generateProject({ folderName, flags })
       .pipe(takeLast(1));
 
-    const normalizedFolder = isUndefined(folderName) || folderName?.length === 0 ?
-      'New Folder' : folderName;
-    const executionPath = process.cwd(),
-      npmService = spawn('npm', ['install'], { cwd: path.join(executionPath, '/', normalizedFolder, '/') });
-
-    const npmOnComplete$ = bindCallback(
-      npmService.stdout.on);
-
-    const npmClose$ = npmOnComplete$
-      .call(npmService, 'close');
-
     generateProject$
       .pipe(takeLast(1))
-      .subscribe({
-        error: () => { },
-        next: () => {
-          console.log(`Downloading node modules...`);
-        }
-      });
-
-    const completeGenerateProject$ = generateProject$
       .pipe(
+        tap(() => console.log('Downloading node modules...')),
         mergeMap(() => {
+          const normalizedFolder = isUndefined(folderName) || folderName?.length === 0 ?
+            'New Folder' : folderName;
+          const executionPath = process.cwd(),
+            npmService = spawn('npm', ['install'], { cwd: path.join(executionPath, '/', normalizedFolder, '/content/') });
+
+          const npmOnComplete$ = bindCallback(
+            npmService.stdout.on);
+
+          const npmClose$ = npmOnComplete$
+            .call(npmService, 'close');
+          
           return npmClose$;
-        }),
-        takeLast(1)
-      );
-
-    completeGenerateProject$
-      .subscribe({
-        error: () => { },
-        complete: () => {
-          console.log('Complete project generation');
-        }
-      });
-
-    npmClose$
-      .pipe(takeUntil(completeGenerateProject$))
+        })
+      )
       .subscribe({
         error: () => { },
         next: () => {
-          console.log(`Node modules downloaded`);
+          console.log('Complete project generation')
         }
       });
 

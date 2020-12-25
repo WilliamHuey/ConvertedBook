@@ -18,6 +18,9 @@ class ProjectPackageJson {
       "license": "ISC",
       "dependencies": {
         "snowpack": "^2.17.1"
+      },
+      "scripts": {
+        "start": "snowpack dev"
       }
     });
   }
@@ -37,26 +40,48 @@ export function generateProject(options: GenerateProjectOptions) {
 
   // Create project folder
   /*
-    /project-name
+
+  /project-name
+    /config
+      /latex
+    /content
+      /site
       package.json
-      /config
+
   */
   const createProjectFolder$ = mkdir(path.join(executionPath,
     '/', normalizedFolder))
     .pipe(share());
-  const createPackageJSON$ = writeFile(path.join(executionPath,
-    '/', normalizedFolder, '/', 'package.json'),
-    JSON.stringify(new ProjectPackageJson(projectName), null, 4))
-    .pipe(share());
+
   const createConfigFolder$ = mkdir(path.join(executionPath,
-    '/', normalizedFolder, '/', 'config'))
+    '/', normalizedFolder, '/config'))
+    .pipe(share());
+
+  const createConfigLatexFolder$ = mkdir(path.join(executionPath,
+    '/', normalizedFolder, '/config/latex'))
+    .pipe(share());
+
+  const createContentFolder$ = mkdir(path.join(executionPath,
+    '/', normalizedFolder, '/content'))
+    .pipe(share());
+
+  const createSiteFolder$ = mkdir(path.join(executionPath,
+    '/', normalizedFolder, '/content/site'))
+    .pipe(share());
+
+  const createPackageJSON$ = writeFile(path.join(executionPath,
+    '/', normalizedFolder, '/content/package.json'),
+    JSON.stringify(new ProjectPackageJson(projectName), null, 4))
     .pipe(share());
 
   // Create package.json
   const generateProject$ = concat(
     createProjectFolder$,
+    createConfigFolder$,
+    createConfigLatexFolder$,
+    createContentFolder$,
+    createSiteFolder$,
     createPackageJSON$,
-    createConfigFolder$
   );
 
   createProjectFolder$
