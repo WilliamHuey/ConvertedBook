@@ -42,11 +42,16 @@ export function generateProject(options: GenerateProjectOptions) {
   /*
 
   /project-name
+    .gitignore
     /config
       /latex
+        .gitkeep
     /content
       /site
+        index.html
+      favicon.ico
       package.json
+      snowpack.config.js
 
   */
   const createProjectFolder$ = mkdir(path.join(executionPath,
