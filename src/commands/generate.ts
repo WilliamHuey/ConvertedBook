@@ -34,13 +34,8 @@ export default class Generate extends Command {
     const { args, flags } = this.parse(Generate),
       { folderName } = args;
 
-    const projectName = "things";
-
-    const folderStructure = new GenerateContent(projectName);
-    console.log(
-      "🚀 ~ file: generate.ts ~ line 40 ~ Generate ~ run ~ folderStructure",
-      folderStructure
-    );
+    // Read the project folder for generating the observable creating chain
+    const folderStructure = new GenerateContent(folderName);
     GenerateContent.generateStructure(folderStructure);
 
     // const generateProject$ = this.generateProject({ folderName, flags })

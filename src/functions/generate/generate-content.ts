@@ -18,12 +18,36 @@ class ProjectPackageJson {
 }
 
 interface GenerateStructure {
-  projectName: string;
+  projectName?: string;
   content: Record<any, any>;
+  count?: number;
 }
 
-class GenerateContent {
+interface FileContentProperties {
+  name: string;
+  fileContent?: string;
+}
+
+interface InnerContentProperties {
+  name: string;
+  content: {
+    folders?: Array<InnerContentProperties>;
+    files?: Array<FileContentProperties>;
+  };
+}
+
+interface ContentProperties {
+  folders?: Array<InnerContentProperties>;
+  files?: Array<FileContentProperties>;
+}
+
+class GenerateContent implements GenerateStructure {
+  projectName: string;
+  content: ContentProperties;
+
   constructor(projectName: string) {
+    this.projectName = projectName;
+
     // Create project folder
     /*
 
@@ -39,80 +63,98 @@ class GenerateContent {
         package.json
         snowpack.config.js
     */
-    Object.assign(this, {
-      projectName,
-      content: {
-        folders: [
-          {
-            name: "config",
-            content: [
+    this.content = {
+      folders: [
+        {
+          name: "config",
+          content: {
+            folders: [
               {
-                folders: [
-                  {
-                    name: "latex",
-                    content: [
-                      {
-                        files: [
-                          {
-                            name: ".gitkeep",
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
+                name: "latex",
+                content: {
+                  files: [
+                    {
+                      name: ".gitkeep",
+                    },
+                  ],
+                },
               },
             ],
           },
-          {
-            name: "content",
-            content: [
+        },
+        {
+          name: "content",
+          content: {
+            folders: [
               {
-                folders: [
-                  {
-                    name: "site",
-                    content: [
-                      {
-                        files: [
-                          {
-                            name: "index.html",
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-                files: [
-                  {
-                    name: "favicon.ico",
-                  },
-                  {
-                    name: "package.json",
-                    fileContent: JSON.stringify(
-                      new ProjectPackageJson(projectName),
-                      null,
-                      4
-                    ),
-                  },
-                  {
-                    name: "snowpack.config.js",
-                  },
-                ],
+                name: "site",
+                content: {
+                  files: [
+                    {
+                      name: "index.html",
+                    },
+                  ],
+                },
+              },
+            ],
+            files: [
+              {
+                name: "favicon.ico",
+              },
+              {
+                name: "package.json",
+                fileContent: JSON.stringify(
+                  new ProjectPackageJson(projectName),
+                  null,
+                  4
+                ),
+              },
+              {
+                name: "snowpack.config.js",
               },
             ],
           },
-        ],
-      },
-    });
+        },
+      ],
+      files: [
+        {
+          name: ".gitignore",
+        },
+      ],
+    };
   }
 
-  static totalStructureCount = (folderStructure: GenerateStructure) => {
-    console.log("generate structure", folderStructure);
-    const { projectName, content } = folderStructure;
+  static readTotalStructureCount = (
+    folderStructure: GenerateStructure
+  ): number => {
+    const { content, count } = folderStructure;
+
+    // Count the initial folder as one item
+    let structureCount = typeof count === "undefined" ? 1 : count;
+
+    structureCount = content?.folders?.length
+      ? structureCount + content?.folders.length
+      : structureCount;
+
+    structureCount = content?.files?.length
+      ? structureCount + content?.files.length
+      : structureCount;
+
+    content?.folders?.forEach((element: InnerContentProperties) => {
+      if (element.content)
+        structureCount = GenerateContent.readTotalStructureCount({
+          content: element.content,
+          count: structureCount,
+        });
+    });
+
+    return structureCount;
   };
 
   static generateStructure = (folderStructure: GenerateStructure) => {
-    GenerateContent.totalStructureCount(folderStructure);
+    const structureCount = GenerateContent.readTotalStructureCount(
+      folderStructure
+    );
   };
 }
 
