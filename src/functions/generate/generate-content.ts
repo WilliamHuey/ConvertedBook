@@ -54,14 +54,14 @@ class GenerateContent implements GenerateStructure {
     /project-name
         .gitignore
         /config
-        /latex
+          /latex
             .gitkeep
         /content
-        /site
+          /site
             index.html
-        favicon.ico
-        package.json
-        snowpack.config.js
+            favicon.ico
+            package.json
+            snowpack.config.js
     */
     this.content = {
       folders: [

@@ -36,7 +36,18 @@ export default class Generate extends Command {
 
     // Read the project folder for generating the observable creating chain
     const folderStructure = new GenerateContent(folderName);
-    GenerateContent.generateStructure(folderStructure);
+
+    // Generate the top folder project first, before using a recursive
+    // pattern creation of other files
+    const projectFolder$ = this.generateProject({ folderName, flags });
+
+    projectFolder$.subscribe(() => {
+      console.log("folderStructure", folderStructure);
+
+      // TODO: Append key of parent folder observable to one level below
+      // folders or files key for subscribing to for proper creation
+      GenerateContent.generateStructure(folderStructure);
+    });
 
     // const generateProject$ = this.generateProject({ folderName, flags })
     //   .pipe(takeLast(1));
