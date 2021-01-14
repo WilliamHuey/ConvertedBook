@@ -18,7 +18,8 @@ class ProjectPackageJson {
 }
 
 interface GenerateStructure {
-  projectName?: string;
+  projectName: string;
+  parentFolderPath: string;
   content: Record<any, any>;
 }
 
@@ -46,10 +47,9 @@ interface ContentProperties {
 }
 
 class GenerateContent implements GenerateStructure {
-  projectName: string;
   content: ContentProperties;
 
-  constructor(projectName: string) {
+  constructor(public projectName: string, public parentFolderPath: string) {
     this.projectName = projectName;
 
     // Create project folder

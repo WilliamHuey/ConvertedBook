@@ -34,8 +34,11 @@ export default class Generate extends Command {
     const { args, flags } = this.parse(Generate),
       { folderName } = args;
 
+    const executionPath = process.cwd();
+    const parentFolderPath = path.join(executionPath, "/");
+
     // Read the project folder for generating the observable creating chain
-    const folderStructure = new GenerateContent(folderName);
+    const folderStructure = new GenerateContent(folderName, parentFolderPath);
 
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
