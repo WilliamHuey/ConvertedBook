@@ -20,7 +20,11 @@ class ProjectPackageJson {
 interface GenerateStructure {
   projectName?: string;
   content: Record<any, any>;
+}
+
+interface ReadStructure {
   count?: number;
+  content: Record<any, any>;
 }
 
 interface FileContentProperties {
@@ -124,9 +128,7 @@ class GenerateContent implements GenerateStructure {
     };
   }
 
-  static readTotalStructureCount = (
-    folderStructure: GenerateStructure
-  ): number => {
+  static readTotalStructureCount = (folderStructure: ReadStructure): number => {
     const { content, count } = folderStructure;
 
     // Count the initial folder as one item
@@ -151,7 +153,7 @@ class GenerateContent implements GenerateStructure {
     return structureCount;
   };
 
-  static generateStructure = (folderStructure: GenerateStructure) => {
+  static generateStructure = (folderStructure: ReadStructure) => {
     const structureCount = GenerateContent.readTotalStructureCount(
       folderStructure
     );
