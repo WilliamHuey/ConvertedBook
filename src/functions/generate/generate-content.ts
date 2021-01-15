@@ -6,41 +6,22 @@ import { concat, Observable } from "rxjs";
 import { writeFile, mkdir } from "@rxnode/fs";
 import { share } from "rxjs/operators";
 
-class ProjectPackageJson {
-  constructor(name: string) {
-    Object.assign(this, {
-      name: name || "<from cli input name>",
-      version: "1.0.0",
-      description: "",
-      main: "index.js",
-      author: "",
-      license: "ISC",
-      dependencies: {
-        snowpack: "^2.17.1",
-      },
-      scripts: {
-        start: "snowpack dev",
-      },
-    });
-  }
-}
+// Library modules
+import { GenerateStructureOutline } from "./generate-structure";
 
-interface GenerateStructure {
+interface GenerateStructure extends ReadStructure {
   projectName: string;
-  parentFolder$: Observable<any>;
-  parentFolderPath: string;
-  content: Record<any, any>;
 }
 
 interface ReadStructure {
   parentFolder$: Observable<any>;
   parentFolderPath: string;
-  content: Record<any, any>;
+  content: ContentProperties;
 }
 
 interface CountStructure {
   count?: number;
-  content: Record<any, any>;
+  content: ContentProperties;
 }
 
 interface FileContentProperties {
@@ -50,10 +31,7 @@ interface FileContentProperties {
 
 interface InnerContentProperties {
   name: string;
-  content: {
-    folders?: Array<InnerContentProperties>;
-    files?: Array<FileContentProperties>;
-  };
+  content: ContentProperties;
 }
 
 interface ContentProperties {
@@ -69,83 +47,10 @@ class GenerateContent implements GenerateStructure {
     public parentFolder$: Observable<any>,
     public parentFolderPath: string
   ) {
-    // Create project folder
-    /*
-
-    /project-name
-        .gitignore
-        /config
-          /latex
-            .gitkeep
-        /content
-          /site
-            index.html
-            favicon.ico
-            package.json
-            snowpack.config.js
-    */
-    this.content = {
-      folders: [
-        {
-          name: "config",
-          content: {
-            folders: [
-              {
-                name: "latex",
-                content: {
-                  files: [
-                    {
-                      name: ".gitkeep",
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-        {
-          name: "content",
-          content: {
-            folders: [
-              {
-                name: "site",
-                content: {
-                  files: [
-                    {
-                      name: "index.html",
-                    },
-                  ],
-                },
-              },
-            ],
-            files: [
-              {
-                name: "favicon.ico",
-              },
-              {
-                name: "package.json",
-                fileContent: JSON.stringify(
-                  new ProjectPackageJson(projectName),
-                  null,
-                  4
-                ),
-              },
-              {
-                name: "snowpack.config.js",
-              },
-            ],
-          },
-        },
-      ],
-      files: [
-        {
-          name: ".gitignore",
-        },
-      ],
-    };
+    this.content = new GenerateStructureOutline(projectName);
   }
 
-  static readTotalStructureCount = (
+  private readTotalStructureCount = (
     folderStructure: CountStructure
   ): number => {
     const { content, count } = folderStructure;
@@ -163,7 +68,7 @@ class GenerateContent implements GenerateStructure {
 
     content?.folders?.forEach((element: InnerContentProperties) => {
       if (element.content)
-        structureCount = GenerateContent.readTotalStructureCount({
+        structureCount = this.readTotalStructureCount({
           content: element.content,
           count: structureCount,
         });
@@ -172,19 +77,15 @@ class GenerateContent implements GenerateStructure {
     return structureCount;
   };
 
-  static createStructureObservable = (folderStructure: ReadStructure) => {
+  private createStructureObservable = (folderStructure: ReadStructure) => {
     const { content, parentFolder$, parentFolderPath } = folderStructure;
-    console.log("folderStructure", folderStructure);
-    console.log("content", content);
 
     // Generate the files
-    content?.files?.forEach((element: InnerContentProperties) => {
+    content?.files?.forEach((element: FileContentProperties) => {
       const newFileName = path.join(parentFolderPath, element.name),
         createFile$ = writeFile(newFileName, "").pipe(share());
 
-      concat(parentFolder$, createFile$).subscribe((data) => {
-        console.log("created file because parent folder is ready", data);
-      });
+      concat(parentFolder$, createFile$).subscribe(() => {});
     });
 
     // Generate the folders
@@ -192,12 +93,10 @@ class GenerateContent implements GenerateStructure {
       const newFolderName = path.join(parentFolderPath, element.name),
         createFolder$ = mkdir(newFolderName).pipe(share());
 
-      concat(parentFolder$, createFolder$).subscribe((data) => {
-        console.log("created folder because parent folder is ready", data);
-      });
+      concat(parentFolder$, createFolder$).subscribe(() => {});
 
       if (element.content)
-        GenerateContent.createStructureObservable({
+        this.createStructureObservable({
           parentFolder$: createFolder$,
           parentFolderPath: newFolderName,
           content: element.content,
@@ -205,12 +104,10 @@ class GenerateContent implements GenerateStructure {
     });
   };
 
-  static generateStructure = (folderStructure: ReadStructure) => {
-    const structureCount = GenerateContent.readTotalStructureCount(
-      folderStructure
-    );
+  public generateStructure = () => {
+    const structureCount = this.readTotalStructureCount(this);
 
-    GenerateContent.createStructureObservable(folderStructure);
+    this.createStructureObservable(this);
   };
 }
 

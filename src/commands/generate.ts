@@ -42,8 +42,8 @@ export default class Generate extends Command {
     );
 
     // Determine the project folder name
-    const executionPath = process.cwd();
-    const parentFolderPath = path.join(executionPath, "/", folderName);
+    const executionPath = process.cwd(),
+      parentFolderPath = path.join(executionPath, "/", folderName);
 
     // Read the project folder for generating the observable creating chain
     const folderStructure = new GenerateContent(
@@ -52,8 +52,9 @@ export default class Generate extends Command {
       parentFolderPath
     );
 
+    // Project folder ready for the content inside to be generated
     projectFolder$.subscribe(() => {
-      GenerateContent.generateStructure(folderStructure);
+      folderStructure.generateStructure();
     });
 
     // const generateProject$ = this.generateProject({ folderName, flags })
