@@ -36,6 +36,7 @@ export default class Generate extends Command {
 
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
+    // TODO: Move the 'generate-project' content here
     const projectFolder$ = this.generateProject({ folderName, flags }).pipe(
       share()
     );
@@ -52,8 +53,6 @@ export default class Generate extends Command {
     );
 
     projectFolder$.subscribe(() => {
-      // TODO: Append key of parent folder observable to one level below
-      // folders or files key for subscribing to for proper creation
       GenerateContent.generateStructure(folderStructure);
     });
 

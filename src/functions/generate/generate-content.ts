@@ -3,7 +3,8 @@ const path = require("path");
 
 // Third party modules
 import { concat, Observable } from "rxjs";
-import { writeFile } from "@rxnode/fs";
+import { writeFile, mkdir } from "@rxnode/fs";
+import { share } from "rxjs/operators";
 
 class ProjectPackageJson {
   constructor(name: string) {
@@ -176,15 +177,31 @@ class GenerateContent implements GenerateStructure {
     console.log("folderStructure", folderStructure);
     console.log("content", content);
 
-    content?.files.forEach((element: InnerContentProperties) => {
-      console.log("element", element);
-
-      const newFileName = path.join(parentFolderPath, element.name);
-      const createFile$ = writeFile(newFileName, "");
+    // Generate the files
+    content?.files?.forEach((element: InnerContentProperties) => {
+      const newFileName = path.join(parentFolderPath, element.name),
+        createFile$ = writeFile(newFileName, "").pipe(share());
 
       concat(parentFolder$, createFile$).subscribe((data) => {
-        console.log("created file becaue parent folder is ready", data);
+        console.log("created file because parent folder is ready", data);
       });
+    });
+
+    // Generate the folders
+    content?.folders?.forEach((element: InnerContentProperties) => {
+      const newFolderName = path.join(parentFolderPath, element.name),
+        createFolder$ = mkdir(newFolderName).pipe(share());
+
+      concat(parentFolder$, createFolder$).subscribe((data) => {
+        console.log("created folder because parent folder is ready", data);
+      });
+
+      if (element.content)
+        GenerateContent.createStructureObservable({
+          parentFolder$: createFolder$,
+          parentFolderPath: newFolderName,
+          content: element.content,
+        });
     });
   };
 
