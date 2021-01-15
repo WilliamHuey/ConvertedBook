@@ -5,7 +5,7 @@ const path = require("path");
 // Third party modules
 import { Command, flags } from "@oclif/command";
 import { bindCallback } from "rxjs";
-import { takeLast, tap, mergeMap } from "rxjs/operators";
+import { takeLast, tap, mergeMap, share } from "rxjs/operators";
 import { isUndefined } from "is-what";
 
 // Libraries modules
@@ -34,19 +34,24 @@ export default class Generate extends Command {
     const { args, flags } = this.parse(Generate),
       { folderName } = args;
 
-    const executionPath = process.cwd();
-    const parentFolderPath = path.join(executionPath, "/");
-
-    // Read the project folder for generating the observable creating chain
-    const folderStructure = new GenerateContent(folderName, parentFolderPath);
-
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
-    const projectFolder$ = this.generateProject({ folderName, flags });
+    const projectFolder$ = this.generateProject({ folderName, flags }).pipe(
+      share()
+    );
+
+    // Determine the project folder name
+    const executionPath = process.cwd();
+    const parentFolderPath = path.join(executionPath, "/", folderName);
+
+    // Read the project folder for generating the observable creating chain
+    const folderStructure = new GenerateContent(
+      folderName,
+      projectFolder$,
+      parentFolderPath
+    );
 
     projectFolder$.subscribe(() => {
-      console.log("folderStructure", folderStructure);
-
       // TODO: Append key of parent folder observable to one level below
       // folders or files key for subscribing to for proper creation
       GenerateContent.generateStructure(folderStructure);

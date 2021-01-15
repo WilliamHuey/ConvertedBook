@@ -1,3 +1,10 @@
+// Native modules
+const path = require("path");
+
+// Third party modules
+import { concat, Observable } from "rxjs";
+import { writeFile } from "@rxnode/fs";
+
 class ProjectPackageJson {
   constructor(name: string) {
     Object.assign(this, {
@@ -19,11 +26,18 @@ class ProjectPackageJson {
 
 interface GenerateStructure {
   projectName: string;
+  parentFolder$: Observable<any>;
   parentFolderPath: string;
   content: Record<any, any>;
 }
 
 interface ReadStructure {
+  parentFolder$: Observable<any>;
+  parentFolderPath: string;
+  content: Record<any, any>;
+}
+
+interface CountStructure {
   count?: number;
   content: Record<any, any>;
 }
@@ -49,9 +63,11 @@ interface ContentProperties {
 class GenerateContent implements GenerateStructure {
   content: ContentProperties;
 
-  constructor(public projectName: string, public parentFolderPath: string) {
-    this.projectName = projectName;
-
+  constructor(
+    public projectName: string,
+    public parentFolder$: Observable<any>,
+    public parentFolderPath: string
+  ) {
     // Create project folder
     /*
 
@@ -128,7 +144,9 @@ class GenerateContent implements GenerateStructure {
     };
   }
 
-  static readTotalStructureCount = (folderStructure: ReadStructure): number => {
+  static readTotalStructureCount = (
+    folderStructure: CountStructure
+  ): number => {
     const { content, count } = folderStructure;
 
     // Count the initial folder as one item
@@ -153,10 +171,29 @@ class GenerateContent implements GenerateStructure {
     return structureCount;
   };
 
+  static createStructureObservable = (folderStructure: ReadStructure) => {
+    const { content, parentFolder$, parentFolderPath } = folderStructure;
+    console.log("folderStructure", folderStructure);
+    console.log("content", content);
+
+    content?.files.forEach((element: InnerContentProperties) => {
+      console.log("element", element);
+
+      const newFileName = path.join(parentFolderPath, element.name);
+      const createFile$ = writeFile(newFileName, "");
+
+      concat(parentFolder$, createFile$).subscribe((data) => {
+        console.log("created file becaue parent folder is ready", data);
+      });
+    });
+  };
+
   static generateStructure = (folderStructure: ReadStructure) => {
     const structureCount = GenerateContent.readTotalStructureCount(
       folderStructure
     );
+
+    GenerateContent.createStructureObservable(folderStructure);
   };
 }
 
