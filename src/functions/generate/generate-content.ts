@@ -82,8 +82,9 @@ class GenerateContent implements GenerateStructure {
 
     // Generate the files
     content?.files?.forEach((element: FileContentProperties) => {
-      const newFileName = path.join(parentFolderPath, element.name),
-        createFile$ = writeFile(newFileName, "").pipe(share());
+      const fileContent = element.fileContent ? element.fileContent : "",
+        newFileName = path.join(parentFolderPath, element.name),
+        createFile$ = writeFile(newFileName, fileContent).pipe(share());
 
       concat(parentFolder$, createFile$).subscribe(() => {});
     });

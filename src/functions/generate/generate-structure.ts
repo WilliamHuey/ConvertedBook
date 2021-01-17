@@ -17,6 +17,74 @@ class ProjectPackageJson {
   }
 }
 
+const indexHtml = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Blank favicon.ico, remove and replace with your own -->
+    <link href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII=" rel="icon" type="image/x-icon" />
+
+    <title>Document</title>
+  </head>
+  <body>
+    <p>
+      A start of a new project.
+    </p>
+  </body>
+</html>
+`;
+
+// Customize node project gitignore from
+// https://github.com/github/gitignore/blob/master/Node.gitignore
+const gitignore = `
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Dependency directories
+node_modules/
+
+# Snowpack dependency directory (https://snowpack.dev/)
+web_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# dotenv environment variables file
+.env
+.env.test
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Generated content
+build/
+`;
+
+const snowpack = `
+module.exports = {
+  mount: {
+    "site": "/"
+  }
+};
+`;
+
 export class GenerateStructureOutline {
   constructor(projectName: string) {
     /*
@@ -61,6 +129,7 @@ export class GenerateStructureOutline {
                   files: [
                     {
                       name: "index.html",
+                      fileContent: indexHtml,
                     },
                   ],
                 },
@@ -80,6 +149,7 @@ export class GenerateStructureOutline {
               },
               {
                 name: "snowpack.config.js",
+                fileContent: snowpack,
               },
             ],
           },
@@ -88,6 +158,7 @@ export class GenerateStructureOutline {
       files: [
         {
           name: ".gitignore",
+          fileContent: gitignore,
         },
       ],
     });
