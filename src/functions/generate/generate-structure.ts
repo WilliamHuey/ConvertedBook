@@ -17,26 +17,6 @@ class ProjectPackageJson {
   }
 }
 
-const indexHtml = `
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- Blank favicon.ico, remove and replace with your own -->
-    <link href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII=" rel="icon" type="image/x-icon" />
-
-    <title>Document</title>
-  </head>
-  <body>
-    <p>
-      A start of a new project.
-    </p>
-  </body>
-</html>
-`;
-
 // Customize node project gitignore from
 // https://github.com/github/gitignore/blob/master/Node.gitignore
 const gitignore = `
@@ -85,6 +65,21 @@ module.exports = {
 };
 `;
 
+const sampleTex = `
+\\documentclass{article}
+
+\\usepackage[margin=0.5in]{geometry}
+\\title{Tex}
+\\date{}
+
+\\begin{document}
+\\maketitle
+
+\\section{Introduction}
+
+\\end{document}
+`;
+
 export class GenerateStructureOutline {
   constructor(projectName: string) {
     /*
@@ -94,8 +89,9 @@ export class GenerateStructureOutline {
           /latex
             .gitkeep
         /content
+          /latex
+            sample.tex
           /site
-            index.html
             favicon.ico
             package.json
             snowpack.config.js
@@ -125,11 +121,14 @@ export class GenerateStructureOutline {
             folders: [
               {
                 name: "site",
+              },
+              {
+                name: "latex",
                 content: {
                   files: [
                     {
-                      name: "index.html",
-                      fileContent: indexHtml,
+                      name: "sample.tex",
+                      fileContent: sampleTex,
                     },
                   ],
                 },
