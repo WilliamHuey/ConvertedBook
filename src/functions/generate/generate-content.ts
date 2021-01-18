@@ -2,9 +2,9 @@
 const path = require("path");
 
 // Third party modules
-import { concat, Observable } from "rxjs";
+import { concat, Observable, BehaviorSubject } from "rxjs";
+import { share, scan, takeLast, skipWhile } from "rxjs/operators";
 import { writeFile, mkdir } from "@rxnode/fs";
-import { share } from "rxjs/operators";
 
 // Library modules
 import { GenerateStructureOutline } from "./generate-structure";
@@ -17,6 +17,7 @@ interface ReadStructure {
   parentFolder$: Observable<any>;
   parentFolderPath: string;
   content: ContentProperties;
+  structureCreationCountSubject: BehaviorSubject<number>;
 }
 
 interface CountStructure {
@@ -41,6 +42,7 @@ interface ContentProperties {
 
 class GenerateContent implements GenerateStructure {
   content: ContentProperties;
+  structureCreationCountSubject: BehaviorSubject<number>;
 
   constructor(
     public projectName: string,
@@ -48,6 +50,9 @@ class GenerateContent implements GenerateStructure {
     public parentFolderPath: string
   ) {
     this.content = new GenerateStructureOutline(projectName);
+
+    // Start at 1 because the project folder has already been created
+    this.structureCreationCountSubject = new BehaviorSubject(1);
   }
 
   private readTotalStructureCount = (
@@ -86,7 +91,11 @@ class GenerateContent implements GenerateStructure {
         newFileName = path.join(parentFolderPath, element.name),
         createFile$ = writeFile(newFileName, fileContent).pipe(share());
 
-      concat(parentFolder$, createFile$).subscribe(() => {});
+      concat(parentFolder$, createFile$)
+        .pipe(takeLast(1))
+        .subscribe(() => {
+          folderStructure.structureCreationCountSubject.next(1);
+        });
     });
 
     // Generate the folders
@@ -94,21 +103,47 @@ class GenerateContent implements GenerateStructure {
       const newFolderName = path.join(parentFolderPath, element.name),
         createFolder$ = mkdir(newFolderName).pipe(share());
 
-      concat(parentFolder$, createFolder$).subscribe(() => {});
+      concat(parentFolder$, createFolder$)
+        .pipe(takeLast(1))
+        .subscribe(() => {
+          folderStructure.structureCreationCountSubject.next(1);
+        });
 
       if (element.content)
         this.createStructureObservable({
           parentFolder$: createFolder$,
           parentFolderPath: newFolderName,
           content: element.content,
+          structureCreationCountSubject:
+            folderStructure.structureCreationCountSubject,
         });
     });
   };
 
-  public generateStructure = () => {
+  public generateStructure = (): {
+    structureCreationCount$: Observable<number>;
+  } => {
     const structureCount = this.readTotalStructureCount(this);
 
+    // Start reading the structure and generate the folders
+    // and files inside the main project folder
     this.createStructureObservable(this);
+
+    // Keep a running count of the folder and files created
+    // until it reaches to the total count of the folder and files
+    // as to indicate later on the whole project generation completion
+    const structureCreationCount$ = this.structureCreationCountSubject
+      .asObservable()
+      .pipe(
+        scan((acc, curr: number) => acc + curr, 0),
+        skipWhile((structureCreationCount) => {
+          return structureCreationCount !== structureCount;
+        })
+      );
+
+    return {
+      structureCreationCount$,
+    };
   };
 }
 

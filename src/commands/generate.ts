@@ -4,7 +4,7 @@ const path = require("path");
 
 // Third party modules
 import { Command, flags } from "@oclif/command";
-import { bindCallback } from "rxjs";
+import { bindCallback, Observable } from "rxjs";
 import { takeLast, tap, mergeMap, share } from "rxjs/operators";
 import { isUndefined } from "is-what";
 
@@ -53,9 +53,15 @@ export default class Generate extends Command {
     );
 
     // Project folder ready for the content inside to be generated
-    projectFolder$.subscribe(() => {
-      folderStructure.generateStructure();
-    });
+    projectFolder$
+      .pipe(
+        mergeMap(() => {
+          return folderStructure.generateStructure().structureCreationCount$;
+        })
+      )
+      .subscribe((structureCount) => {
+        console.log("structureCount", structureCount);
+      });
 
     // const generateProject$ = this.generateProject({ folderName, flags })
     //   .pipe(takeLast(1));
