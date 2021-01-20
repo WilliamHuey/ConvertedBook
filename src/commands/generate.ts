@@ -9,8 +9,8 @@ import { takeLast, tap, mergeMap, share } from "rxjs/operators";
 import { isUndefined } from "is-what";
 
 // Libraries modules
-import { generateProject } from "../functions/generate/generate-imports";
 import { GenerateContent } from "../functions/generate/generate-content";
+import { mkdir } from "@rxnode/fs";
 
 export default class Generate extends Command {
   static description = 'Create a "convertedbook" project folder.';
@@ -28,22 +28,23 @@ export default class Generate extends Command {
 
   static args = [{ name: "folderName" }];
 
-  public generateProject = generateProject.bind(this);
-
   async run() {
-    const { args, flags } = this.parse(Generate),
+    const { args } = this.parse(Generate),
       { folderName } = args;
 
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
-    // TODO: Move the 'generate-project' content here
-    const projectFolder$ = this.generateProject({ folderName, flags }).pipe(
-      share()
-    );
+    const normalizedFolder =
+      isUndefined(folderName) || folderName?.length === 0
+        ? "New Folder"
+        : folderName;
 
     // Determine the project folder name
     const executionPath = process.cwd(),
       parentFolderPath = path.join(executionPath, "/", folderName);
+    const projectFolder$ = mkdir(
+      path.join(executionPath, "/", normalizedFolder)
+    ).pipe(share());
 
     // Read the project folder for generating the observable creating chain
     const folderStructure = new GenerateContent(

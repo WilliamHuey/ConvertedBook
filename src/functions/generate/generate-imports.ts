@@ -1,1 +1,0 @@
-export { generateProject } from './generate-project';
