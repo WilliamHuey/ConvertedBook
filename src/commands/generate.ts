@@ -4,8 +4,8 @@ const path = require("path");
 
 // Third party modules
 import { Command, flags } from "@oclif/command";
-import { bindCallback, Observable } from "rxjs";
-import { takeLast, tap, mergeMap, share } from "rxjs/operators";
+import { bindCallback } from "rxjs";
+import { tap, mergeMap, share } from "rxjs/operators";
 import { isUndefined } from "is-what";
 import { match } from "ts-pattern";
 
@@ -59,6 +59,25 @@ export default class Generate extends Command {
       .pipe(
         mergeMap(() => {
           return folderStructure.generateStructure().structureCreationCount$;
+        }),
+        tap(() => {
+          console.log("Created project folders and files");
+          console.log("Now downloading node modules...");
+        }),
+        mergeMap(() => {
+          const normalizedFolder =
+            isUndefined(folderName) || folderName?.length === 0
+              ? "New Folder"
+              : folderName;
+          const executionPath = process.cwd(),
+            npmService = spawn("npm", ["install"], {
+              cwd: path.join(executionPath, "/", normalizedFolder, "/content/"),
+            });
+
+          const npmOnComplete$ = bindCallback(npmService.stdout.on),
+            npmClose$ = npmOnComplete$.call(npmService, "close");
+
+          return npmClose$;
         })
       )
       .subscribe({
@@ -76,38 +95,9 @@ export default class Generate extends Command {
             )
             .otherwise(() => console.log("Error: Can not create folder"));
         },
-        next: (structureCount) => {
-          console.log("structureCount", structureCount);
+        next: () => {
+          console.log("Complete project generation");
         },
       });
-
-    // const generateProject$ = this.generateProject({ folderName, flags })
-    //   .pipe(takeLast(1));
-
-    // generateProject$
-    //   .pipe(takeLast(1))
-    //   .pipe(
-    //     tap(() => console.log('Downloading node modules...')),
-    //     mergeMap(() => {
-    //       const normalizedFolder = isUndefined(folderName) || folderName?.length === 0 ?
-    //         'New Folder' : folderName;
-    //       const executionPath = process.cwd(),
-    //         npmService = spawn('npm', ['install'], { cwd: path.join(executionPath, '/', normalizedFolder, '/content/') });
-
-    //       const npmOnComplete$ = bindCallback(
-    //         npmService.stdout.on);
-
-    //       const npmClose$ = npmOnComplete$
-    //         .call(npmService, 'close');
-
-    //       return npmClose$;
-    //     })
-    //   )
-    //   .subscribe({
-    //     error: () => { },
-    //     next: () => {
-    //       console.log('Complete project generation')
-    //     }
-    //   });
   }
 }
