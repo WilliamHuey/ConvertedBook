@@ -1,13 +1,13 @@
 // Native modules
-const path = require("path");
+const path = require('path');
 
 // Third party modules
-import { concat, Observable, BehaviorSubject } from "rxjs";
-import { share, scan, takeLast, skipWhile } from "rxjs/operators";
-import { writeFile, mkdir } from "@rxnode/fs";
+import { concat, Observable, BehaviorSubject } from 'rxjs';
+import { share, scan, takeLast, skipWhile } from 'rxjs/operators';
+import { writeFile, mkdir } from '@rxnode/fs';
 
 // Library modules
-import { GenerateStructureOutline } from "./generate-structure";
+import { GenerateStructureOutline } from './generate-structure';
 
 interface GenerateStructure extends ReadStructure {
   projectName: string;
@@ -42,6 +42,7 @@ interface ContentProperties {
 
 class GenerateContent implements GenerateStructure {
   content: ContentProperties;
+
   structureCreationCountSubject: BehaviorSubject<number>;
 
   constructor(
@@ -61,15 +62,15 @@ class GenerateContent implements GenerateStructure {
     const { content, count } = folderStructure;
 
     // Count the initial folder as one item
-    let structureCount = typeof count === "undefined" ? 1 : count;
+    let structureCount = typeof count === 'undefined' ? 1 : count;
 
-    structureCount = content?.folders?.length
-      ? structureCount + content?.folders.length
-      : structureCount;
+    structureCount = content?.folders?.length ?
+      structureCount + content?.folders.length :
+      structureCount;
 
-    structureCount = content?.files?.length
-      ? structureCount + content?.files.length
-      : structureCount;
+    structureCount = content?.files?.length ?
+      structureCount + content?.files.length :
+      structureCount;
 
     content?.folders?.forEach((element: InnerContentProperties) => {
       if (element.content)
@@ -87,7 +88,7 @@ class GenerateContent implements GenerateStructure {
 
     // Generate the files
     content?.files?.forEach((element: FileContentProperties) => {
-      const fileContent = element.fileContent ? element.fileContent : "",
+      const fileContent = element.fileContent ? element.fileContent : '',
         newFileName = path.join(parentFolderPath, element.name),
         createFile$ = writeFile(newFileName, fileContent).pipe(share());
 
@@ -136,7 +137,7 @@ class GenerateContent implements GenerateStructure {
       .asObservable()
       .pipe(
         scan((acc, curr: number) => acc + curr, 0),
-        skipWhile((structureCreationCount) => {
+        skipWhile(structureCreationCount => {
           return structureCreationCount !== structureCount;
         })
       );

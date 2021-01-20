@@ -1,33 +1,33 @@
 // Native modules
-import { spawn } from "child_process";
-const path = require("path");
+import { spawn } from 'child_process';
+const path = require('path');
 
 // Third party modules
-import { Command, flags } from "@oclif/command";
-import { bindCallback } from "rxjs";
-import { tap, mergeMap, share } from "rxjs/operators";
-import { isUndefined } from "is-what";
-import { match } from "ts-pattern";
+import { Command, flags } from '@oclif/command';
+import { bindCallback } from 'rxjs';
+import { tap, mergeMap, share } from 'rxjs/operators';
+import { isUndefined } from 'is-what';
+import { match } from 'ts-pattern';
 
 // Libraries modules
-import { GenerateContent } from "../functions/generate/generate-content";
-import { mkdir } from "@rxnode/fs";
+import { GenerateContent } from '../functions/generate/generate-content';
+import { mkdir } from '@rxnode/fs';
 
 export default class Generate extends Command {
   static description = 'Create a "convertedbook" project folder.';
 
   static flags = {
-    help: flags.help({ char: "h" }),
+    help: flags.help({ char: 'h' }),
     // flag with a value (-n, --name=VALUE)
-    name: flags.string({ char: "n", description: "Generate" }),
+    name: flags.string({ char: 'n', description: 'Generate' }),
     // flag with no value (-f, --force)
-    force: flags.boolean({ char: "f" }),
-    "project-name": flags.string({ char: "p" }),
+    force: flags.boolean({ char: 'f' }),
+    'project-name': flags.string({ char: 'p' }),
   };
 
-  static aliases = ["g"];
+  static aliases = ['g'];
 
-  static args = [{ name: "folderName" }];
+  static args = [{ name: 'folderName' }];
 
   async run() {
     const { args } = this.parse(Generate),
@@ -36,15 +36,15 @@ export default class Generate extends Command {
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
     const normalizedFolder =
-      isUndefined(folderName) || folderName?.length === 0
-        ? "New Folder"
-        : folderName;
+      isUndefined(folderName) || folderName?.length === 0 ?
+        'New Folder' :
+        folderName;
 
     // Determine the project folder name
     const executionPath = process.cwd(),
-      parentFolderPath = path.join(executionPath, "/", folderName);
+      parentFolderPath = path.join(executionPath, '/', folderName);
     const projectFolder$ = mkdir(
-      path.join(executionPath, "/", normalizedFolder)
+      path.join(executionPath, '/', normalizedFolder)
     ).pipe(share());
 
     // Read the project folder for generating the observable creating chain
@@ -61,31 +61,31 @@ export default class Generate extends Command {
           return folderStructure.generateStructure().structureCreationCount$;
         }),
         tap(() => {
-          console.log("Created project folders and files");
-          console.log("Now downloading node modules...");
+          console.log('Created project folders and files');
+          console.log('Now downloading node modules...');
         }),
         mergeMap(() => {
           const normalizedFolder =
-            isUndefined(folderName) || folderName?.length === 0
-              ? "New Folder"
-              : folderName;
+            isUndefined(folderName) || folderName?.length === 0 ?
+              'New Folder' :
+              folderName;
           const executionPath = process.cwd(),
-            npmService = spawn("npm", ["install"], {
-              cwd: path.join(executionPath, "/", normalizedFolder, "/content/"),
+            npmService = spawn('npm', ['install'], {
+              cwd: path.join(executionPath, '/', normalizedFolder, '/content/'),
             });
 
           const npmOnComplete$ = bindCallback(npmService.stdout.on),
-            npmClose$ = npmOnComplete$.call(npmService, "close");
+            npmClose$ = npmOnComplete$.call(npmService, 'close');
 
           return npmClose$;
         })
       )
       .subscribe({
-        error: (error) => {
+        error: error => {
           match(error)
             .with(
               {
-                code: "EEXIST",
+                code: 'EEXIST',
               },
               () => {
                 console.log(
@@ -93,10 +93,10 @@ export default class Generate extends Command {
                 );
               }
             )
-            .otherwise(() => console.log("Error: Can not create folder"));
+            .otherwise(() => console.log('Error: Can not create folder'));
         },
         next: () => {
-          console.log("Complete project generation");
+          console.log('Complete project generation');
         },
       });
   }

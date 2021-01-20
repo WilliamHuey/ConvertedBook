@@ -1,17 +1,17 @@
 class ProjectPackageJson {
   constructor(name: string) {
     Object.assign(this, {
-      name: name || "<from cli input name>",
-      version: "1.0.0",
-      description: "",
-      main: "index.js",
-      author: "",
-      license: "ISC",
+      name: name || '<from cli input name>',
+      version: '1.0.0',
+      description: '',
+      main: 'index.js',
+      author: '',
+      license: 'ISC',
       dependencies: {
-        snowpack: "^2.17.1",
+        snowpack: '^2.17.1',
       },
       scripts: {
-        start: "snowpack dev",
+        start: 'snowpack dev',
       },
     });
   }
@@ -99,15 +99,15 @@ export class GenerateStructureOutline {
     Object.assign(this, {
       folders: [
         {
-          name: "config",
+          name: 'config',
           content: {
             folders: [
               {
-                name: "latex",
+                name: 'latex',
                 content: {
                   files: [
                     {
-                      name: ".gitkeep",
+                      name: '.gitkeep',
                     },
                   ],
                 },
@@ -116,18 +116,18 @@ export class GenerateStructureOutline {
           },
         },
         {
-          name: "content",
+          name: 'content',
           content: {
             folders: [
               {
-                name: "site",
+                name: 'site',
               },
               {
-                name: "latex",
+                name: 'latex',
                 content: {
                   files: [
                     {
-                      name: "sample.tex",
+                      name: 'sample.tex',
                       fileContent: sampleTex,
                     },
                   ],
@@ -136,10 +136,10 @@ export class GenerateStructureOutline {
             ],
             files: [
               {
-                name: "favicon.ico",
+                name: 'favicon.ico',
               },
               {
-                name: "package.json",
+                name: 'package.json',
                 fileContent: JSON.stringify(
                   new ProjectPackageJson(projectName),
                   null,
@@ -147,7 +147,7 @@ export class GenerateStructureOutline {
                 ),
               },
               {
-                name: "snowpack.config.js",
+                name: 'snowpack.config.js',
                 fileContent: snowpack,
               },
             ],
@@ -156,7 +156,7 @@ export class GenerateStructureOutline {
       ],
       files: [
         {
-          name: ".gitignore",
+          name: '.gitignore',
           fileContent: gitignore,
         },
       ],
