@@ -7,6 +7,7 @@ import { Command, flags } from "@oclif/command";
 import { bindCallback, Observable } from "rxjs";
 import { takeLast, tap, mergeMap, share } from "rxjs/operators";
 import { isUndefined } from "is-what";
+import { match } from "ts-pattern";
 
 // Libraries modules
 import { GenerateContent } from "../functions/generate/generate-content";
@@ -60,8 +61,24 @@ export default class Generate extends Command {
           return folderStructure.generateStructure().structureCreationCount$;
         })
       )
-      .subscribe((structureCount) => {
-        console.log("structureCount", structureCount);
+      .subscribe({
+        error: (error) => {
+          match(error)
+            .with(
+              {
+                code: "EEXIST",
+              },
+              () => {
+                console.log(
+                  `Error: Folder already exists: ${error.path}, project was not generated`
+                );
+              }
+            )
+            .otherwise(() => console.log("Error: Can not create folder"));
+        },
+        next: (structureCount) => {
+          console.log("structureCount", structureCount);
+        },
       });
 
     // const generateProject$ = this.generateProject({ folderName, flags })
