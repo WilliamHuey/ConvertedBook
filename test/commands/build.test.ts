@@ -2,7 +2,7 @@
 const path = require('path');
 
 // Third party modules
-import { expect, test } from '@oclif/test';
+import { expect } from '@oclif/test';
 import { unnest } from 'ramda';
 const del = require('del');
 
@@ -12,6 +12,7 @@ import { AsyncCheckResults } from '../../src/functions/build/build-cli-input-asy
 import { buildGenerate } from '../../src/functions/build/build-generate';
 import CheckResults from '../fixtures/objects/check-results';
 import AsyncCheckRes from '../fixtures/objects/async-check-results';
+import { retryTest, baseTempFolder, dryFlag } from './test-utilities';
 
 describe('Build', () => {
   const testDataDirectory = path.join(__dirname, '../', 'fixtures/io/');
@@ -20,23 +21,10 @@ describe('Build', () => {
   const validInputFlag = `--input=${testDataDirectory}input.latex`;
   const validOutputFlag = `--output=${testDataDirectory}`;
   const flags = [validInputFlag, validOutputFlag];
-  const dryFlag = ['-d=true'];
-
-  // Remove generated testing files
-  // after the set of tests have completed
-  const baseTempFolder = path.join(__dirname, '../temp/');
 
   after(() => {
     del([`${baseTempFolder}*`, `!${baseTempFolder}.gitkeep`]);
   });
-
-  // Observables resolution is slow and the
-  // tests need retries to prevent incorrect
-  // readings
-  const retryTest = function () {
-    return test
-      .retries(100);
-  };
 
   retryTest()
     .stdout()

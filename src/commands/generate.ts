@@ -22,7 +22,8 @@ export default class Generate extends Command {
     name: flags.string({ char: 'n', description: 'Generate' }),
     // flag with no value (-f, --force)
     force: flags.boolean({ char: 'f' }),
-    'project-name': flags.string({ char: 'p' }),
+    'npm-project-name': flags.string({ char: 'p' }),
+    'dry-run': flags.string({ char: 'd' })
   };
 
   static aliases = ['g'];
@@ -64,21 +65,21 @@ export default class Generate extends Command {
           console.log('Created project folders and files');
           console.log('Now downloading node modules...');
         }),
-        mergeMap(() => {
-          const normalizedFolder =
-            isUndefined(folderName) || folderName?.length === 0 ?
-              'New Folder' :
-              folderName;
-          const executionPath = process.cwd(),
-            npmService = spawn('npm', ['install'], {
-              cwd: path.join(executionPath, '/', normalizedFolder, '/content/'),
-            });
+        // mergeMap(() => {
+        //   const normalizedFolder =
+        //     isUndefined(folderName) || folderName?.length === 0 ?
+        //       'New Folder' :
+        //       folderName;
+        //   const executionPath = process.cwd(),
+        //     npmService = spawn('npm', ['install'], {
+        //       cwd: path.join(executionPath, '/', normalizedFolder, '/content/'),
+        //     });
 
-          const npmOnComplete$ = bindCallback(npmService.stdout.on),
-            npmClose$ = npmOnComplete$.call(npmService, 'close');
+        //   const npmOnComplete$ = bindCallback(npmService.stdout.on),
+        //     npmClose$ = npmOnComplete$.call(npmService, 'close');
 
-          return npmClose$;
-        })
+        //   return npmClose$;
+        // })
       )
       .subscribe({
         error: error => {
