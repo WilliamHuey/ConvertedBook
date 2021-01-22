@@ -4,8 +4,8 @@ const path = require('path');
 
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { bindCallback } from 'rxjs';
-import { tap, mergeMap, share } from 'rxjs/operators';
+import { bindCallback, NEVER, of } from 'rxjs';
+import { tap, mergeMap, share, takeUntil } from 'rxjs/operators';
 import { isUndefined } from 'is-what';
 import { match } from 'ts-pattern';
 
@@ -30,9 +30,36 @@ export default class Generate extends Command {
 
   static args = [{ name: 'folderName' }];
 
+  private logCreationBegin = () => {
+    console.log('Created project folders and files');
+    console.log('Now downloading node modules...');
+  }
+
+  private logCreationDone = {
+    error: (error: any) => {
+      match(error)
+        .with(
+          {
+            code: 'EEXIST',
+          },
+          () => {
+            console.log(
+              `Error: Folder already exists: ${error.path}, project was not generated`
+            );
+          }
+        )
+        .otherwise(() => console.log('Error: Can not create folder'));
+    },
+    next: () => {
+      console.log('Complete project generation');
+    },
+  }
+
   async run() {
-    const { args } = this.parse(Generate),
+    const { args, flags } = this.parse(Generate),
       { folderName } = args;
+
+    console.log('flags', flags);
 
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
@@ -48,6 +75,9 @@ export default class Generate extends Command {
       path.join(executionPath, '/', normalizedFolder)
     ).pipe(share());
 
+    const projectFolderDry$ = flags['dry-run'] ?
+      of(path.join(executionPath, '/', normalizedFolder)) : NEVER;
+
     // Read the project folder for generating the observable creating chain
     const folderStructure = new GenerateContent(
       folderName,
@@ -55,16 +85,19 @@ export default class Generate extends Command {
       parentFolderPath
     );
 
+    // Project dry run to test out console logging
+    projectFolderDry$
+      .pipe(tap(this.logCreationBegin))
+      .subscribe(this.logCreationDone);
+
     // Project folder ready for the content inside to be generated
     projectFolder$
       .pipe(
+        takeUntil(projectFolderDry$),
         mergeMap(() => {
           return folderStructure.generateStructure().structureCreationCount$;
         }),
-        tap(() => {
-          console.log('Created project folders and files');
-          console.log('Now downloading node modules...');
-        }),
+        tap(this.logCreationBegin),
         // mergeMap(() => {
         //   const normalizedFolder =
         //     isUndefined(folderName) || folderName?.length === 0 ?
@@ -81,24 +114,6 @@ export default class Generate extends Command {
         //   return npmClose$;
         // })
       )
-      .subscribe({
-        error: error => {
-          match(error)
-            .with(
-              {
-                code: 'EEXIST',
-              },
-              () => {
-                console.log(
-                  `Error: Folder already exists: ${error.path}, project was not generated`
-                );
-              }
-            )
-            .otherwise(() => console.log('Error: Can not create folder'));
-        },
-        next: () => {
-          console.log('Complete project generation');
-        },
-      });
+      .subscribe(this.logCreationDone);
   }
 }
