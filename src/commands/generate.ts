@@ -70,13 +70,13 @@ export default class Generate extends Command {
 
     // Determine the project folder name
     const executionPath = process.cwd(),
-      parentFolderPath = path.join(executionPath, '/', folderName);
+      parentFolderPath = path.join(executionPath, folderName);
     const projectFolder$ = mkdir(
-      path.join(executionPath, '/', normalizedFolder)
+      path.join(executionPath, normalizedFolder)
     ).pipe(share());
 
     const projectFolderDry$ = flags['dry-run'] ?
-      of(path.join(executionPath, '/', normalizedFolder)) : NEVER;
+      of(path.join(executionPath, normalizedFolder)) : NEVER;
 
     // Read the project folder for generating the observable creating chain
     const folderStructure = new GenerateContent(
@@ -98,21 +98,23 @@ export default class Generate extends Command {
           return folderStructure.generateStructure().structureCreationCount$;
         }),
         tap(this.logCreationBegin),
-        // mergeMap(() => {
-        //   const normalizedFolder =
-        //     isUndefined(folderName) || folderName?.length === 0 ?
-        //       'New Folder' :
-        //       folderName;
-        //   const executionPath = process.cwd(),
-        //     npmService = spawn('npm', ['install'], {
-        //       cwd: path.join(executionPath, '/', normalizedFolder, '/content/'),
-        //     });
+        mergeMap(() => {
 
-        //   const npmOnComplete$ = bindCallback(npmService.stdout.on),
-        //     npmClose$ = npmOnComplete$.call(npmService, 'close');
+          // Install the NPM modules
+          const normalizedFolder =
+            isUndefined(folderName) || folderName?.length === 0 ?
+              'New Folder' :
+              folderName;
+          const executionPath = process.cwd(),
+            npmService = spawn('npm', ['install'], {
+              cwd: path.join(executionPath, normalizedFolder, 'content/'),
+            });
 
-        //   return npmClose$;
-        // })
+          const npmOnComplete$ = bindCallback(npmService.stdout.on),
+            npmClose$ = npmOnComplete$.call(npmService, 'close');
+
+          return npmClose$;
+        })
       )
       .subscribe(this.logCreationDone);
   }
