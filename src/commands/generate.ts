@@ -56,10 +56,8 @@ export default class Generate extends Command {
   }
 
   async run() {
-    const { args, flags } = this.parse(Generate),
+    const { args, flags, argv } = this.parse(Generate),
       { folderName } = args;
-
-    console.log('flags', flags);
 
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
@@ -76,7 +74,7 @@ export default class Generate extends Command {
     ).pipe(share());
 
     const projectFolderDry$ = flags['dry-run'] ?
-      of(path.join(executionPath, normalizedFolder)) : NEVER;
+      of(path.join(executionPath, normalizedFolder)).pipe(tap(this.logCreationBegin)) : NEVER;
 
     // Read the project folder for generating the observable creating chain
     const folderStructure = new GenerateContent(
@@ -87,11 +85,10 @@ export default class Generate extends Command {
 
     // Project dry run to test out console logging
     projectFolderDry$
-      .pipe(tap(this.logCreationBegin))
       .subscribe(this.logCreationDone);
 
     // Project folder ready for the content inside to be generated
-    projectFolder$
+    const projectFolderWithContents$ = projectFolder$
       .pipe(
         takeUntil(projectFolderDry$),
         mergeMap(() => {
@@ -116,6 +113,16 @@ export default class Generate extends Command {
           return npmClose$;
         })
       )
+      .pipe(share());
+
+    projectFolderWithContents$
       .subscribe(this.logCreationDone);
+
+    return {
+      projectFolderWithContents$:
+        projectFolderWithContents$,
+      projectFolderDry$:
+        projectFolderDry$.pipe(share())
+    };
   }
 }
