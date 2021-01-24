@@ -5,7 +5,7 @@ const path = require('path');
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { bindCallback, NEVER, of } from 'rxjs';
-import { tap, mergeMap, share, takeUntil } from 'rxjs/operators';
+import { tap, mergeMap, share, takeUntil, takeLast } from 'rxjs/operators';
 import { isUndefined } from 'is-what';
 import { match } from 'ts-pattern';
 
@@ -56,7 +56,7 @@ export default class Generate extends Command {
   }
 
   async run() {
-    const { args, flags, argv } = this.parse(Generate),
+    const { args, flags } = this.parse(Generate),
       { folderName } = args;
 
     // Generate the top folder project first, before using a recursive
@@ -74,7 +74,8 @@ export default class Generate extends Command {
     ).pipe(share());
 
     const projectFolderDry$ = flags['dry-run'] ?
-      of(path.join(executionPath, normalizedFolder)).pipe(tap(this.logCreationBegin)) : NEVER;
+      of(path.join(executionPath, normalizedFolder))
+        .pipe(share()) : NEVER;
 
     // Read the project folder for generating the observable creating chain
     const folderStructure = new GenerateContent(
@@ -83,14 +84,9 @@ export default class Generate extends Command {
       parentFolderPath
     );
 
-    // Project dry run to test out console logging
-    projectFolderDry$
-      .subscribe(this.logCreationDone);
-
     // Project folder ready for the content inside to be generated
     const projectFolderWithContents$ = projectFolder$
       .pipe(
-        takeUntil(projectFolderDry$),
         mergeMap(() => {
           return folderStructure.generateStructure().structureCreationCount$;
         }),
@@ -115,14 +111,20 @@ export default class Generate extends Command {
       )
       .pipe(share());
 
+    // Project dry run to test out console logging
+    projectFolderDry$
+      .pipe(tap(this.logCreationBegin))
+      .subscribe(this.logCreationDone);
+
     projectFolderWithContents$
+      .pipe(takeUntil(projectFolderDry$))
       .subscribe(this.logCreationDone);
 
     return {
       projectFolderWithContents$:
         projectFolderWithContents$,
       projectFolderDry$:
-        projectFolderDry$.pipe(share())
+        projectFolderDry$
     };
   }
 }

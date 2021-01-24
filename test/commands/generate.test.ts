@@ -21,7 +21,7 @@ describe('Generate', () => {
     });
 
   it('generate project goes to "completion" status', ctx => {
-    generate.run([projectFolderName])
+    generate.run([projectFolderName, "--npm-project-name", npmProjectName])
       .then((res) => {
         res.projectFolderWithContents$
           .subscribe({
