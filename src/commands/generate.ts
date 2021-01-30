@@ -4,22 +4,26 @@ const path = require('path');
 
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { bindCallback, NEVER, of } from 'rxjs';
-import { tap, mergeMap, share, takeUntil, takeLast } from 'rxjs/operators';
+import { bindCallback, of, from } from 'rxjs';
+import { tap, mergeMap, share, takeUntil, catchError, filter } from 'rxjs/operators';
 import { isUndefined } from 'is-what';
 import { match } from 'ts-pattern';
+const IsThere = require('is-there');
 
 // Libraries modules
 import { GenerateContent } from '../functions/generate/generate-content';
 import { mkdir } from '@rxnode/fs';
+import { truncateFilePath, supposedFileName } from '../functions/build/build-utilities';
 
 export default class Generate extends Command {
   static description = 'Create a "convertedbook" project folder.';
 
   static flags = {
     help: flags.help({ char: 'h' }),
+
     // flag with a value (-n, --name=VALUE)
     name: flags.string({ char: 'n', description: 'Generate' }),
+
     // flag with no value (-f, --force)
     force: flags.boolean({ char: 'f' }),
     'npm-project-name': flags.string({ char: 'p' }),
@@ -59,6 +63,8 @@ export default class Generate extends Command {
     const { args, flags } = this.parse(Generate),
       { folderName } = args;
 
+    const isDryRun = "dry-run" in flags;
+
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
     const normalizedFolder =
@@ -67,15 +73,99 @@ export default class Generate extends Command {
         folderName;
 
     // Determine the project folder name
+    const {
+      filePathFolder: parentFolderName,
+      filePathSplit
+    } = truncateFilePath(folderName);
+
+    const parentFolderNamePresent = parentFolderName.length > 0 ? true : false;
+    const normalizedParentFolderName = !parentFolderNamePresent ? normalizedFolder : parentFolderName;
+    const actualProjectFolderName = supposedFileName(normalizedFolder)
+      ?.join("");
+
+    const checkFullOutputPathProjectFolder$ = from(IsThere
+      .promises.directory(normalizedFolder) as Promise<boolean>);
+
+    // Verify the full project's folder existence or non-existence
+    const fullProjectFolderExists$ = checkFullOutputPathProjectFolder$
+      .pipe(
+        filter((outputFolder: boolean) => {
+          return outputFolder;
+        })
+      );
+    const fullProjectFolderNonExists$ = checkFullOutputPathProjectFolder$
+      .pipe(
+        filter((outputFolder: boolean) => {
+          return !outputFolder;
+        })
+      );
+
+    const checkOutputFolder$ = from(IsThere
+      .promises.directory(normalizedParentFolderName) as Promise<boolean>);
+
+    // Checking one level up the project to verify the proper placement
+    // of the project folder
+    const outputFolderExists$ = checkOutputFolder$
+      .pipe(
+        filter((outputFolder: boolean) => {
+
+          // Also accept the situation where only the project name exists
+          // by itself, meaning that the output folder should exist
+          return outputFolder || !parentFolderNamePresent;
+        })
+      );
+
+    const outputFolderNonExists$ = checkOutputFolder$
+      .pipe(
+        filter((outputFolder: boolean) => {
+          return !outputFolder;
+        })
+      );
+
+    const nonExistentUpperLevelFolder$ = outputFolderNonExists$
+      .pipe(
+        filter(() => {
+          return parentFolderNamePresent;
+        }),
+        takeUntil(outputFolderExists$)
+      );
+
+    nonExistentUpperLevelFolder$
+      .subscribe({
+        next: () => {
+          console.log(`Error: Non-existent parent folder for "${actualProjectFolderName}"`);
+        }
+      });
+
     const executionPath = process.cwd(),
       parentFolderPath = path.join(executionPath, folderName);
-    const projectFolder$ = mkdir(
-      path.join(executionPath, normalizedFolder)
-    ).pipe(share());
 
-    const projectFolderDry$ = flags['dry-run'] ?
-      of(path.join(executionPath, normalizedFolder))
-        .pipe(share()) : NEVER;
+    const creationVerified$ = fullProjectFolderNonExists$
+      .pipe(
+        mergeMap(() => {
+          return outputFolderExists$;
+        }),
+        takeUntil(nonExistentUpperLevelFolder$)
+      );
+
+    const projectFolder$ = creationVerified$
+      .pipe(
+        filter(() => {
+          return !isDryRun;
+        }),
+        mergeMap(() => {
+          return parentFolderNamePresent ?
+
+            // Output folder exists one level above the specified project folder name
+            // then create the project folder as is
+            mkdir(
+              filePathSplit.join("/")
+            ).pipe(share()) : mkdir(
+              path.join(executionPath, normalizedFolder)
+            ).pipe(share())
+        }
+
+        ), catchError(error => of(error)));
 
     // Read the project folder for generating the observable creating chain
     const folderStructure = new GenerateContent(
@@ -111,13 +201,26 @@ export default class Generate extends Command {
       )
       .pipe(share());
 
-    // Project dry run to test out console logging
-    projectFolderDry$
-      .pipe(tap(this.logCreationBegin))
+    // Existing folder prevents generation of the project folder
+    fullProjectFolderExists$
+      .subscribe(() => {
+        console.log(
+          `Error: Folder already exists: ${normalizedParentFolderName}, project was not generated`
+        );
+      });
+
+    // Actual project generation
+    projectFolderWithContents$
       .subscribe(this.logCreationDone);
 
-    projectFolderWithContents$
-      .pipe(takeUntil(projectFolderDry$))
+    // Dry run project generation
+    const projectFolderDry$ = creationVerified$
+      .pipe(filter(() => {
+        return isDryRun;
+      }));
+
+    projectFolderDry$
+      .pipe(tap(this.logCreationBegin))
       .subscribe(this.logCreationDone);
 
     return {
