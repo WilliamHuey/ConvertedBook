@@ -4,7 +4,7 @@ import { unnest } from 'ramda';
 
 // Library modules
 import generate from '../../src/commands/generate';
-import { retryTest, baseTempFolder, dryFlag } from './test-utilities';
+import { retryTest, dryFlag } from './test-utilities';
 
 describe('Generate', () => {
   // Command line usage:
@@ -21,8 +21,8 @@ describe('Generate', () => {
     });
 
   it('generate project goes to "completion" status', ctx => {
-    generate.run([projectFolderName, "--npm-project-name", npmProjectName])
-      .then((res) => {
+    generate.run([projectFolderName, '--npm-project-name', npmProjectName])
+      .then(res => {
         res.projectFolderWithContents$
           .subscribe({
             next: () => {
@@ -35,8 +35,6 @@ describe('Generate', () => {
               console.log('Error', e);
             }
           });
-
-      })
+      });
   });
-
 });

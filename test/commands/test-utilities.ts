@@ -8,8 +8,8 @@ import { test } from '@oclif/test';
 // tests need retries to prevent incorrect
 // readings
 const retryTest = function () {
-    return test
-        .retries(100);
+  return test
+    .retries(100);
 };
 
 // Remove generated testing files
@@ -19,7 +19,7 @@ const baseTempFolder = path.join(__dirname, '../temp/');
 const dryFlag = ['-d=true'];
 
 export {
-    retryTest,
-    baseTempFolder,
-    dryFlag
+  retryTest,
+  baseTempFolder,
+  dryFlag
 };

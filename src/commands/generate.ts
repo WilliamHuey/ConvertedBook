@@ -63,7 +63,7 @@ export default class Generate extends Command {
     const { args, flags } = this.parse(Generate),
       { folderName } = args;
 
-    const isDryRun = "dry-run" in flags;
+    const isDryRun = 'dry-run' in flags;
 
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
@@ -78,10 +78,10 @@ export default class Generate extends Command {
       filePathSplit
     } = truncateFilePath(folderName);
 
-    const parentFolderNamePresent = parentFolderName.length > 0 ? true : false;
-    const normalizedParentFolderName = !parentFolderNamePresent ? normalizedFolder : parentFolderName;
+    const parentFolderNamePresent = parentFolderName.length > 0;
+    const normalizedParentFolderName = parentFolderNamePresent ? parentFolderName : normalizedFolder;
     const actualProjectFolderName = supposedFileName(normalizedFolder)
-      ?.join("");
+      ?.join('');
 
     const checkFullOutputPathProjectFolder$ = from(IsThere
       .promises.directory(normalizedFolder) as Promise<boolean>);
@@ -108,7 +108,6 @@ export default class Generate extends Command {
     const outputFolderExists$ = checkOutputFolder$
       .pipe(
         filter((outputFolder: boolean) => {
-
           // Also accept the situation where only the project name exists
           // by itself, meaning that the output folder should exist
           return outputFolder || !parentFolderNamePresent;
@@ -159,13 +158,16 @@ export default class Generate extends Command {
             // Output folder exists one level above the specified project folder name
             // then create the project folder as is
             mkdir(
-              filePathSplit.join("/")
+              filePathSplit.join('/')
             ).pipe(share()) : mkdir(
               path.join(executionPath, normalizedFolder)
-            ).pipe(share())
+            ).pipe(share());
         }
 
-        ), catchError(error => of(error)));
+        ),
+        share(),
+        catchError(error => of(error))
+      );
 
     // Read the project folder for generating the observable creating chain
     const folderStructure = new GenerateContent(
@@ -182,7 +184,6 @@ export default class Generate extends Command {
         }),
         tap(this.logCreationBegin),
         mergeMap(() => {
-
           // Install the NPM modules
           const normalizedFolder =
             isUndefined(folderName) || folderName?.length === 0 ?
