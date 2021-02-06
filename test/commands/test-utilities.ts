@@ -18,8 +18,11 @@ const baseTempFolder = path.join(__dirname, '../temp/');
 
 const dryFlag = ['-d=true'];
 
+const testDataDirectory = path.join(__dirname, '../', 'fixtures/io/');
+
 export {
   retryTest,
   baseTempFolder,
-  dryFlag
+  dryFlag,
+  testDataDirectory
 };

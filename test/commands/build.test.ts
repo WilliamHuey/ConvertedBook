@@ -1,6 +1,3 @@
-// Native modules
-const path = require('path');
-
 // Third party modules
 import { expect } from '@oclif/test';
 import { unnest } from 'ramda';
@@ -12,10 +9,9 @@ import { AsyncCheckResults } from '../../src/functions/build/build-cli-input-asy
 import { buildGenerate } from '../../src/functions/build/build-generate';
 import CheckResults from '../fixtures/objects/check-results';
 import AsyncCheckRes from '../fixtures/objects/async-check-results';
-import { retryTest, baseTempFolder, dryFlag } from './test-utilities';
+import { retryTest, baseTempFolder, dryFlag, testDataDirectory } from './test-utilities';
 
 describe('Build', () => {
-  const testDataDirectory = path.join(__dirname, '../', 'fixtures/io/');
   const invalidInputFlag = `--input=${testDataDirectory}zz`;
   const invalidOutputFlag = `--output=${testDataDirectory}jkl/hlkj/`;
   const validInputFlag = `--input=${testDataDirectory}input.latex`;

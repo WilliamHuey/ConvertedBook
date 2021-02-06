@@ -8,7 +8,7 @@ class ProjectPackageJson {
       author: '',
       license: 'ISC',
       dependencies: {
-        snowpack: '^2.17.1',
+        snowpack: '^3.0.11',
       },
       scripts: {
         start: 'snowpack dev',
@@ -135,9 +135,6 @@ export class GenerateStructureOutline {
               },
             ],
             files: [
-              {
-                name: 'favicon.ico',
-              },
               {
                 name: 'package.json',
                 fileContent: JSON.stringify(

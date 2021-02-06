@@ -5,7 +5,7 @@ const path = require('path');
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { bindCallback, of, from } from 'rxjs';
-import { tap, mergeMap, share, takeUntil, catchError, filter } from 'rxjs/operators';
+import { tap, mergeMap, share, takeUntil, catchError, filter, mapTo } from 'rxjs/operators';
 import { isUndefined } from 'is-what';
 import { match } from 'ts-pattern';
 const IsThere = require('is-there');
@@ -160,20 +160,19 @@ export default class Generate extends Command {
             mkdir(
               filePathSplit.join('/')
             ).pipe(share()) : mkdir(
-              path.join(executionPath, normalizedFolder)
+              normalizedFolder
             ).pipe(share());
-        }
-
-        ),
+        }),
         share(),
         catchError(error => of(error))
       );
 
-    // Read the project folder for generating the observable creating chain
+    // Read the project folder for generating the observable creating chain.
+    // Normalize the path for project folder generation
     const folderStructure = new GenerateContent(
       folderName,
       projectFolder$,
-      parentFolderPath
+      (parentFolderNamePresent ? normalizedFolder : parentFolderPath)
     );
 
     // Project folder ready for the content inside to be generated

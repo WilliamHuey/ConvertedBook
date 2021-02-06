@@ -4,10 +4,11 @@ import { unnest } from 'ramda';
 import { from } from 'rxjs';
 import { filter, share } from 'rxjs/operators';
 const isOnline = require('is-online');
+const del = require('del');
 
 // Library modules
 import generate from '../../src/commands/generate';
-import { retryTest, dryFlag } from './test-utilities';
+import { retryTest, dryFlag, baseTempFolder } from './test-utilities';
 
 // Command line usage:
 // convertedbook generate my_project --npm-project-name=my_project_name
@@ -17,13 +18,18 @@ const npmProjectName = 'my_project_name',
 describe('Dry Run Generation:', () => {
   retryTest()
     .stdout()
-    .command(unnest([['generate'], ['dry-run-generate', npmProjectFlagAndName], dryFlag]))
+    .command(unnest([['generate'], [`${baseTempFolder}/dry-run-generate`, npmProjectFlagAndName], dryFlag]))
     .it('dry run with valid project name and npm project name', ctx => {
       expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
     });
 });
 
 describe('Actual Project Generation:', () => {
+
+  after(() => {
+    del([`${baseTempFolder}*`, `!${baseTempFolder}.gitkeep`]);
+  });
+
   // The generation test relies on internet connectivity to test out
   // project generation, which provide warning when no connection is found
   const onLineTest$ = from(isOnline() as Promise<boolean>);
@@ -50,7 +56,7 @@ describe('Actual Project Generation:', () => {
   isOnLine$
     .subscribe(() => {
       it('generate project goes to "completion" status', ctx => {
-        generate.run(['project-generate', '--npm-project-name', npmProjectName])
+        generate.run([`${baseTempFolder}/project-generate`, '--npm-project-name', npmProjectName])
           .then(res => {
             res.projectFolderWithContents$
               .pipe(share())
