@@ -5,7 +5,7 @@ const path = require('path');
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { bindCallback, of, from } from 'rxjs';
-import { tap, mergeMap, share, takeUntil, catchError, filter, mapTo } from 'rxjs/operators';
+import { tap, mergeMap, share, takeUntil, catchError, filter } from 'rxjs/operators';
 import { isUndefined } from 'is-what';
 import { match } from 'ts-pattern';
 const IsThere = require('is-there');

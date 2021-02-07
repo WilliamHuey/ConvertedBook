@@ -59,13 +59,13 @@ build/
 
 const snowpack = `
 module.exports = {
-  mount: {
-    "site": "/"
-  }
+  plugins: [
+    ['./plugins/latex.js', {/* pluginOptions */ }]
+  ]
 };
 `;
 
-const sampleTex = `
+const indexTex = `
 \\documentclass{article}
 
 \\usepackage[margin=0.5in]{geometry}
@@ -80,6 +80,19 @@ const sampleTex = `
 \\end{document}
 `;
 
+const latexPlugin = `
+module.exports = function (snowpackConfig, pluginOptions) {
+  return {
+    name: 'my-first-snowpack-plugin',
+    load() { },
+    resolve: { input: [".tex"], output: [".html"] },
+    onChange(change) {
+      console.log('changed', change);
+    }
+  };
+};
+`;
+
 export class GenerateStructureOutline {
   constructor(projectName: string) {
     /*
@@ -92,9 +105,11 @@ export class GenerateStructureOutline {
           /latex
             sample.tex
           /site
-            favicon.ico
-            package.json
-            snowpack.config.js
+            .gitkeep
+          /plugins
+            latex.js
+          package.json
+          snowpack.config.js
     */
     Object.assign(this, {
       folders: [
@@ -120,15 +135,33 @@ export class GenerateStructureOutline {
           content: {
             folders: [
               {
+                name: 'plugins',
+                content: {
+                  files: [
+                    {
+                      name: 'latex.js',
+                      fileContent: latexPlugin
+                    }
+                  ]
+                }
+              },
+              {
                 name: 'site',
+                content: {
+                  files: [
+                    {
+                      name: '.gitkeep',
+                    },
+                  ],
+                }
               },
               {
                 name: 'latex',
                 content: {
                   files: [
                     {
-                      name: 'sample.tex',
-                      fileContent: sampleTex,
+                      name: 'index.tex',
+                      fileContent: indexTex,
                     },
                   ],
                 },
