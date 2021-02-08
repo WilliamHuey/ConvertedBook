@@ -100,10 +100,8 @@ export class GenerateStructureOutline {
         .gitignore
         /config
           /latex
-            .gitkeep
+            index.tex
         /content
-          /latex
-            sample.tex
           /site
             .gitkeep
           /plugins
@@ -122,7 +120,8 @@ export class GenerateStructureOutline {
                 content: {
                   files: [
                     {
-                      name: '.gitkeep',
+                      name: 'index.tex',
+                      fileContent: indexTex,
                     },
                   ],
                 },
@@ -154,17 +153,6 @@ export class GenerateStructureOutline {
                     },
                   ],
                 }
-              },
-              {
-                name: 'latex',
-                content: {
-                  files: [
-                    {
-                      name: 'index.tex',
-                      fileContent: indexTex,
-                    },
-                  ],
-                },
               },
             ],
             files: [

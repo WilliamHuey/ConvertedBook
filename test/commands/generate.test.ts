@@ -1,5 +1,5 @@
 // Third party modules
-import { expect } from '@oclif/test';
+import { expect, test } from '@oclif/test';
 import { unnest } from 'ramda';
 import { from } from 'rxjs';
 import { filter, share } from 'rxjs/operators';
@@ -8,6 +8,7 @@ const del = require('del');
 
 // Library modules
 import generate from '../../src/commands/generate';
+import { mkdir } from '@rxnode/fs';
 import { retryTest, dryFlag, baseTempFolder } from './test-utilities';
 
 // Command line usage:
@@ -18,9 +19,19 @@ const npmProjectName = 'my_project_name',
 describe('Dry Run Generation:', () => {
   retryTest()
     .stdout()
-    .command(unnest([['generate'], [`${baseTempFolder}/dry-run-generate`, npmProjectFlagAndName], dryFlag]))
+    .command(unnest([['generate'], [`${baseTempFolder}dry-run-generate`, npmProjectFlagAndName], dryFlag]))
     .it('dry run with valid project name and npm project name', ctx => {
       expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
+    });
+
+  mkdir(`${baseTempFolder}/dry-duplicate-folder`).pipe(share())
+    .subscribe(() => {
+      test
+        .stdout()
+        .command(unnest([['generate'], [`${baseTempFolder}dry-duplicate-folder`, npmProjectFlagAndName], dryFlag]))
+        .it('dry run with existing project folder name', ctx => {
+          expect(ctx.stdout.trim()).to.contain('Error: Folder already exists');
+        });
     });
 });
 
@@ -55,8 +66,9 @@ describe('Actual Project Generation:', () => {
 
   isOnLine$
     .subscribe(() => {
+
       it('generate project goes to "completion" status', ctx => {
-        generate.run([`${baseTempFolder}/project-generate`, '--npm-project-name', npmProjectName])
+        generate.run([`${baseTempFolder}project-generate`, '--npm-project-name', npmProjectName])
           .then(res => {
             res.projectFolderWithContents$
               .pipe(share())
@@ -66,12 +78,9 @@ describe('Actual Project Generation:', () => {
                   // and use this as a marker for a
                   // successful project generation
                   ctx();
-                },
-                error: (e: any) => {
-                  console.log('Error', e);
                 }
               });
-          });
+          })
       });
     });
 });

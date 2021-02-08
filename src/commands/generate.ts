@@ -62,6 +62,8 @@ export default class Generate extends Command {
   async run() {
     const { args, flags } = this.parse(Generate),
       { folderName } = args;
+    let { 'npm-project-name': npmProjectName } = flags;
+    npmProjectName = npmProjectName || 'project';
 
     const isDryRun = 'dry-run' in flags;
 
@@ -167,12 +169,14 @@ export default class Generate extends Command {
         catchError(error => of(error))
       );
 
+    const normalizedFolderPath = parentFolderNamePresent ? normalizedFolder : parentFolderPath;
+
     // Read the project folder for generating the observable creating chain.
     // Normalize the path for project folder generation
     const folderStructure = new GenerateContent(
-      folderName,
+      npmProjectName,
       projectFolder$,
-      (parentFolderNamePresent ? normalizedFolder : parentFolderPath)
+      normalizedFolderPath
     );
 
     // Project folder ready for the content inside to be generated
@@ -184,14 +188,9 @@ export default class Generate extends Command {
         tap(this.logCreationBegin),
         mergeMap(() => {
           // Install the NPM modules
-          const normalizedFolder =
-            isUndefined(folderName) || folderName?.length === 0 ?
-              'New Folder' :
-              folderName;
-          const executionPath = process.cwd(),
-            npmService = spawn('npm', ['install'], {
-              cwd: path.join(executionPath, normalizedFolder, 'content/'),
-            });
+          const npmService = spawn('npm', ['install'], {
+            cwd: path.join(normalizedFolderPath, 'content/'),
+          });
 
           const npmOnComplete$ = bindCallback(npmService.stdout.on),
             npmClose$ = npmOnComplete$.call(npmService, 'close');
