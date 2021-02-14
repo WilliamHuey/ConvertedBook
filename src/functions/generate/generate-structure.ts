@@ -8,7 +8,9 @@ class ProjectPackageJson {
       author: '',
       license: 'ISC',
       dependencies: {
+        "@snowpack/plugin-run-script": "^2.3.0",
         snowpack: '^3.0.11',
+
       },
       scripts: {
         start: 'snowpack dev',
@@ -60,7 +62,13 @@ build/
 const snowpack = `
 module.exports = {
   plugins: [
-    ['./plugins/latex.js', {/* pluginOptions */ }]
+    ['./plugins/latex.js', {/* pluginOptions */ }],
+    [
+      '@snowpack/plugin-run-script',
+      {
+        cmd: 'convertedbook build html --input="./latex/index.tex" --output="./index.html"'
+      ]
+    ],
   ]
 };
 `;
@@ -83,7 +91,7 @@ const indexTex = `
 const latexPlugin = `
 module.exports = function (snowpackConfig, pluginOptions) {
   return {
-    name: 'my-first-snowpack-plugin',
+    name: 'latex',
     load() { },
     resolve: { input: [".tex"], output: [".html"] },
     onChange(change) {

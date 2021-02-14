@@ -16,7 +16,7 @@ function generateFormat(input: string,
   format: string,
   fileOutputExistence: FileOutputExistence) {
   const pandocService = spawn('pandoc',
-    ['-o', `${normalizedOutputPath}.${format}`, input]);
+    ['-o', `${normalizedOutputPath}.${format}`, input, '-s']);
 
   // Warn on existing file format with the name of the output path
   if (fileOutputExistence[format])
