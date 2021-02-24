@@ -186,17 +186,17 @@ export default class Generate extends Command {
           return folderStructure.generateStructure().structureCreationCount$;
         }),
         tap(this.logCreationBegin),
-        mergeMap(() => {
-          // Install the NPM modules
-          const npmService = spawn('npm', ['install'], {
-            cwd: path.join(normalizedFolderPath, 'content/'),
-          });
+        // mergeMap(() => {
+        //   // Install the NPM modules
+        //   const npmService = spawn('npm', ['install'], {
+        //     cwd: path.join(normalizedFolderPath, 'content/'),
+        //   });
 
-          const npmOnComplete$ = bindCallback(npmService.stdout.on),
-            npmClose$ = npmOnComplete$.call(npmService, 'close');
+        //   const npmOnComplete$ = bindCallback(npmService.stdout.on),
+        //     npmClose$ = npmOnComplete$.call(npmService, 'close');
 
-          return npmClose$;
-        })
+        //   return npmClose$;
+        // })
       )
       .pipe(share());
 

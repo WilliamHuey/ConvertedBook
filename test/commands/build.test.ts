@@ -1,5 +1,6 @@
 // Third party modules
 import { expect } from '@oclif/test';
+import { takeLast } from 'rxjs/operators';
 import { unnest } from 'ramda';
 const del = require('del');
 
@@ -153,7 +154,8 @@ describe('Build', () => {
     const asyncCheckRes = new AsyncCheckRes();
 
     const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
-      .pandocClose$;
+      .pandocClose$
+      .pipe(takeLast(1))
 
     pd
       .subscribe({

@@ -41,7 +41,10 @@ function generateFormat(input: string,
       }
     });
 
-  return pandocClose$;
+  return {
+    pandocClose$,
+    pandocService
+  };
 }
 
 export function buildGenerate(results: BuildCheckGoodResults, asyncResults: AsyncCheckResults): any
@@ -58,22 +61,32 @@ export function buildGenerate(this: Build,
   const generated = normalizedFormats
     .map(format => {
       return generateFormat(input, normalizedOutputPath, format, fileOutputExistence);
-    })
-    .map(pandocClose$ => {
-      return pandocClose$;
     });
+
+  const pandocGen = generated.reduce((acc, el): any => {
+    return {
+      pandocServiceGroup: [...acc.pandocServiceGroup, el.pandocService],
+      pandocCloseGroup: [...acc.pandocCloseGroup, el.pandocClose$]
+    };
+  }, { pandocServiceGroup: [], pandocCloseGroup: [] });
+
+  const {
+    pandocCloseGroup: pandocCloseGroup$,
+    pandocServiceGroup
+  } = pandocGen;
 
   // Treat the inpout file types as a group even though
   // one might only be present for easier processing
-  const groupFormatsGenerated$ = forkJoin(generated)
+  const groupFormatsGenerated$ = forkJoin(pandocCloseGroup$)
     .pipe(first());
 
   groupFormatsGenerated$
-    .subscribe(() => {
+    .subscribe((a) => {
       console.log('Complete file format generation');
     });
 
   return {
-    pandocClose$: groupFormatsGenerated$
+    pandocClose$: groupFormatsGenerated$,
+    pandocServiceGroup
   };
 }
