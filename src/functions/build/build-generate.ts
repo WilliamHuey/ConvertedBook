@@ -18,10 +18,6 @@ function generateFormat(input: string,
   const pandocService = spawn('pandoc',
     ['-o', `${normalizedOutputPath}.${format}`, input, '-s']);
 
-  // Warn on existing file format with the name of the output path
-  if (fileOutputExistence[format])
-    console.log(`Warning: ${format} file type exists`);
-
   // Convert callback into observable for the
   // 'complete' signal. The observable can also be
   // converted for use as a promise for testing.
@@ -35,6 +31,10 @@ function generateFormat(input: string,
     .subscribe({
       next: () => {
         console.log(`Generated ${format}`);
+
+        // Warn on existing file format with the name of the output path
+        if (fileOutputExistence[format])
+          console.log(`Warning: ${format} file type exists`);
       },
       error: (e: any) => {
         console.log('Error', e);
