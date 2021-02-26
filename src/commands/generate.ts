@@ -15,6 +15,13 @@ import { GenerateContent } from '../functions/generate/generate-content';
 import { mkdir } from '@rxnode/fs';
 import { truncateFilePath, supposedFileName } from '../functions/build/build-utilities';
 
+type FileFolderPathError = string
+
+interface FileFolderError {
+  code: string,
+  path: FileFolderPathError
+}
+
 export default class Generate extends Command {
   static description = 'Create a "convertedbook" project folder.';
 
@@ -39,17 +46,22 @@ export default class Generate extends Command {
     console.log('Now downloading node modules...');
   }
 
+  private logErrorMsg = (error: FileFolderError) => {
+    console.log(
+      `Error: Folder already exists: ${error.path}, project was not generated`
+    );
+  }
+
   private logCreationDone = {
-    error: (error: any) => {
+    error: (error: FileFolderError) => {
+
       match(error)
         .with(
           {
             code: 'EEXIST',
           },
           () => {
-            console.log(
-              `Error: Folder already exists: ${error.path}, project was not generated`
-            );
+            this.logErrorMsg(error);
           }
         )
         .otherwise(() => console.log('Error: Can not create folder'));
@@ -203,9 +215,7 @@ export default class Generate extends Command {
     // Existing folder prevents generation of the project folder
     fullProjectFolderExists$
       .subscribe(() => {
-        console.log(
-          `Error: Folder already exists: ${normalizedParentFolderName}, project was not generated`
-        );
+        this.logErrorMsg({ code: 'EEXIST', path: normalizedParentFolderName });
       });
 
     // Actual project generation
