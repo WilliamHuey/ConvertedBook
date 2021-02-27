@@ -19,6 +19,13 @@ export interface BuildReportConditions {
   normalizedFormats: Array<string>;
 }
 
+interface BuildFlagsStatus {
+  allRequiredFlagsRecognized: boolean,
+  someFlagsRequiredRecognized: boolean,
+  optionalArgsFlagKeys: string[],
+  argsFlagKeys: Array<string>
+}
+
 export interface BuildReportResults {
   conditionsHelpers: {
     argsCommaList: Array<string>;
@@ -26,7 +33,7 @@ export interface BuildReportResults {
     emptyArgs: boolean;
     unknownFormats: Array<string>;
     hasUnknownFormats: boolean;
-    buildFlagsStatus: Record<string, any>;
+    buildFlagsStatus: BuildFlagsStatus;
   };
   conditions: BuildReportConditions;
 }

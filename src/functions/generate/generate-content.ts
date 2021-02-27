@@ -14,7 +14,7 @@ interface GenerateStructure extends ReadStructure {
 }
 
 interface ReadStructure {
-  parentFolder$: Observable<any>;
+  parentFolder$: Observable<void>;
   parentFolderPath: string;
   content: ContentProperties;
   structureCreationCountSubject: BehaviorSubject<number>;
@@ -47,7 +47,7 @@ class GenerateContent implements GenerateStructure {
 
   constructor(
     public projectName: string,
-    public parentFolder$: Observable<any>,
+    public parentFolder$: Observable<void>,
     public parentFolderPath: string
   ) {
     this.content = new GenerateStructureOutline(projectName);
