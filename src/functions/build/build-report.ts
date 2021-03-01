@@ -19,10 +19,13 @@ export interface BuildReportConditions {
   normalizedFormats: Array<string>;
 }
 
+type optionalArgsFlagKeys = 'input' | 'output'
+export type optionalArgsFlagKeysArray = optionalArgsFlagKeys[]
+
 interface BuildFlagsStatus {
   allRequiredFlagsRecognized: boolean,
   someFlagsRequiredRecognized: boolean,
-  optionalArgsFlagKeys: string[],
+  optionalArgsFlagKeys: optionalArgsFlagKeysArray,
   argsFlagKeys: Array<string>
 }
 
