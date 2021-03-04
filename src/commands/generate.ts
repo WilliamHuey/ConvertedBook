@@ -201,7 +201,7 @@ export default class Generate extends Command {
         mergeMap(() => {
           // Install the NPM modules
           const npmService = spawn('npm', ['install'], {
-            cwd: path.join(normalizedFolderPath, 'content/'),
+            cwd: normalizedFolderPath,
           });
 
           const npmOnComplete$ = bindCallback(npmService.stdout.on),
