@@ -8,7 +8,6 @@ class ProjectPackageJson {
       author: '',
       license: 'ISC',
       dependencies: {
-        "@snowpack/plugin-run-script": "^2.3.0",
         snowpack: '^3.0.11',
 
       },
@@ -62,13 +61,7 @@ build/
 const snowpack = `
 module.exports = {
   plugins: [
-    ['./plugins/latex.js', {/* pluginOptions */ }],
-    [
-      '@snowpack/plugin-run-script',
-      {
-        cmd: 'convertedbook build html --input="./latex/index.tex" --output="./index.html"'
-      ]
-    ],
+    ['./plugins/latex.js', {/* pluginOptions */ }]
   ]
 };
 `;
