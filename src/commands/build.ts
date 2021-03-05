@@ -10,7 +10,7 @@ import {
   buildReport, buildLog, buildCliInputsChecks,
   buildCliInputsAsyncChecks, BuildCheckResults,
   BuildCheckGoodResults, buildChecks, buildDependencies,
-  buildGenerate
+  buildGenerate, AsyncCheckResults
 } from '../functions/build/build-import';
 
 export default class Build extends Command {
@@ -127,14 +127,14 @@ export default class Build extends Command {
         })
       );
 
-    const buildRunMap: Record<string, any> = {
-      'dry-run': ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, any]) => {
+    const buildRunMap: Record<string, Function> = {
+      'dry-run': ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
         // Dry run will only log out from console
         // meaning no file generation will occur
         this.log(buildCli.msg.trim());
         this.log(buildAsyncResults.msg.trim());
       },
-      default: ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, any]) => {
+      default: ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
         // Default build with file generation
         this.log(buildCli.msg.trim());
         this.log(buildAsyncResults.msg.trim());
@@ -153,7 +153,6 @@ export default class Build extends Command {
       .subscribe(([buildCli, buildAsyncResults]) => {
         const flagOptions = (buildCli as BuildCheckGoodResults).conditions.flags;
         const options = difference(Object.keys(flagOptions), Build.requiredFlags);
-
         // Apply any flags selectively one at a time,
         // for custom changes for each flag other than 'input' and 'output'
         if (options.length > 0) {

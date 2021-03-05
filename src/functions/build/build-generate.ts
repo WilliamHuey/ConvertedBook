@@ -81,7 +81,7 @@ export function buildGenerate(this: Build,
     .pipe(first());
 
   groupFormatsGenerated$
-    .subscribe((a) => {
+    .subscribe(() => {
       console.log('Complete file format generation');
     });
 
