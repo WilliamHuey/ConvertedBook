@@ -23,10 +23,10 @@ type optionalArgsFlagKeys = 'input' | 'output'
 export type optionalArgsFlagKeysArray = optionalArgsFlagKeys[]
 
 interface BuildFlagsStatus {
-  allRequiredFlagsRecognized: boolean,
-  someFlagsRequiredRecognized: boolean,
-  optionalArgsFlagKeys: optionalArgsFlagKeysArray,
-  argsFlagKeys: Array<string>
+  allRequiredFlagsRecognized: boolean;
+  someFlagsRequiredRecognized: boolean;
+  optionalArgsFlagKeys: optionalArgsFlagKeysArray;
+  argsFlagKeys: Array<string>;
 }
 
 export interface BuildReportResults {

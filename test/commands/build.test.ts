@@ -155,7 +155,7 @@ describe('Build', () => {
 
     const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
       .pandocClose$
-      .pipe(takeLast(1))
+      .pipe(takeLast(1));
 
     pd
       .subscribe({

@@ -36,7 +36,6 @@ describe('Dry Run Generation:', () => {
 });
 
 describe('Actual Project Generation:', () => {
-
   after(() => {
     del([`${baseTempFolder}*`, `!${baseTempFolder}.gitkeep`]);
   });
@@ -66,7 +65,6 @@ describe('Actual Project Generation:', () => {
 
   isOnLine$
     .subscribe(() => {
-
       it('generate project goes to "completion" status', ctx => {
         generate.run([`${baseTempFolder}project-generate`, '--npm-project-name', npmProjectName])
           .then(res => {
@@ -80,7 +78,7 @@ describe('Actual Project Generation:', () => {
                   ctx();
                 }
               });
-          })
+          });
       });
     });
 });

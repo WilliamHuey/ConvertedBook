@@ -18,8 +18,8 @@ import { truncateFilePath, supposedFileName } from '../functions/build/build-uti
 type FileFolderPathError = string
 
 interface FileFolderError {
-  code: string,
-  path: FileFolderPathError
+  code: string;
+  path: FileFolderPathError;
 }
 
 export default class Generate extends Command {
@@ -54,7 +54,6 @@ export default class Generate extends Command {
 
   private logCreationDone = {
     error: (error: FileFolderError) => {
-
       match(error)
         .with(
           {
