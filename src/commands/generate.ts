@@ -54,6 +54,7 @@ export default class Generate extends Command {
 
   private logCreationDone = {
     error: (error: FileFolderError) => {
+      console.log(error);
       match(error)
         .with(
           {

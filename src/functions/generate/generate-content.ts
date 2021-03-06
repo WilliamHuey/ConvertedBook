@@ -3,11 +3,14 @@ const path = require('path');
 
 // Third party modules
 import { concat, Observable, BehaviorSubject } from 'rxjs';
-import { share, scan, takeLast, skipWhile } from 'rxjs/operators';
+import { share, scan, takeLast, skipWhile, mergeMap, map, filter } from 'rxjs/operators';
 import { writeFile, mkdir } from '@rxnode/fs';
+import { match, __ } from 'ts-pattern';
+import { isString } from 'is-what';
 
 // Library modules
 import { GenerateStructureOutline } from './generate-structure';
+import { fileContentObservable } from './generate-file-content-map';
 
 interface GenerateStructure extends ReadStructure {
   projectName: string;
@@ -28,6 +31,7 @@ interface CountStructure {
 interface FileContentProperties {
   name: string;
   fileContent?: string;
+  data?: any;
 }
 
 interface InnerContentProperties {
@@ -83,6 +87,17 @@ class GenerateContent implements GenerateStructure {
     return structureCount;
   };
 
+  private fileContentType = (fileContent: any) => {
+    return match(fileContent)
+      .with(undefined, () => {
+        return '';
+      })
+      .with(__.string, () => {
+        return fileContent;
+      })
+      .run();
+  }
+
   private createStructureObservable = (folderStructure: ReadStructure) => {
     const { content, parentFolder$, parentFolderPath } = folderStructure;
 
@@ -90,7 +105,20 @@ class GenerateContent implements GenerateStructure {
     content?.files?.forEach((element: FileContentProperties) => {
       const fileContent = element.fileContent ? element.fileContent : '',
         newFileName = path.join(parentFolderPath, element.name),
-        createFile$ = writeFile(newFileName, fileContent).pipe(share());
+        fileNameKey = this.fileContentType(fileContent),
+        fileContent$ = fileContentObservable(fileNameKey, element.data);
+
+      const createFile$ = fileContent$
+        .pipe(
+          filter((fileContent: any) => {
+            return isString(fileContent);
+          }),
+          map(fileContent => {
+            return fileContent;
+          }),
+          mergeMap(fileContent => {
+            return writeFile(newFileName, fileContent).pipe(share());
+          }));
 
       concat(parentFolder$, createFile$)
         .pipe(takeLast(1))
