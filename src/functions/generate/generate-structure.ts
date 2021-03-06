@@ -8,8 +8,7 @@ class ProjectPackageJson {
       author: '',
       license: 'ISC',
       dependencies: {
-        snowpack: '^3.0.13',
-
+        snowpack: '^3.0.13'
       },
       scripts: {
         start: 'snowpack dev',
@@ -104,12 +103,12 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
       // and other changes will get pick up causing an endless loop
       if (!texFileChange) return;
 
-      const cwd = process.cwd()
+      const cwd = process.cwd();
 
       const ls = spawn('convertedbook',
         ['build', 'html', '-i',
-          path.join(cwd, '/config/latex/index.tex'), '-o',
-          path.join(cwd, '/index.html')])
+          path.join(cwd, '/content/index.tex'), '-o',
+          path.join(cwd, '/index.html')]);
 
       ls.stdout.on('error', (error) => {
         console.log(error);
@@ -142,12 +141,13 @@ export class GenerateStructureOutline {
       /project-name
         .gitignore
         /config
-          /latex
-            index.tex
+          /html
         /site
           .gitkeep
         /plugins
           latex.js
+        /content
+          index.tex
         index.html
         package.json
         snowpack.config.js
@@ -159,15 +159,14 @@ export class GenerateStructureOutline {
           content: {
             folders: [
               {
-                name: 'latex',
+                name: 'html',
                 content: {
                   files: [
                     {
-                      name: 'index.tex',
-                      fileContent: indexTex,
+                      name: '.gitkeep',
                     },
                   ],
-                },
+                }
               }
             ],
           },
@@ -193,6 +192,17 @@ export class GenerateStructureOutline {
             ],
           }
         },
+        {
+          name: 'content',
+          content: {
+            files: [
+              {
+                name: 'index.tex',
+                fileContent: indexTex,
+              },
+            ],
+          },
+        }
       ],
       files: [
         {
