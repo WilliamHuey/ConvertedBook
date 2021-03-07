@@ -16,7 +16,12 @@ export function getFileNameFromParts(supposeFileParts: string[] | undefined): st
 export function truncateFilePath(filePath: string) {
   const filePathSplit = filePath.split('/'),
     supposeFilePathFolderName = init(filePathSplit),
-    filePathFolder = supposeFilePathFolderName.join('/');
+    supposeFilePathFolderNameJoin = supposeFilePathFolderName.join('/'),
+
+    // Normalize the path output to the current directory when no './'
+    // is found in the front of the output file path
+    filePathFolder = supposeFilePathFolderNameJoin.length === 0 ?
+      ['.'].join('/') : supposeFilePathFolderNameJoin;
 
   return {
     filePathSplit,
