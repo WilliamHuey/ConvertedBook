@@ -16,7 +16,7 @@ function generateFormat(input: string,
   format: string,
   fileOutputExistence: FileOutputExistence) {
   const pandocService = spawn('pandoc',
-    ['-o', `${normalizedOutputPath}.${format}`, input, '-s']);
+    [`--data-dir=${process.cwd()}/config/`, '--template=default.html5', '-o', `${normalizedOutputPath}.${format}`, input, '-s',]);
 
   // Convert callback into observable for the
   // 'complete' signal. The observable can also be

@@ -4,7 +4,8 @@ export class GenerateStructureOutline {
       /project-name
         .gitignore
         /config
-          /html
+          /templates
+            default.html5
         /site
           .gitkeep
         /plugins
@@ -22,12 +23,13 @@ export class GenerateStructureOutline {
           content: {
             folders: [
               {
-                name: 'html',
+                name: 'templates',
                 content: {
                   files: [
                     {
-                      name: '.gitkeep',
-                    },
+                      name: 'default.html5',
+                      fileContent: 'texHtml5Template'
+                    }
                   ],
                 }
               }
@@ -50,7 +52,7 @@ export class GenerateStructureOutline {
           content: {
             files: [
               {
-                name: '.gitkeep',
+                name: '.gitkeep'
               },
             ],
           }
