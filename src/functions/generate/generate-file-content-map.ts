@@ -7,6 +7,9 @@ import { share } from 'rxjs/operators';
 import { readFile } from '@rxnode/fs';
 import { isString, isFunction, isUndefined } from 'is-what';
 
+// Library modules
+import { ProjectPackageJson } from './files/dynamic/project-package-json'
+
 interface FileContentNameValueType {
   name: string;
 }
@@ -17,25 +20,6 @@ interface FileContentFnValueType {
 
 interface FileContentType {
   [key: string]: FileContentNameValueType | FileContentFnValueType;
-}
-
-class ProjectPackageJson {
-  constructor(name: string) {
-    Object.assign(this, {
-      name: name || '<from cli input name>',
-      version: '1.0.0',
-      description: '',
-      main: 'index.js',
-      author: '',
-      license: 'ISC',
-      dependencies: {
-        snowpack: '^3.0.13'
-      },
-      scripts: {
-        start: 'snowpack dev',
-      },
-    });
-  }
 }
 
 const fileContent: FileContentType = {
@@ -60,17 +44,15 @@ export function fileContentObservable(key: string, data: Record<string, any>) {
   const asFn = fileContent[key] as FileContentFnValueType,
     asStr = fileContent[key] as FileContentNameValueType;
 
-  if (isUndefined(fileContent[key])) {
+  if (isUndefined(fileContent[key]))
     return of({});
-  }
 
-  if (isFunction(asFn.content)) {
+  if (isFunction(asFn.content))
     return of(asFn.content(data));
-  }
 
-  if (isString(asStr.name)) {
+  if (isString(asStr.name))
     return readFile(path.join(__dirname, `/files/${asStr.name}`), 'utf8')
       .pipe(share());
-  }
+
   return of({});
 }
