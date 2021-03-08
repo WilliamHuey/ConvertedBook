@@ -1,6 +1,6 @@
 {
   "name": "convertedbook",
-  "description": "Convert latex to different ebook formats",
+  "description": "Convert LaTeX to different ebook formats and includes live server functionality to preview LaTeX changes.",
   "version": "1.0.0",
   "author": "William Huey",
   "bin": {
