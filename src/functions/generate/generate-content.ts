@@ -87,13 +87,13 @@ class GenerateContent implements GenerateStructure {
     return structureCount;
   };
 
-  private fileContentType = (fileContent: any) => {
+  private fileContentType = (fileContent: string | undefined) => {
     return match(fileContent)
       .with(undefined, () => {
         return '';
       })
       .with(__.string, () => {
-        return fileContent;
+        return fileContent as string;
       })
       .run();
   }
@@ -110,7 +110,7 @@ class GenerateContent implements GenerateStructure {
 
       const createFile$ = fileContent$
         .pipe(
-          filter((fileContent: any) => {
+          filter((fileContent) => {
             return isString(fileContent);
           }),
           map(fileContent => {

@@ -2,7 +2,7 @@
 const path = require('path');
 
 // Third party modules
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { readFile } from '@rxnode/fs';
 import { isString, isFunction, isUndefined } from 'is-what';
@@ -40,7 +40,8 @@ const fileContent: FileContentType = {
   snowpack: { name: 'generate-file-snowpack.js' }
 };
 
-export function fileContentObservable(key: string, data: Record<string, any>) {
+// Data could vary and pattern is not predictable
+export function fileContentObservable(key: string, data: Record<string, any>): Observable<string | {}> {
   const asFn = fileContent[key] as FileContentFnValueType,
     asStr = fileContent[key] as FileContentNameValueType;
 
