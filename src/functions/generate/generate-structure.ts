@@ -6,8 +6,7 @@ export class GenerateStructureOutline {
         /config
           /templates
             default.html5
-        /site
-          .gitkeep
+          main.css
         /plugins
           latex.js
         /content
@@ -34,6 +33,11 @@ export class GenerateStructureOutline {
                 }
               }
             ],
+            files: [
+              {
+                name: 'main.css'
+              }
+            ]
           },
         },
         {
@@ -45,16 +49,6 @@ export class GenerateStructureOutline {
                 fileContent: 'latexSnowpackPlugin'
               }
             ]
-          }
-        },
-        {
-          name: 'site',
-          content: {
-            files: [
-              {
-                name: '.gitkeep'
-              },
-            ],
           }
         },
         {

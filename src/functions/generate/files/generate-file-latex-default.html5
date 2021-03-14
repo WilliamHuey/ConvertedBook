@@ -20,9 +20,7 @@
     <style>
       $styles.html()$
     </style>
-  $for(css)$
-    <link rel="stylesheet" href="$css$" />
-  $endfor$
+  <link rel="stylesheet" href="config/main.css" />
   $for(header-includes)$
     $header-includes$
   $endfor$

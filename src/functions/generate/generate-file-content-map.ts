@@ -45,6 +45,10 @@ export function fileContentObservable(key: string, data: Record<string, any>): O
   const asFn = fileContent[key] as FileContentFnValueType,
     asStr = fileContent[key] as FileContentNameValueType;
 
+  // For files without content
+  if (key === '')
+    return of('');
+
   if (isUndefined(fileContent[key]))
     return of({});
 
