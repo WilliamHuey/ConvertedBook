@@ -2,7 +2,22 @@ const childProcess = require('child_process'),
   path = require('path'),
   { spawn } = childProcess;
 
-const textExtWithDot = '.tex';
+const textExtWithDot = '.tex',
+  html5ExtWithDot = '.html5';
+
+const extGroupAllowChange = [textExtWithDot, html5ExtWithDot];
+
+const hasExtInGroup = (filePath) => {
+  let validFileChange = false;
+  extGroupAllowChange.forEach(function(extPath) {
+    const lastCharIndex = filePath.length - 1,
+    extIndex = filePath.lastIndexOf(extPath),
+    fileChange = (lastCharIndex - extPath.length + 1) ===
+      extIndex;
+    validFileChange = fileChange ? true : false;
+  })
+  return validFileChange
+}
 
 module.exports = function (_snowpackConfig, _pluginOptions) {
   return {
@@ -10,14 +25,11 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
     load() { },
     resolve: { input: [textExtWithDot], output: ['.html'] },
     onChange: ({ filePath }) => {
-      const lastCharIndex = filePath.length - 1,
-        texExtIndex = filePath.lastIndexOf(textExtWithDot),
-        texFileChange = (lastCharIndex - textExtWithDot.length + 1) ===
-          texExtIndex;
+      const acceptedFileChange = hasExtInGroup(filePath);
 
-      // Only allow changes from .tex file to be made or else html
-      // and other changes will get pick up causing an endless loop
-      if (!texFileChange) return;
+      // Only allow changes from .tex and template files to be made or else html
+      // and otherunrelated changes will get pick up causing an endless loop
+      if (!acceptedFileChange) return;
 
       const cwd = process.cwd();
 
