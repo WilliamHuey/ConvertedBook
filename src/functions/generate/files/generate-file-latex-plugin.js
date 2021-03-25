@@ -2,21 +2,23 @@ const childProcess = require('child_process'),
   path = require('path'),
   { spawn } = childProcess;
 
+// Changes from these file types will
+// allow for rebuild on the change detection
 const textExtWithDot = '.tex',
-  html5ExtWithDot = '.html5';
-
-const extGroupAllowChange = [textExtWithDot, html5ExtWithDot];
+  html5ExtWithDot = '.html5',
+  extGroupAllowChange = [textExtWithDot, html5ExtWithDot];
 
 const hasExtInGroup = (filePath) => {
-  let validFileChange = false;
+  let validFileChangeCount = 0;
   extGroupAllowChange.forEach(function(extPath) {
     const lastCharIndex = filePath.length - 1,
     extIndex = filePath.lastIndexOf(extPath),
     fileChange = (lastCharIndex - extPath.length + 1) ===
       extIndex;
-    validFileChange = fileChange ? true : false;
-  })
-  return validFileChange
+    validFileChangeCount = fileChange ?
+      (validFileChangeCount + 1) : validFileChangeCount;
+  });
+  return validFileChangeCount;
 }
 
 module.exports = function (_snowpackConfig, _pluginOptions) {
@@ -25,11 +27,11 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
     load() { },
     resolve: { input: [textExtWithDot], output: ['.html'] },
     onChange: ({ filePath }) => {
-      const acceptedFileChange = hasExtInGroup(filePath);
+      const validFileChangeCount = hasExtInGroup(filePath);
 
       // Only allow changes from .tex and template files to be made or else html
       // and otherunrelated changes will get pick up causing an endless loop
-      if (!acceptedFileChange) return;
+      if (validFileChangeCount === 0) return;
 
       const cwd = process.cwd();
 

@@ -7,6 +7,7 @@ export class GenerateStructureOutline {
           /templates
             default.html5
           main.css
+          main.js
         /plugins
           latex.js
         /content
@@ -36,6 +37,9 @@ export class GenerateStructureOutline {
             files: [
               {
                 name: 'main.css'
+              },
+              {
+                name: 'main.js'
               }
             ]
           },
