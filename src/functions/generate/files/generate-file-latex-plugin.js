@@ -2,6 +2,8 @@ const childProcess = require('child_process'),
   path = require('path'),
   { spawn } = childProcess;
 
+const cwd = process.cwd();
+
 // Changes from these file types will
 // allow for rebuild on the change detection
 const textExtWithDot = '.tex',
@@ -10,16 +12,31 @@ const textExtWithDot = '.tex',
 
 const hasExtInGroup = (filePath) => {
   let validFileChangeCount = 0;
-  extGroupAllowChange.forEach(function(extPath) {
+  extGroupAllowChange.forEach(function (extPath) {
     const lastCharIndex = filePath.length - 1,
-    extIndex = filePath.lastIndexOf(extPath),
-    fileChange = (lastCharIndex - extPath.length + 1) ===
-      extIndex;
+      extIndex = filePath.lastIndexOf(extPath),
+      fileChange = lastCharIndex - extPath.length + 1 === extIndex;
     validFileChangeCount = fileChange ?
-      (validFileChangeCount + 1) : validFileChangeCount;
+      validFileChangeCount + 1 :
+      validFileChangeCount;
   });
   return validFileChangeCount;
-}
+};
+
+const convertLatexToHtml = function () {
+  return spawn('convertedbook', [
+    'build',
+    'html',
+    '-i',
+    path.join(cwd, '/content/index.tex'),
+    '-o',
+    path.join(cwd, '/index.html'),
+  ]);
+};
+
+// Run the conversion process on initial load of the snowpack server
+// to permit changes from the html5 template file to be picked up
+convertLatexToHtml();
 
 module.exports = function (_snowpackConfig, _pluginOptions) {
   return {
@@ -33,16 +50,11 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
       // and otherunrelated changes will get pick up causing an endless loop
       if (validFileChangeCount === 0) return;
 
-      const cwd = process.cwd();
-
-      const ls = spawn('convertedbook',
-        ['build', 'html', '-i',
-          path.join(cwd, '/content/index.tex'), '-o',
-          path.join(cwd, '/index.html')]);
+      const ls = convertLatexToHtml();
 
       ls.stdout.on('error', (error) => {
         console.log(error);
       });
-    }
+    },
   };
 };
