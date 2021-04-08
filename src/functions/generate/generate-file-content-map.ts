@@ -26,6 +26,7 @@ const fileContent: FileContentType = {
   gitignore: { name: 'generate-file-git-ignore.txt' },
   indexHtml: { name: 'generate-file-index.html' },
   indexTex: { name: 'generate-file-index.tex' },
+  indexJs: { name: 'generate-file-index.js' },
   texHtml5Template: { name: 'generate-file-latex-default.html5' },
   packageJson: {
     content: ({ projectName }) => {

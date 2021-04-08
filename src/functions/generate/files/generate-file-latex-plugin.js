@@ -41,8 +41,6 @@ convertLatexToHtml();
 module.exports = function (_snowpackConfig, _pluginOptions) {
   return {
     name: 'latex',
-    load() { },
-    resolve: { input: [textExtWithDot], output: ['.html'] },
     onChange: ({ filePath }) => {
       const validFileChangeCount = hasExtInGroup(filePath);
 

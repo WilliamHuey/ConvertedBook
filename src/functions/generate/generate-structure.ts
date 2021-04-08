@@ -4,9 +4,10 @@ export class GenerateStructureOutline {
       /project-name
         .gitignore
         /config
+          /styles
+            index.scss
           /templates
             default.html5
-          main.css
           main.js
         /plugins
           latex.js
@@ -23,6 +24,16 @@ export class GenerateStructureOutline {
           content: {
             folders: [
               {
+                name: 'styles',
+                content: {
+                  files: [
+                    {
+                      name: 'index.module.scss'
+                    }
+                  ]
+                }
+              },
+              {
                 name: 'templates',
                 content: {
                   files: [
@@ -36,10 +47,8 @@ export class GenerateStructureOutline {
             ],
             files: [
               {
-                name: 'main.css'
-              },
-              {
-                name: 'main.js'
+                name: 'main.js',
+                fileContent: 'indexJs'
               }
             ]
           },

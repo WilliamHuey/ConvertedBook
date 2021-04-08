@@ -1,5 +1,6 @@
 module.exports = {
   plugins: [
-    ['./plugins/latex.js', {/* pluginOptions */ }]
+    ['./plugins/latex.js', {/* pluginOptions */ }],
+    ["@snowpack/plugin-sass"]
   ]
 };
