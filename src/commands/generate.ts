@@ -34,7 +34,8 @@ export default class Generate extends Command {
     // flag with no value (-f, --force)
     force: flags.boolean({ char: 'f' }),
     'npm-project-name': flags.string({ char: 'p' }),
-    'dry-run': flags.string({ char: 'd' })
+    'dry-run': flags.boolean({ char: 'd', default: false }),
+    'toc': flags.boolean({ char: 't', default: false })
   };
 
   static aliases = ['g'];
@@ -77,7 +78,7 @@ export default class Generate extends Command {
     let { 'npm-project-name': npmProjectName } = flags;
     npmProjectName = npmProjectName || 'project';
 
-    const isDryRun = 'dry-run' in flags;
+    const isDryRun = flags['dry-run'];
 
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
