@@ -63,8 +63,11 @@ USAGE
 
 OPTIONS
   -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
+  -h, --help              show CLI help
+  -n, --name=name         name to print
+  -p ,--npm-project-name  project's npm project name
+  -d, --dry-run           test out command without generating folder and files
+  -t, --toc               when present, display table of contents for the document
 ```
 
 _See code: [src/commands/generate.ts](https://github.com/WilliamHuey/ConvertedBook/blob/v1.0.0/src/commands/generate.ts)_
