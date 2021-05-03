@@ -41,10 +41,19 @@ export default class Build extends Command {
 
   static flags = {
     help: flags.help({ char: 'h' }),
-    input: flags.string({ char: 'i' }),
-    output: flags.string({ char: 'o' }),
+    input: flags.string({
+      char: 'i',
+      description: 'path of the input file to convert'
+    }),
+    output: flags.string({
+      char: 'o',
+      description: 'path of the output file destination'
+    }),
     args: flags.string({ char: 'a' }),
-    'dry-run': flags.string({ char: 'd' })
+    'dry-run': flags.string({
+      char: 'd',
+      description: 'test out the build command to see cli output without generating the actual output file(s)'
+    })
   }
 
   static aliases = ['b']

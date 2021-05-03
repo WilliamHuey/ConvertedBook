@@ -31,11 +31,20 @@ export default class Generate extends Command {
     // flag with a value (-n, --name=VALUE)
     name: flags.string({ char: 'n', description: 'Generate' }),
 
-    // flag with no value (-f, --force)
-    force: flags.boolean({ char: 'f' }),
-    'npm-project-name': flags.string({ char: 'p' }),
-    'dry-run': flags.boolean({ char: 'd', default: false }),
-    'toc': flags.boolean({ char: 't', default: false })
+    'npm-project-name': flags.string({
+      char: 'p',
+      description: 'add the package.json\'s project name field'
+    }),
+    'dry-run': flags.boolean({
+      char: 'd',
+      default: false,
+      description: 'test out the generate command to see cli output without generating the actual project folder and files'
+    }),
+    'toc': flags.boolean({
+      char: 't',
+      default: false,
+      description: 'when present, display the table of contents link on the top of the document'
+    })
   };
 
   static aliases = ['g'];
