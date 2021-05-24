@@ -1,5 +1,8 @@
 import { Command, flags } from '@oclif/command'
 
+const childProcess = require('child_process');
+const { spawn } = childProcess;
+
 export default class Serve extends Command {
   static description = 'describe the command here'
 
@@ -16,6 +19,10 @@ export default class Serve extends Command {
   async run() {
     const { args, flags } = this.parse(Serve)
 
+    const server = spawn('node', ['./server.js']);
 
+    server.stdout.on('data', (data: any) => {
+      console.error(`data on: ${data}`);
+    });
   }
 }

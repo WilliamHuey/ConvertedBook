@@ -15,6 +15,7 @@ export class GenerateStructureOutline {
           index.tex
         index.html
         package.json
+        server.js
         snowpack.config.js
     */
     Object.assign(this, {
@@ -89,6 +90,10 @@ export class GenerateStructureOutline {
           name: 'package.json',
           fileContent: 'packageJson',
           data: { projectName }
+        },
+        {
+          name: 'server.js',
+          fileContent: 'server'
         },
         {
           name: 'snowpack.config.js',

@@ -38,6 +38,7 @@ const fileContent: FileContentType = {
     }
   },
   latexSnowpackPlugin: { name: 'generate-file-latex-plugin.js' },
+  server: { name: 'generate-file-server.js' },
   snowpack: { name: 'generate-file-snowpack.js' }
 };
 
