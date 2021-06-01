@@ -3,9 +3,8 @@ const snowpack = require('snowpack'),
 
 const { loadConfiguration, startServer } = snowpack;
 
-(async function server() {
-    const config = path.resolve(process.cwd(), 'snowpack.config.js');
-
+(async () => {
+    const loc = path.resolve(process.cwd(), 'snowpack.config.js');
     const config = await loadConfiguration({
         plugins: [
             ['./plugins/latex.js', {}],
@@ -15,7 +14,6 @@ const { loadConfiguration, startServer } = snowpack;
             hmr: true,
             hmrErrorOverlay: false
         }
-
-    }, config);
+    }, loc);
     startServer({ config });
 })();
