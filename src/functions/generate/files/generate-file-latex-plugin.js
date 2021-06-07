@@ -27,16 +27,23 @@ const convertLatexToHtml = () => {
 
   // Arguments passed in from running 'node server.js'
   const args = process.argv[2];
-  console.log('args: ', args);
 
-  return spawn('convertedbook', [
+  const covertedBookBuild = spawn('convertedbook', [
     'build',
     'html',
     '-i',
     path.join(cwd, '/content/index.tex'),
     '-o',
     path.join(cwd, '/index.html'),
+    '-p',
+    args
   ]);
+
+  covertedBookBuild.stdout.on('data', (data) => {
+    console.log(`${data}`);
+  });
+
+  return covertedBookBuild;
 };
 
 // Run the conversion process on initial load of the snowpack server

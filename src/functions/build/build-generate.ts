@@ -14,9 +14,12 @@ import { truncateFilePath } from './build-utilities';
 function generateFormat(input: string,
   normalizedOutputPath: string,
   format: string,
-  fileOutputExistence: FileOutputExistence) {
+  fileOutputExistence: FileOutputExistence,
+  flags: Record<string, any>) {
+
+  const pandocOptions = JSON.parse(flags.pandoc).pandoc || '';
   const pandocService = spawn('pandoc',
-    [`--data-dir=${process.cwd()}/config/`, '--template=default.html5', '-o', `${normalizedOutputPath}.${format}`, input, '-s']);
+    [`--data-dir=${process.cwd()}/config/`, '--template=default.html5', '-o', `${normalizedOutputPath}.${format}`, input, '-s', pandocOptions]);
 
   // Convert callback into observable for the
   // 'complete' signal. The observable can also be
@@ -52,7 +55,7 @@ export function buildGenerate(this: Build,
   results: BuildCheckGoodResults, asyncResults: AsyncCheckResults) {
   const { conditions } = results,
     { input, output: outputPath } = conditions.flags,
-    { normalizedFormats } = conditions,
+    { normalizedFormats, flags } = conditions,
     { truncateOutput, outputFilename, fileOutputExistence } = asyncResults,
     normalizedOutputPath = truncateOutput ?
       `${truncateFilePath(outputPath).filePathFolder}/${outputFilename}` :
@@ -60,7 +63,7 @@ export function buildGenerate(this: Build,
 
   const generated = normalizedFormats
     .map(format => {
-      return generateFormat(input, normalizedOutputPath, format, fileOutputExistence);
+      return generateFormat(input, normalizedOutputPath, format, fileOutputExistence, flags);
     });
 
   const pandocGen = generated.reduce((acc, el): any => {

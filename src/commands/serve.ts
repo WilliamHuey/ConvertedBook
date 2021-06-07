@@ -18,9 +18,8 @@ export default class Serve extends Command {
   static aliases = ['s']
 
   async run() {
-    const { flags } = this.parse(Serve);
-
-    const server = spawn('node', ['./server.js', JSON.stringify(flags)]);
+    const { flags } = this.parse(Serve),
+      server = spawn('node', ['./server.js', JSON.stringify(flags)]);
 
     server.stdout.on('data', (data: any) => {
       console.error(`Info: ${data}`);

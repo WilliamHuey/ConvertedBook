@@ -53,6 +53,10 @@ export default class Build extends Command {
     'dry-run': flags.string({
       char: 'd',
       description: 'test out the build command to see cli output without generating the actual output file(s)'
+    }),
+    pandoc: flags.string({
+      char: 'p',
+      description: 'Pandoc options'
     })
   }
 
@@ -143,6 +147,9 @@ export default class Build extends Command {
         this.log(buildCli.msg.trim());
         this.log(buildAsyncResults.msg.trim());
       },
+      pandoc: ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
+        buildRunMap.default([buildCli, buildAsyncResults]);
+      },
       default: ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
         // Default build with file generation
         this.log(buildCli.msg.trim());
@@ -162,6 +169,7 @@ export default class Build extends Command {
       .subscribe(([buildCli, buildAsyncResults]) => {
         const flagOptions = (buildCli as BuildCheckGoodResults).conditions.flags;
         const options = difference(Object.keys(flagOptions), Build.requiredFlags);
+
         // Apply any flags selectively one at a time,
         // for custom changes for each flag other than 'input' and 'output'
         if (options.length > 0) {
