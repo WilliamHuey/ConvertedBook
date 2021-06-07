@@ -12,18 +12,20 @@ export default class Serve extends Command {
     name: flags.string({ char: 'n', description: 'Serve' }),
     // flag with no value (-f, --force)
     force: flags.boolean({ char: 'f' }),
+    pandoc: flags.string({ char: 'p', description: 'Pandoc options' })
   }
 
-  static args = [{ name: 'file' }]
+  static aliases = ['s']
 
   async run() {
-    const { args, flags } = this.parse(Serve)
+    const { flags } = this.parse(Serve);
 
-    const server = spawn('node', ['./server.js']);
+    const server = spawn('node', ['./server.js', JSON.stringify(flags)]);
 
     server.stdout.on('data', (data: any) => {
       console.error(`Info: ${data}`);
     });
+
     server.stderr.on('data', (data: any) => {
       console.error(`Error: ${data}`);
     });

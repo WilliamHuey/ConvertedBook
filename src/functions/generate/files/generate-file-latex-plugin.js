@@ -23,7 +23,12 @@ const hasExtInGroup = (filePath) => {
   return validFileChangeCount;
 };
 
-const convertLatexToHtml = function () {
+const convertLatexToHtml = () => {
+
+  // Arguments passed in from running 'node server.js'
+  const args = process.argv[2];
+  console.log('args: ', args);
+
   return spawn('convertedbook', [
     'build',
     'html',
@@ -42,10 +47,11 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
   return {
     name: 'latex',
     onChange: ({ filePath }) => {
+
       const validFileChangeCount = hasExtInGroup(filePath);
 
       // Only allow changes from .tex and template files to be made or else html
-      // and otherunrelated changes will get pick up causing an endless loop
+      // and other unrelated changes will get pick up causing an endless loop
       if (validFileChangeCount === 0) return;
 
       const ls = convertLatexToHtml();
