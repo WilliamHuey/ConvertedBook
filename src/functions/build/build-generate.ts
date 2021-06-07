@@ -17,9 +17,15 @@ function generateFormat(input: string,
   fileOutputExistence: FileOutputExistence,
   flags: Record<string, any>) {
 
-  const pandocOptions = JSON.parse(flags.pandoc).pandoc || '';
-  const pandocService = spawn('pandoc',
-    [`--data-dir=${process.cwd()}/config/`, '--template=default.html5', '-o', `${normalizedOutputPath}.${format}`, input, '-s', pandocOptions]);
+  const pandocAdditionalOptions = JSON.parse(flags.pandoc).pandoc;
+  let pandocDefaultOptions = [`--data-dir=${process.cwd()}/config/`, '--template=default.html5', '-o', `${normalizedOutputPath}.${format}`, input, '-s'];
+
+  // Add in more options for Pandoc when specified
+  const allPandocOptions = pandocAdditionalOptions ?
+    [...pandocDefaultOptions, pandocAdditionalOptions] :
+    pandocDefaultOptions
+
+  const pandocService = spawn('pandoc', allPandocOptions);
 
   // Convert callback into observable for the
   // 'complete' signal. The observable can also be
