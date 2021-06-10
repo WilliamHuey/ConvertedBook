@@ -50,7 +50,7 @@ export default class Build extends Command {
       description: 'path of the output file destination'
     }),
     args: flags.string({ char: 'a' }),
-    'dry-run': flags.string({
+    'dry-run': flags.boolean({
       char: 'd',
       description: 'test out the build command to see cli output without generating the actual output file(s)'
     }),

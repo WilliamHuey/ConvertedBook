@@ -17,7 +17,8 @@ function generateFormat(input: string,
   fileOutputExistence: FileOutputExistence,
   flags: Record<string, any>) {
 
-  const pandocAdditionalOptions = JSON.parse(flags.pandoc).pandoc;
+  const pandocAdditionalOptions = flags.pandoc ?
+    JSON.parse(flags.pandoc).pandoc : null;
   let pandocDefaultOptions = [`--data-dir=${process.cwd()}/config/`, '--template=default.html5', '-o', `${normalizedOutputPath}.${format}`, input, '-s'];
 
   // Add in more options for Pandoc when specified

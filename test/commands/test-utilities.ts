@@ -16,7 +16,7 @@ const retryTest = function () {
 // after the set of tests have completed
 const baseTempFolder = path.join(__dirname, '../temp/');
 
-const dryFlag = ['-d=true'];
+const dryFlag = ['--dry-run'];
 
 const testDataDirectory = path.join(__dirname, '../', 'fixtures/io/');
 
