@@ -1,6 +1,6 @@
 // Native modules
 import { spawn } from 'child_process';
-const path = require('path');
+import * as path from 'path';
 
 // Third party modules
 import { Command, flags } from '@oclif/command';

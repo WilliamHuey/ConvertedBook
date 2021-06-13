@@ -1,7 +1,9 @@
-import { Command, flags } from '@oclif/command'
+// Native modules
+import * as childProcess from "child_process";
+const { spawn } = childProcess;
 
-const childProcess = require('child_process'),
-  { spawn } = childProcess;
+// Third party modules
+import { Command, flags } from '@oclif/command'
 
 export default class Serve extends Command {
   static description = 'Run live server for real-time updates on document changes'

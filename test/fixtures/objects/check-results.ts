@@ -1,5 +1,5 @@
 // Native modules
-const path = require('path');
+import * as path from 'path';
 
 export default class CheckResults {
   constructor() {

@@ -1,5 +1,5 @@
 // Native modules
-const path = require('path');
+import * as path from 'path';
 
 // Third party modules
 import { of, Observable } from 'rxjs';
