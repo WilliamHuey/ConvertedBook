@@ -57,9 +57,17 @@ export default class Generate extends Command {
   }
 
   private logErrorMsg = (error: FileFolderError) => {
-    console.log(
-      `Error: Folder already exists: ${error.path}, project was not generated`
-    );
+    if (error.path === ".") {
+
+      // Current directory path
+      console.log(
+        `Error: Folder already exists in current directory and project was not generated`
+      );
+    } else {
+      console.log(
+        `Error: Folder already exists: ${error.path}. Project was not generated`
+      );
+    }
   }
 
   private logCreationDone = {
