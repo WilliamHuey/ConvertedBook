@@ -31,6 +31,12 @@ export default class Generate extends Command {
     // flag with a value (-n, --name=VALUE)
     name: flags.string({ char: 'n', description: 'Generate' }),
 
+    // flag with no value (-f, --force)
+    force: flags.boolean({
+      char: 'f',
+      default: false,
+      description: 'overwrite an existing folder'
+    }),
     'npm-project-name': flags.string({
       char: 'p',
       description: 'add the package.json\'s project name field'
@@ -95,7 +101,8 @@ export default class Generate extends Command {
     let { 'npm-project-name': npmProjectName } = flags;
     npmProjectName = npmProjectName || 'project';
 
-    const isDryRun = flags['dry-run'];
+    const isDryRun = flags['dry-run'],
+      forcedGenerate = flags.force;
 
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
@@ -232,6 +239,11 @@ export default class Generate extends Command {
 
     // Existing folder prevents generation of the project folder
     fullProjectFolderExists$
+      .pipe(
+        filter(() => {
+          return !forcedGenerate;
+        })
+      )
       .subscribe(() => {
         this.logErrorMsg({ code: 'EEXIST', path: normalizedParentFolderName });
       });
