@@ -101,6 +101,27 @@ class GenerateContent implements GenerateStructure {
   private createStructureObservable = (folderStructure: ReadStructure) => {
     const { content, parentFolder$, parentFolderPath } = folderStructure;
 
+    // Generate the folders
+    content?.folders?.forEach((element: InnerContentProperties) => {
+      const newFolderName = path.join(parentFolderPath, element.name),
+        createFolder$ = mkdir(newFolderName).pipe(share());
+
+      concat(parentFolder$, createFolder$)
+        .pipe(takeLast(1))
+        .subscribe(() => {
+          folderStructure.structureCreationCountSubject.next(1);
+        });
+
+      if (element.content)
+        this.createStructureObservable({
+          parentFolder$: createFolder$,
+          parentFolderPath: newFolderName,
+          content: element.content,
+          structureCreationCountSubject:
+            folderStructure.structureCreationCountSubject,
+        });
+    });
+
     // Generate the files
     content?.files?.forEach((element: FileContentProperties) => {
       const fileContent = element.fileContent ? element.fileContent : '',
@@ -127,26 +148,6 @@ class GenerateContent implements GenerateStructure {
         });
     });
 
-    // Generate the folders
-    content?.folders?.forEach((element: InnerContentProperties) => {
-      const newFolderName = path.join(parentFolderPath, element.name),
-        createFolder$ = mkdir(newFolderName).pipe(share());
-
-      concat(parentFolder$, createFolder$)
-        .pipe(takeLast(1))
-        .subscribe(() => {
-          folderStructure.structureCreationCountSubject.next(1);
-        });
-
-      if (element.content)
-        this.createStructureObservable({
-          parentFolder$: createFolder$,
-          parentFolderPath: newFolderName,
-          content: element.content,
-          structureCreationCountSubject:
-            folderStructure.structureCreationCountSubject,
-        });
-    });
   };
 
   public generateStructure = (): {
