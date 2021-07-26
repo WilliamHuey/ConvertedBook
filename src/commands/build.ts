@@ -14,6 +14,7 @@ import {
 } from '../functions/build/build-import';
 
 export default class Build extends Command {
+
   // Allow any number of arguments
   static strict = false;
 
@@ -142,6 +143,7 @@ export default class Build extends Command {
 
     const buildRunMap: Record<string, Function> = {
       'dry-run': ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
+
         // Dry run will only log out from console
         // meaning no file generation will occur
         this.log(buildCli.msg.trim());
@@ -151,6 +153,7 @@ export default class Build extends Command {
         buildRunMap.default([buildCli, buildAsyncResults]);
       },
       default: ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
+
         // Default build with file generation
         this.log(buildCli.msg.trim());
         this.log(buildAsyncResults.msg.trim());
@@ -177,6 +180,7 @@ export default class Build extends Command {
             buildRunMap[opt]([buildCli, buildAsyncResults]);
           });
         } else {
+
           // Basic build command for generation
           buildRunMap.default([buildCli, buildAsyncResults]);
         }

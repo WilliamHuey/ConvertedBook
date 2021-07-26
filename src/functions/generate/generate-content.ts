@@ -1,12 +1,16 @@
 // Native modules
 import * as path from 'path';
+import * as fs from 'fs';
 
 // Third party modules
-import { concat, Observable, BehaviorSubject } from 'rxjs';
-import { share, scan, takeLast, skipWhile, mergeMap, map, filter } from 'rxjs/operators';
+import { concat, Observable, BehaviorSubject, of, bindNodeCallback } from 'rxjs';
+import { share, scan, takeLast, skipWhile, mergeMap, map, filter, takeUntil } from 'rxjs/operators';
 import { writeFile, mkdir } from '@rxnode/fs';
 import { match, __ } from 'ts-pattern';
 import { isString } from 'is-what';
+
+// RxJs wrapped fs remove
+const remove = bindNodeCallback(fs.rm);
 
 // Library modules
 import { GenerateStructureOutline } from './generate-structure';
@@ -49,10 +53,12 @@ class GenerateContent implements GenerateStructure {
 
   structureCreationCountSubject: BehaviorSubject<number>;
 
+  fullProjectFolderExists$: Observable<boolean> = of(false)
+
   constructor(
     public projectName: string,
     public parentFolder$: Observable<void>,
-    public parentFolderPath: string
+    public parentFolderPath: string,
   ) {
     this.content = new GenerateStructureOutline(projectName);
 
@@ -104,10 +110,35 @@ class GenerateContent implements GenerateStructure {
     // Generate the folders
     content?.folders?.forEach((element: InnerContentProperties) => {
       const newFolderName = path.join(parentFolderPath, element.name),
-        createFolder$ = mkdir(newFolderName).pipe(share());
+        createFolder$ = mkdir(newFolderName)
+          .pipe(takeUntil(this.fullProjectFolderExists$))
+          .pipe(share());
 
-      concat(parentFolder$, createFolder$)
-        .pipe(takeLast(1))
+      const countStructureNonExistFolders$ = concat(parentFolder$, createFolder$)
+        .pipe(takeLast(1), takeUntil(this.fullProjectFolderExists$))
+
+      const countStructureExistingFolder$ = this.fullProjectFolderExists$
+        .pipe(
+          mergeMap(() => {
+            return remove(newFolderName, { recursive: true, force: true })
+              .pipe(takeLast(1), share());
+          }),
+          mergeMap(() => {
+            return mkdir(newFolderName).pipe(takeLast(1), share());
+          }))
+        .pipe(takeLast(1));
+
+      countStructureExistingFolder$
+        .subscribe({
+          next: () => {
+            folderStructure.structureCreationCountSubject.next(1);
+          },
+          error: () => {
+            // Ignore the error, timing issues with the remove an write
+          }
+        });
+
+      countStructureNonExistFolders$
         .subscribe(() => {
           folderStructure.structureCreationCountSubject.next(1);
         });
@@ -150,10 +181,13 @@ class GenerateContent implements GenerateStructure {
 
   };
 
-  public generateStructure = (): {
+  public generateStructure = (fullProjectFolderExists$: Observable<boolean>): {
     structureCreationCount$: Observable<number>;
   } => {
     const structureCount = this.readTotalStructureCount(this);
+
+    // Turn on the '--force' flag when present
+    this.fullProjectFolderExists$ = fullProjectFolderExists$;
 
     // Start reading the structure and generate the folders
     // and files inside the main project folder
