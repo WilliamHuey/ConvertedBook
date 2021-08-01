@@ -29,7 +29,8 @@ export class GenerateStructureOutline {
                 content: {
                   files: [
                     {
-                      name: 'index.module.scss'
+                      name: 'index.module.scss',
+                      fileContent: 'configStylesIndex'
                     }
                   ]
                 }

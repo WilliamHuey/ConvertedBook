@@ -27,6 +27,7 @@ const fileContent: FileContentType = {
   indexHtml: { name: 'generate-file-index.html' },
   indexTex: { name: 'generate-file-index.tex' },
   indexJs: { name: 'generate-file-index.js' },
+  configStylesIndex: { name: 'generate-file-index-module.scss' },
   texHtml5Template: { name: 'generate-file-latex-default.html5' },
   packageJson: {
     content: ({ projectName }) => {
