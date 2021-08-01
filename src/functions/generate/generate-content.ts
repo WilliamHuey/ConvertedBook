@@ -111,11 +111,11 @@ class GenerateContent implements GenerateStructure {
     content?.folders?.forEach((element: InnerContentProperties) => {
       const newFolderName = path.join(parentFolderPath, element.name),
         createFolder$ = mkdir(newFolderName)
-          .pipe(takeUntil(this.fullProjectFolderExists$))
+          .pipe(takeLast(1), takeUntil(this.fullProjectFolderExists$))
           .pipe(share());
 
       const countStructureNonExistFolders$ = concat(parentFolder$, createFolder$)
-        .pipe(takeLast(1), takeUntil(this.fullProjectFolderExists$))
+        .pipe(share())
 
       const countStructureExistingFolder$ = this.fullProjectFolderExists$
         .pipe(
@@ -139,8 +139,13 @@ class GenerateContent implements GenerateStructure {
         });
 
       countStructureNonExistFolders$
-        .subscribe(() => {
-          folderStructure.structureCreationCountSubject.next(1);
+        .subscribe({
+          next: () => {
+            folderStructure.structureCreationCountSubject.next(1);
+          },
+          error: () => {
+            // Ignore the error
+          }
         });
 
       if (element.content)

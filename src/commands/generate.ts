@@ -5,7 +5,7 @@ import * as path from 'path';
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { bindCallback, of, from, merge } from 'rxjs';
-import { tap, mergeMap, share, takeUntil, catchError, filter } from 'rxjs/operators';
+import { tap, mergeMap, share, takeUntil, catchError, filter, takeLast, bufferCount } from 'rxjs/operators';
 import { isUndefined } from 'is-what';
 import { match } from 'ts-pattern';
 const IsThere = require('is-there');
@@ -210,6 +210,7 @@ export default class Generate extends Command {
               normalizedFolder
             ).pipe(share());
         }),
+        takeLast(1),
         share(),
         catchError(error => of(error))
       );
@@ -230,6 +231,9 @@ export default class Generate extends Command {
         mergeMap(() => {
           return folderStructure.generateStructure(fullProjectFolderExists$).structureCreationCount$;
         }),
+
+        // Unwanted multiple executions, buffer events to only lead to one
+        bufferCount(3),
         tap(this.logCreationBegin),
         mergeMap(() => {
           // Install the NPM modules
@@ -267,6 +271,10 @@ export default class Generate extends Command {
       }));
 
     projectFolderDry$
+      .pipe(share())
+
+      // Unwanted multiple executions, buffer events to only lead to one
+      .pipe(bufferCount(2))
       .pipe(tap(this.logCreationBegin))
       .subscribe(this.logCreationDone);
 

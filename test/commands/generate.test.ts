@@ -16,6 +16,8 @@ import { retryTest, dryFlag, baseTempFolder } from './test-utilities';
 const npmProjectName = 'my_project_name',
   npmProjectFlagAndName = `--npm-project-name=${npmProjectName}`;
 
+// TODO: Force flag on existing folder and non-existing folder
+
 describe('Dry Run Generation:', () => {
   retryTest()
     .stdout()
