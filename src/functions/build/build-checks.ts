@@ -17,6 +17,7 @@ export type BuildCheckGoodResults = {
   msg: string;
   continue: boolean;
   conditions: CondsFlagsArgv;
+  fromServerCli?: boolean;
 }
 
 export type BuildCheckResults = XOR<BuildCheckBadResults, BuildCheckGoodResults>

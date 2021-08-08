@@ -150,7 +150,7 @@ export default class Build extends Command {
         this.log(buildAsyncResults.msg.trim());
       },
       pandoc: ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
-        buildRunMap.default([buildCli, buildAsyncResults]);
+        buildRunMap.default([{ ...buildCli, fromServerCli: true }, buildAsyncResults]);
       },
       default: ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
 

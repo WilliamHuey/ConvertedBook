@@ -4,6 +4,7 @@ import { spawn } from 'child_process';
 // Third party modules
 import { bindCallback, forkJoin } from 'rxjs';
 import { first } from 'rxjs/operators';
+import { isUndefined } from 'is-what';
 
 // Library modules
 import Build from '../../commands/build';
@@ -15,7 +16,8 @@ function generateFormat(input: string,
   normalizedOutputPath: string,
   format: string,
   fileOutputExistence: FileOutputExistence,
-  flags: Record<string, any>) {
+  flags: Record<string, any>,
+  fromServerCli: boolean) {
 
   const pandocAdditionalOptions = flags.pandoc ?
     JSON.parse(flags.pandoc).pandoc : null;
@@ -43,7 +45,7 @@ function generateFormat(input: string,
         console.log(`Generated ${format}`);
 
         // Warn on existing file format with the name of the output path
-        if (fileOutputExistence[format])
+        if (fileOutputExistence[format] && !fromServerCli)
           console.log(`Warning: ${format} file type exists`);
       },
       error: (e: any) => {
@@ -60,7 +62,7 @@ function generateFormat(input: string,
 export function buildGenerate(results: BuildCheckGoodResults, asyncResults: AsyncCheckResults): any
 export function buildGenerate(this: Build,
   results: BuildCheckGoodResults, asyncResults: AsyncCheckResults) {
-  const { conditions } = results,
+  const { conditions, fromServerCli } = results,
     { input, output: outputPath } = conditions.flags,
     { normalizedFormats, flags } = conditions,
     { truncateOutput, outputFilename, fileOutputExistence } = asyncResults,
@@ -68,9 +70,12 @@ export function buildGenerate(this: Build,
       `${truncateFilePath(outputPath).filePathFolder}/${outputFilename}` :
       `${outputPath}${outputFilename}`;
 
+  const checkFromServerCli = isUndefined(fromServerCli) ?
+    false : fromServerCli;
+
   const generated = normalizedFormats
     .map(format => {
-      return generateFormat(input, normalizedOutputPath, format, fileOutputExistence, flags);
+      return generateFormat(input, normalizedOutputPath, format, fileOutputExistence, flags, checkFromServerCli);
     });
 
   const pandocGen = generated.reduce((acc, el): any => {
