@@ -1,13 +1,9 @@
 // Third party modules
 import { expect, test } from '@oclif/test';
 import { unnest } from 'ramda';
-import { from } from 'rxjs';
-import { filter, share } from 'rxjs/operators';
-const isOnline = require('is-online');
-const del = require('del');
+import { share } from 'rxjs/operators';
 
 // Library modules
-import generate from '../../src/commands/generate';
 import { mkdir } from '@rxnode/fs';
 import { retryTest, dryFlag, baseTempFolder } from './test-utilities';
 
@@ -37,50 +33,4 @@ describe('Dry Run Generation:', () => {
     });
 });
 
-describe('Actual Project Generation:', () => {
-  after(() => {
-    del([`${baseTempFolder}*`, `!${baseTempFolder}.gitkeep`]);
-  });
 
-  // The generation test relies on internet connectivity to test out
-  // project generation, which provide warning when no connection is found
-  const onLineTest$ = from(isOnline() as Promise<boolean>);
-
-  const isOnLine$ = onLineTest$
-    .pipe(
-      filter((connected): boolean => {
-        return connected;
-      })
-    );
-
-  const isOffLine$ = onLineTest$
-    .pipe(
-      filter((connected): boolean => {
-        return !connected;
-      })
-    );
-
-  isOffLine$
-    .subscribe(() => {
-      console.log('Warning: Did not run tests related to NPM module download due to no internet connectivity');
-    });
-
-  isOnLine$
-    .subscribe(() => {
-      it('generate project goes to "completion" status', ctx => {
-        generate.run([`${baseTempFolder}project-generate`, '--npm-project-name', npmProjectName])
-          .then(res => {
-            res.projectFolderWithContents$
-              .pipe(share())
-              .subscribe({
-                next: () => {
-                  // Able to reach completion is a good sign
-                  // and use this as a marker for a
-                  // successful project generation
-                  ctx();
-                }
-              });
-          });
-      });
-    });
-});
