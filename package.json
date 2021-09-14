@@ -33,6 +33,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^15.12.2",
     "chai": "^4.2.0",
+    "concurrently": "^6.2.1",
     "del": "^6.0.0",
     "eslint": "^5.16.0",
     "eslint-config-oclif": "^3.1.0",
@@ -74,12 +75,12 @@
     "postpack": "rm -f oclif.manifest.json",
     "lint": "eslint . --ext .ts --config .eslintrc",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+    "test": "concurrently \"npm run test-commands\" \"npm run test-commands-download\"",
     "test-commands": "mocha --forbid-only \"test/commands/*.test.ts\"",
     "test-commands-download": "mocha --forbid-only \"test/commands-download/*.test.ts\"",
-    "nyctest": "nyc --extension .ts  mocha --forbid-only \"test/**/*.test.ts\"",
+    "nyctest": "concurrently \"npm run nyctest-commands\" \"npm run nyctest-commands-download\"",
     "nyctest-commands": "nyc --extension .ts  mocha --forbid-only \"test/commands/*.test.ts\"",
-    "nyctest-commands-download": "nyc --extension .ts  mocha --forbid-only \"test/commands-downloads/*.test.ts\"",
+    "nyctest-commands-download": "nyc --extension .ts  mocha --forbid-only \"test/commands-download/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md"
   },
   "types": "lib/index.d.ts"
