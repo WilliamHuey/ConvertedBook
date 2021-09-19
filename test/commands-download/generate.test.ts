@@ -42,10 +42,13 @@ describe('Actual Project Generation:', () => {
       console.log('Warning: Did not run tests related to NPM module download due to no internet connectivity');
     });
 
+  // Folder paths for generation tests
+  const generationPathProjectGenerate = `${baseTempFolder}project-generate`;
+
   const generatedFolder$ = isOnLine$
     .pipe(
       mergeMap(() => {
-        return from(generate.run([`${baseTempFolder}project-generate`, '--npm-project-name', npmProjectName]) as Promise<any>);
+        return from(generate.run([generationPathProjectGenerate, '--npm-project-name', npmProjectName]) as Promise<any>);
       }),
       share()
     );
@@ -69,5 +72,9 @@ describe('Actual Project Generation:', () => {
           }
         });
     });
+
+
+  // TODO
+  // Run server and wait for the "localhost" server message
 
 });
