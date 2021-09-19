@@ -9,3 +9,4 @@ test/temp/*
 /yarn.lock
 node_modules
 /report
+sabik_report/
