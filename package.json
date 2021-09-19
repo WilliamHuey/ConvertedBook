@@ -76,11 +76,11 @@
     "lint": "eslint . --ext .ts --config .eslintrc",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
     "test": "concurrently \"npm run test-commands\" \"npm run test-commands-download\"",
-    "test-commands": "mocha --forbid-only \"test/commands/*.test.ts\"",
-    "test-commands-download": "mocha --forbid-only \"test/commands-download/*.test.ts\"",
+    "test-commands": "mocha \"test/commands/*.test.ts\"",
+    "test-commands-download": "mocha \"test/commands-download/*.test.ts\"",
     "nyctest": "concurrently \"npm run nyctest-commands\" \"npm run nyctest-commands-download\"",
-    "nyctest-commands": "nyc --extension .ts  mocha --forbid-only \"test/commands/*.test.ts\"",
-    "nyctest-commands-download": "nyc --extension .ts  mocha --forbid-only \"test/commands-download/*.test.ts\"",
+    "nyctest-commands": "nyc --extension .ts  mocha \"test/commands/*.test.ts\"",
+    "nyctest-commands-download": "nyc --extension .ts  mocha \"test/commands-download/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md"
   },
   "types": "lib/index.d.ts"
