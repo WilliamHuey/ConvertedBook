@@ -56,7 +56,6 @@ describe('Actual project generation:', () => {
 
         isOnLine$
           .subscribe(() => {
-
             const generateProjectFolder$ = from(generate.run([generationPathProjectGenerate, '--npm-project-name', npmProjectName]) as Promise<any>).pipe(take(1), share());
 
             generateProjectFolder$
@@ -73,6 +72,17 @@ describe('Actual project generation:', () => {
               });
           });
 
+      });
+
+    fancy
+      .it('run the server', (_, done) => {
+        isOnLine$
+          .subscribe(() => {
+            //process.chdir(generationPathProjectGenerate);
+
+            //process.chdir(originalFolderPath);
+            done();
+          });
       });
 
   });
