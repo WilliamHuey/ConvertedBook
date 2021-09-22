@@ -1,7 +1,7 @@
 // Third party modules
 import { from } from 'rxjs';
 import { fancy } from 'fancy-test'
-import { filter, share, mergeMap } from 'rxjs/operators';
+import { filter, take, share } from 'rxjs/operators';
 const del = require('del');
 const isOnline = require('is-online');
 
@@ -13,7 +13,7 @@ import { baseTempFolder } from '../commands/test-utilities';
 // convertedbook generate my_project --npm-project-name=my_project_name
 const npmProjectName = 'my_project_name';
 
-describe('Actual Project Generation:', () => {
+describe('Actual project generation:', () => {
 
   after(() => {
     del([`${baseTempFolder}*`, `!${baseTempFolder}.gitkeep`]);
@@ -39,42 +39,41 @@ describe('Actual Project Generation:', () => {
 
   isOffLine$
     .subscribe(() => {
-      console.log('Warning: Did not run tests related to NPM module download due to no internet connectivity');
+      console.log('Warning: Tests will fail if NPM module can not be downloaded due to no internet connectivity');
     });
 
-  // Folder paths for generation tests
-  const generationPathProjectGenerate = `${baseTempFolder}project-generate`;
+  // Able to reach completion is a good sign
+  // and use this as a marker for a
+  // successful project generation
+  describe('with internet connectivity:', () => {
 
-  const generatedFolder$ = isOnLine$
-    .pipe(
-      mergeMap(() => {
-        return from(generate.run([generationPathProjectGenerate, '--npm-project-name', npmProjectName]) as Promise<any>);
-      }),
-      share()
-    );
+    // Folder paths for generation tests
+    const originalFolderPath = process.cwd();
+    const generationPathProjectGenerate = `${baseTempFolder}project-generate`;
 
-  fancy
-    .it('generate project goes to "completion" status', (_, done) => {
-      generatedFolder$
-        .subscribe({
-          next: (result) => {
-            result
-              .projectFolderWithContents$
+    fancy
+      .it('will download NPM modules to generate project to "completion" status', (_, done) => {
+
+        isOnLine$
+          .subscribe(() => {
+
+            const generateProjectFolder$ = from(generate.run([generationPathProjectGenerate, '--npm-project-name', npmProjectName]) as Promise<any>).pipe(take(1), share());
+
+            generateProjectFolder$
               .subscribe({
-                complete: () => {
-
-                  // Able to reach completion is a good sign
-                  // and use this as a marker for a
-                  // successful project generation
-                  done();
+                next: (result) => {
+                  result
+                    .projectFolderWithContents$
+                    .subscribe({
+                      complete: () => {
+                        done();
+                      }
+                    })
                 }
-              })
-          }
-        });
-    });
+              });
+          });
 
+      });
 
-  // TODO
-  // Run server and wait for the "localhost" server message
-
+  });
 });
