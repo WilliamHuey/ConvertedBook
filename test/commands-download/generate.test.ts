@@ -42,6 +42,12 @@ describe('Actual project generation:', () => {
       console.log('Warning: Tests will fail if NPM module can not be downloaded due to no internet connectivity');
     });
 
+  // Online observable wrapped function
+  const isOnLine = function (fn: any) {
+    isOnLine$
+      .subscribe(fn)
+  }
+
   // Able to reach completion is a good sign
   // and use this as a marker for a
   // successful project generation
@@ -54,35 +60,33 @@ describe('Actual project generation:', () => {
     fancy
       .it('will download NPM modules to generate project to "completion" status', (_, done) => {
 
-        isOnLine$
-          .subscribe(() => {
-            const generateProjectFolder$ = from(generate.run([generationPathProjectGenerate, '--npm-project-name', npmProjectName]) as Promise<any>).pipe(take(1), share());
+        isOnLine(() => {
+          const generateProjectFolder$ = from(generate.run([generationPathProjectGenerate, '--npm-project-name', npmProjectName]) as Promise<any>).pipe(take(1), share());
 
-            generateProjectFolder$
-              .subscribe({
-                next: (result) => {
-                  result
-                    .projectFolderWithContents$
-                    .subscribe({
-                      complete: () => {
-                        done();
-                      }
-                    })
-                }
-              });
-          });
+          generateProjectFolder$
+            .subscribe({
+              next: (result) => {
+                result
+                  .projectFolderWithContents$
+                  .subscribe({
+                    complete: () => {
+                      done();
+                    }
+                  })
+              }
+            });
+        });
 
       });
 
     fancy
       .it('run the server', (_, done) => {
-        isOnLine$
-          .subscribe(() => {
-            //process.chdir(generationPathProjectGenerate);
+        isOnLine(() => {
+          //process.chdir(generationPathProjectGenerate);
 
-            //process.chdir(originalFolderPath);
-            done();
-          });
+          //process.chdir(originalFolderPath);
+          done();
+        });
       });
 
   });
