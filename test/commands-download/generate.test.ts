@@ -1,12 +1,13 @@
 // Third party modules
-import { from } from 'rxjs';
+import { from, ReplaySubject } from 'rxjs';
 import { fancy } from 'fancy-test'
-import { filter, take, share } from 'rxjs/operators';
+import { filter, take, share, mergeMap } from 'rxjs/operators';
 const del = require('del');
 const isOnline = require('is-online');
 
 // Library modules
 import generate from '../../src/commands/generate';
+import serve from '../../src/commands/serve';
 import { baseTempFolder } from '../commands/test-utilities';
 
 // Command line usage:
@@ -14,10 +15,6 @@ import { baseTempFolder } from '../commands/test-utilities';
 const npmProjectName = 'my_project_name';
 
 describe('Actual project generation:', () => {
-
-  after(() => {
-    del([`${baseTempFolder}*`, `!${baseTempFolder}.gitkeep`]);
-  });
 
   // The generation test relies on internet connectivity to test out
   // project generation, which provide warning when no connection is found
@@ -48,14 +45,19 @@ describe('Actual project generation:', () => {
       .subscribe(fn)
   }
 
-  // Able to reach completion is a good sign
-  // and use this as a marker for a
+  // Able to reach completion is a good sign and use this as a marker for a
   // successful project generation
   describe('with internet connectivity:', () => {
 
+    after(() => {
+      del([`${baseTempFolder}*`, `!${baseTempFolder}.gitkeep`]);
+    });
+
     // Folder paths for generation tests
-    const originalFolderPath = process.cwd();
-    const generationPathProjectGenerate = `${baseTempFolder}project-generate`;
+    const originalFolderPath = process.cwd(),
+      generationPathProjectGenerate = `${baseTempFolder}project-generate`;
+
+    const generationDone$ = new ReplaySubject();
 
     fancy
       .it('will download NPM modules to generate project to "completion" status', (_, done) => {
@@ -64,15 +66,15 @@ describe('Actual project generation:', () => {
           const generateProjectFolder$ = from(generate.run([generationPathProjectGenerate, '--npm-project-name', npmProjectName]) as Promise<any>).pipe(take(1), share());
 
           generateProjectFolder$
+            .pipe(
+              mergeMap((res) => {
+                return res.projectFolderWithContents$;
+              })
+            )
             .subscribe({
-              next: (result) => {
-                result
-                  .projectFolderWithContents$
-                  .subscribe({
-                    complete: () => {
-                      done();
-                    }
-                  })
+              next: () => {
+                done();
+                generationDone$.next('generated');
               }
             });
         });
@@ -80,12 +82,21 @@ describe('Actual project generation:', () => {
       });
 
     fancy
-      .it('run the server', (_, done) => {
-        isOnLine(() => {
-          //process.chdir(generationPathProjectGenerate);
+      .it('run the server command', (_, done) => {
+        generationDone$.subscribe(() => {
+          process.chdir(generationPathProjectGenerate);
+          const serveRun = serve.run([]);
 
-          //process.chdir(originalFolderPath);
-          done();
+          serveRun
+            .then((serveProcess) => {
+              serveProcess.stdout.on('data', function (data: any) {
+                if (data.toString().trim() == "Complete file format generation") {
+                  serveProcess.kill();
+                  process.chdir(originalFolderPath);
+                  done();
+                }
+              });
+            });
         });
       });
 

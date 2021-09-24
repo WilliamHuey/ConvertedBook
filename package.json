@@ -75,7 +75,7 @@
     "postpack": "rm -f oclif.manifest.json",
     "lint": "eslint . --ext .ts --config .eslintrc",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "concurrently \"npm run test-commands\" \"npm run test-commands-download\"",
+    "test": "concurrently \"npm run test-commands\" \"npm run test-commands-download\" --max-processes 1",
     "test-commands": "mocha \"test/commands/*.test.ts\"",
     "test-commands-download": "mocha \"test/commands-download/*.test.ts\"",
     "nyctest": "concurrently \"npm run nyctest-commands\" \"npm run nyctest-commands-download\"",

@@ -28,5 +28,7 @@ export default class Serve extends Command {
     server.stderr.on('data', (data: any) => {
       console.error(`Error: ${data}`);
     });
+
+    return server;
   }
 }
