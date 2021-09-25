@@ -17,7 +17,7 @@ export default class CheckResults {
         normalizedFormats: ['html', 'pdf', 'epub'],
         flags: {
           input: path.join(__dirname, '../../../README.md'),
-          output: path.join(__dirname, '../../temp/')
+          output: path.join(__dirname, '../../temp/no-downloads/')
         },
         argv: ['html', 'pdf', 'epub']
       },

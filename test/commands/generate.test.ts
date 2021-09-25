@@ -6,6 +6,7 @@ import { share } from 'rxjs/operators';
 // Library modules
 import { mkdir } from '@rxnode/fs';
 import { retryTest, dryFlag, baseTempFolder } from './test-utilities';
+const baseTempNoDownloadFolder = `${baseTempFolder}no-downloads/`;
 
 // Command line usage:
 // convertedbook generate my_project --npm-project-name=my_project_name
@@ -17,16 +18,16 @@ const npmProjectName = 'my_project_name',
 describe('Dry Run Generation:', () => {
   retryTest()
     .stdout()
-    .command(unnest([['generate'], [`${baseTempFolder}dry-run-generate`, npmProjectFlagAndName], dryFlag]))
+    .command(unnest([['generate'], [`${baseTempNoDownloadFolder}dry-run-generate`, npmProjectFlagAndName], dryFlag]))
     .it('dry run with valid project name and npm project name', ctx => {
       expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
     });
 
-  mkdir(`${baseTempFolder}/dry-duplicate-folder`).pipe(share())
+  mkdir(`${baseTempNoDownloadFolder}dry-duplicate-folder`).pipe(share())
     .subscribe(() => {
       test
         .stdout()
-        .command(unnest([['generate'], [`${baseTempFolder}dry-duplicate-folder`, npmProjectFlagAndName], dryFlag]))
+        .command(unnest([['generate'], [`${baseTempNoDownloadFolder}dry-duplicate-folder`, npmProjectFlagAndName], dryFlag]))
         .it('dry run with existing project folder name', ctx => {
           expect(ctx.stdout.trim()).to.contain('Error: Folder already exists');
         });

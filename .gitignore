@@ -4,7 +4,8 @@
 /dist
 /lib
 /tmp
-test/temp/*
+test/temp/downloads/*
+test/temp/no-downloads/*
 !test/temp/.gitkeep
 /yarn.lock
 node_modules

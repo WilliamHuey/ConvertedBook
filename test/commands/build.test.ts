@@ -20,7 +20,7 @@ describe('Build', () => {
   const flags = [validInputFlag, validOutputFlag];
 
   after(() => {
-    del([`${baseTempFolder}*`, `!${baseTempFolder}.gitkeep`]);
+    del([`${baseTempFolder}no-downloads/*`, `!${baseTempFolder}no-downloads/.gitkeep`]);
   });
 
   retryTest()
@@ -150,6 +150,10 @@ describe('Build', () => {
     });
 
   it('generate function goes to "completion" status', ctx => {
+    const originalFolderPath = process.cwd();
+    const generationPathProjectGenerate = `${baseTempFolder}no-downloads/`;
+    process.chdir(generationPathProjectGenerate);
+
     const checkResults = new CheckResults();
     const asyncCheckRes = new AsyncCheckRes();
 
@@ -164,6 +168,7 @@ describe('Build', () => {
           // and use this as a marker for a
           // successful file generation
           ctx();
+          process.chdir(originalFolderPath);
         },
         error: (e: any) => {
           console.log('Error', e);

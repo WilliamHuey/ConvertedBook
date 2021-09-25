@@ -9,6 +9,7 @@ const isOnline = require('is-online');
 import generate from '../../src/commands/generate';
 import serve from '../../src/commands/serve';
 import { baseTempFolder } from '../commands/test-utilities';
+const baseTempDownloadFolder = `${baseTempFolder}downloads/`;
 
 // Command line usage:
 // convertedbook generate my_project --npm-project-name=my_project_name
@@ -50,12 +51,12 @@ describe('Actual project generation:', () => {
   describe('with internet connectivity:', () => {
 
     after(() => {
-      del([`${baseTempFolder}*`, `!${baseTempFolder}.gitkeep`]);
+      del([`${baseTempDownloadFolder}*`, `!${baseTempDownloadFolder}.gitkeep`]);
     });
 
     // Folder paths for generation tests
     const originalFolderPath = process.cwd(),
-      generationPathProjectGenerate = `${baseTempFolder}project-generate`;
+      generationPathProjectGenerate = `${baseTempDownloadFolder}project-generate`;
 
     const generationDone$ = new ReplaySubject();
 
