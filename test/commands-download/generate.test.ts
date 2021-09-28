@@ -101,5 +101,7 @@ describe('Actual project generation:', () => {
         });
       });
 
+    // TODO: Force flag on existing folder and non-existing folder
+
   });
 });

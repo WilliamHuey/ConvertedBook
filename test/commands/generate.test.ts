@@ -13,8 +13,6 @@ const baseTempNoDownloadFolder = `${baseTempFolder}no-downloads/`;
 const npmProjectName = 'my_project_name',
   npmProjectFlagAndName = `--npm-project-name=${npmProjectName}`;
 
-// TODO: Force flag on existing folder and non-existing folder
-
 describe('Dry Run Generation:', () => {
   retryTest()
     .stdout()
@@ -34,8 +32,24 @@ describe('Dry Run Generation:', () => {
     });
 
   // dry-run and force flag with existing folder
+  mkdir(`${baseTempNoDownloadFolder}dry-forced-duplicate-folder`).pipe(share())
+    .subscribe(() => {
+      test
+        .stdout()
+        .command(unnest([['generate'], [`${baseTempNoDownloadFolder}dry-forced-duplicate-folder`, npmProjectFlagAndName], dryFlag, '--force']))
+        .it('dry run forced with existing project folder name', ctx => {
+          expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
+        });
+    });
 
   // dry-run and force flag with non-existing folder
+  retryTest()
+    .stdout()
+    .command(unnest([['generate'], [`${baseTempNoDownloadFolder}dry-forced-folder`, npmProjectFlagAndName], dryFlag]))
+    .it('dry run forced with valid project name and npm project name', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
+    });
+
 
 });
 
