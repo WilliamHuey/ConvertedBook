@@ -50,7 +50,6 @@ describe('Dry Run Generation:', () => {
       expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
     });
 
-
 });
 
 

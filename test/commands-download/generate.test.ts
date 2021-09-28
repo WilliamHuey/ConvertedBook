@@ -56,7 +56,8 @@ describe('Actual project generation:', () => {
 
     // Folder paths for generation tests
     const originalFolderPath = process.cwd(),
-      generationPathProjectGenerate = `${baseTempDownloadFolder}project-generate`;
+      generationPathProjectGenerate = `${baseTempDownloadFolder}project-generate`,
+      forcedGenerationPathProjectGenerate = `${baseTempDownloadFolder}forced-project-generate`;
 
     const generationDone$ = new ReplaySubject();
 
@@ -101,7 +102,48 @@ describe('Actual project generation:', () => {
         });
       });
 
-    // TODO: Force flag on existing folder and non-existing folder
+    const forceGenerationDone$ = new ReplaySubject();
+
+    fancy
+      .it('will download NPM modules with "--force" flag to generate project to "completion" status', (_, done) => {
+
+        isOnLine(() => {
+          const forceGenerateProjectFolder$ = from(generate.run([forcedGenerationPathProjectGenerate, '--npm-project-name', npmProjectName, '--force']) as Promise<any>).pipe(take(1), share());
+
+          forceGenerateProjectFolder$
+            .pipe(
+              mergeMap((res) => {
+                return res.projectFolderWithContents$;
+              })
+            )
+            .subscribe({
+              next: () => {
+                done();
+                forceGenerationDone$.next('generated');
+              }
+            });
+        });
+
+      });
+
+    fancy
+      .it('will download NPM modules with "--force" flag to overwrite project', (_, done) => {
+        forceGenerationDone$.subscribe(() => {
+          const forceGenerateProjectFolder$ = from(generate.run([forcedGenerationPathProjectGenerate, '--npm-project-name', npmProjectName, '--force']) as Promise<any>).pipe(take(1), share());
+
+          forceGenerateProjectFolder$
+            .pipe(
+              mergeMap((res) => {
+                return res.projectFolderWithContents$;
+              })
+            )
+            .subscribe({
+              next: () => {
+                done();
+              }
+            });
+        });
+      });
 
   });
 });
