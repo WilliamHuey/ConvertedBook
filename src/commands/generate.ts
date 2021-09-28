@@ -272,7 +272,7 @@ export default class Generate extends Command {
       }));
 
     projectFolderDry$
-      .pipe(share())
+      .pipe(takeLast(1), share())
       .pipe(tap(this.logCreationBegin))
       .subscribe(this.logCreationDone);
 

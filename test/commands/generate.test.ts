@@ -32,6 +32,11 @@ describe('Dry Run Generation:', () => {
           expect(ctx.stdout.trim()).to.contain('Error: Folder already exists');
         });
     });
+
+  // dry-run and force flag with existing folder
+
+  // dry-run and force flag with non-existing folder
+
 });
 
 
