@@ -1,7 +1,7 @@
 // Third party modules
 import { all } from 'ramda';
 import { isString, isUndefined } from 'is-what';
-import { forkJoin } from 'rxjs';
+import { forkJoin, from, Observable } from 'rxjs';
 import { filter, map, take } from 'rxjs/operators';
 const { lookpath } = require('lookpath');
 
@@ -10,14 +10,14 @@ import Build from '../../commands/build';
 
 export function buildDependencies(this: Build) {
   // Check for presence of external dependencies
-  const depCheckGroup$ = Build
+  const depCheckGroup: Array<Observable<any>> = Build
     .requiredExternalDeps
     .map(extDep => {
-      return lookpath(extDep);
+      return from(lookpath(extDep));
     });
 
   // Run checks for all external dependencies at once
-  const pathCheckResults$ = forkJoin(depCheckGroup$);
+  const pathCheckResults$ = forkJoin(depCheckGroup);
 
   // All extenal dependencies are found
   const allDepsSatisfied$ = pathCheckResults$
