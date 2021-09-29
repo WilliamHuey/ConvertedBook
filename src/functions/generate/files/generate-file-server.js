@@ -8,8 +8,7 @@ const { loadConfiguration, startServer } = snowpack;
 
     const config = await loadConfiguration({
         devOptions: {
-            hmr: true,
-            hmrErrorOverlay: false
+            hmr: true
         }
     }, configPath);
     startServer({ config });
