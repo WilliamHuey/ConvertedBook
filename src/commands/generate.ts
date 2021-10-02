@@ -46,7 +46,7 @@ export default class Generate extends Command {
       default: false,
       description: 'test out the generate command to see cli output without generating the actual project folder and files'
     }),
-    'toc': flags.boolean({
+    toc: flags.boolean({
       char: 't',
       default: false,
       description: 'when present, display the table of contents link on the top of the document'
@@ -63,11 +63,10 @@ export default class Generate extends Command {
   }
 
   private logErrorMsg = (error: FileFolderError) => {
-    if (error.path === ".") {
-
+    if (error.path === '.') {
       // Current directory path
       console.log(
-        `Error: Folder already exists in current directory and project was not generated`
+        'Error: Folder already exists in current directory and project was not generated'
       );
     } else {
       console.log(
@@ -147,7 +146,6 @@ export default class Generate extends Command {
     const outputFolderExists$ = checkOutputFolder$
       .pipe(
         filter((outputFolder: boolean) => {
-
           // Also accept the situation where only the project name exists
           // by itself, meaning that the output folder should exist
           return outputFolder || !parentFolderNamePresent;

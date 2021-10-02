@@ -1,9 +1,9 @@
 // Native modules
-import * as childProcess from "child_process";
+import * as childProcess from 'child_process';
 const { spawn } = childProcess;
 
 // Third party modules
-import { Command, flags } from '@oclif/command'
+import { Command, flags } from '@oclif/command';
 import { from, ReplaySubject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 const IsThere = require('is-there');
@@ -35,7 +35,7 @@ export default class Serve extends Command {
 
     const hasServerFile$ = checkServerFilepath$
       .pipe(
-        filter((hasServerFile) => {
+        filter(hasServerFile => {
           return hasServerFile;
         })
       );
@@ -46,7 +46,7 @@ export default class Serve extends Command {
       .subscribe({
         next: () => {
           const server = spawn('node', [Serve.serverFilenamePath,
-          JSON.stringify(flags)]);
+            JSON.stringify(flags)]);
 
           server.stdout.on('data', (data: any) => {
             console.error(`Info: ${data}`);
@@ -67,7 +67,7 @@ export default class Serve extends Command {
     // is most likely not a 'convertedbook' project
     const noServerFile$ = checkServerFilepath$
       .pipe(
-        filter((hasServerFile) => {
+        filter(hasServerFile => {
           return !hasServerFile;
         })
       );

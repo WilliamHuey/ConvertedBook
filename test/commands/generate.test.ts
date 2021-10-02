@@ -49,7 +49,5 @@ describe('Dry Run Generation:', () => {
     .it('dry run forced with valid project name and npm project name', ctx => {
       expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
     });
-
 });
-
 

@@ -4,6 +4,14 @@
     "oclif-typescript"
   ],
   "rules": {
+    "max-params": [
+      1,
+      6
+    ],
+    "max-nested-callbacks": [
+      1,
+      5
+    ],
     "object-curly-spacing": [
       "error",
       "always"

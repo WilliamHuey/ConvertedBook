@@ -18,15 +18,14 @@ function generateFormat(input: string,
   fileOutputExistence: FileOutputExistence,
   flags: Record<string, any>,
   fromServerCli: boolean) {
-
   const pandocAdditionalOptions = flags.pandoc ?
     JSON.parse(flags.pandoc).pandoc : null;
-  let pandocDefaultOptions = [`--data-dir=${process.cwd()}/config/`, '--template=default.html5', '-o', `${normalizedOutputPath}.${format}`, input, '-s'];
+  const pandocDefaultOptions = [`--data-dir=${process.cwd()}/config/`, '--template=default.html5', '-o', `${normalizedOutputPath}.${format}`, input, '-s'];
 
   // Add in more options for Pandoc when specified
   const allPandocOptions = pandocAdditionalOptions ?
     [...pandocDefaultOptions, pandocAdditionalOptions] :
-    pandocDefaultOptions
+    pandocDefaultOptions;
 
   const pandocService = spawn('pandoc', allPandocOptions);
 

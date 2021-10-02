@@ -8,7 +8,7 @@ import { readFile } from '@rxnode/fs';
 import { isString, isFunction, isUndefined } from 'is-what';
 
 // Library modules
-import { ProjectPackageJson } from './files/dynamic/project-package-json'
+import { ProjectPackageJson } from './files/dynamic/project-package-json';
 
 interface FileContentNameValueType {
   name: string;

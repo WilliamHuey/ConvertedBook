@@ -115,7 +115,7 @@ class GenerateContent implements GenerateStructure {
           .pipe(share());
 
       const countStructureNonExistFolders$ = concat(parentFolder$, createFolder$)
-        .pipe(share())
+        .pipe(share());
 
       const countStructureExistingFolder$ = this.fullProjectFolderExists$
         .pipe(
@@ -167,7 +167,7 @@ class GenerateContent implements GenerateStructure {
 
       const createFile$ = fileContent$
         .pipe(
-          filter((fileContent) => {
+          filter(fileContent => {
             return isString(fileContent);
           }),
           map(fileContent => {
@@ -183,7 +183,6 @@ class GenerateContent implements GenerateStructure {
           folderStructure.structureCreationCountSubject.next(1);
         });
     });
-
   };
 
   public generateStructure = (fullProjectFolderExists$: Observable<boolean>): {
