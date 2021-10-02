@@ -1,9 +1,12 @@
 // Third party modules
 import { from, ReplaySubject } from 'rxjs';
+import { unnest } from 'ramda';
+import { expect, test } from '@oclif/test';
 import { fancy } from 'fancy-test'
 import { filter, take, share, mergeMap } from 'rxjs/operators';
 const del = require('del');
 const isOnline = require('is-online');
+import { mkdir } from '@rxnode/fs';
 
 // Library modules
 import generate from '../../src/commands/generate';
@@ -145,6 +148,18 @@ describe('Actual project generation:', () => {
               }
             });
         });
+      });
+
+    mkdir(`${baseTempDownloadFolder}serve-empty-folder`).pipe(share())
+      .subscribe(() => {
+
+        process.chdir(`${baseTempDownloadFolder}serve-empty-folder`);
+        test
+          .stdout()
+          .command('serve')
+          .it('will error out when serving in an empty folder', ctx => {
+            expect(ctx.stdout.trim()).to.contain('Did not find the server.js" file, might not be a "convertedbook" project!');
+          });
       });
 
   });

@@ -2,9 +2,9 @@
 import { expect, test } from '@oclif/test';
 import { unnest } from 'ramda';
 import { share } from 'rxjs/operators';
+import { mkdir } from '@rxnode/fs';
 
 // Library modules
-import { mkdir } from '@rxnode/fs';
 import { retryTest, dryFlag, baseTempFolder } from './test-utilities';
 const baseTempNoDownloadFolder = `${baseTempFolder}no-downloads/`;
 

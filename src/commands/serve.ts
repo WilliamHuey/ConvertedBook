@@ -32,6 +32,7 @@ export default class Serve extends Command {
 
     // Basic check for 'server.js' file as a measure
     // of a folder being a 'convertedbook' project.
+
     const hasServerFile$ = checkServerFilepath$
       .pipe(
         filter((hasServerFile) => {
@@ -39,6 +40,8 @@ export default class Serve extends Command {
         })
       );
 
+    // A found 'server.js' file means it is most
+    // likely to be a 'convertedbook' project
     hasServerFile$
       .subscribe({
         next: () => {
@@ -60,6 +63,8 @@ export default class Serve extends Command {
         }
       });
 
+    // Did not find the 'server.js' means that it
+    // is most likely not a 'convertedbook' project
     const noServerFile$ = checkServerFilepath$
       .pipe(
         filter((hasServerFile) => {
