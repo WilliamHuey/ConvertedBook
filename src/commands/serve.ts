@@ -4,6 +4,9 @@ const { spawn } = childProcess;
 
 // Third party modules
 import { Command, flags } from '@oclif/command'
+import { from, ReplaySubject } from 'rxjs';
+import { filter } from 'rxjs/operators';
+const IsThere = require('is-there');
 
 export default class Serve extends Command {
   static description = 'Run live server for real-time updates on document changes'
@@ -17,18 +20,60 @@ export default class Serve extends Command {
 
   static aliases = ['s']
 
+  static serverFilenamePath = 'server.js';
+
   async run() {
-    const { flags } = this.parse(Serve),
-      server = spawn('node', ['./server.js', JSON.stringify(flags)]);
+    const { flags } = this.parse(Serve);
 
-    server.stdout.on('data', (data: any) => {
-      console.error(`Info: ${data}`);
-    });
+    const server$ = new ReplaySubject();
 
-    server.stderr.on('data', (data: any) => {
-      console.error(`Error: ${data}`);
-    });
+    const checkServerFilepath$ = from(IsThere
+      .promises.file(Serve.serverFilenamePath) as Promise<boolean>);
 
-    return server;
+    // Basic check for 'server.js' file as a measure
+    // of a folder being a 'convertedbook' project.
+    const hasServerFile$ = checkServerFilepath$
+      .pipe(
+        filter((hasServerFile) => {
+          return hasServerFile;
+        })
+      );
+
+    hasServerFile$
+      .subscribe({
+        next: () => {
+          const server = spawn('node', [Serve.serverFilenamePath,
+          JSON.stringify(flags)]);
+
+          server.stdout.on('data', (data: any) => {
+            console.error(`Info: ${data}`);
+          });
+
+          server.stderr.on('data', (data: any) => {
+            console.error(`Error: ${data}`);
+          });
+
+          server$.next(server);
+        },
+        error: () => {
+          console.log('Error when attempting to start server!');
+        }
+      });
+
+    const noServerFile$ = checkServerFilepath$
+      .pipe(
+        filter((hasServerFile) => {
+          return !hasServerFile;
+        })
+      );
+
+    noServerFile$
+      .subscribe({
+        next: () => {
+          console.log('Did not find the server.js" file, might not be a "convertedbook" project!');
+        }
+      });
+
+    return server$;
   }
 }

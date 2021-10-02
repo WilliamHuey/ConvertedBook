@@ -88,17 +88,19 @@ describe('Actual project generation:', () => {
         generationDone$.subscribe(() => {
           process.chdir(generationPathProjectGenerate);
           const serveRun = serve.run([]);
-
           serveRun
-            .then((serveProcess) => {
-              serveProcess.stdout.on('data', function (data: any) {
-                if (data.toString().trim() == "Complete file format generation") {
-                  serveProcess.kill();
-                  process.chdir(originalFolderPath);
-                  done();
-                }
-              });
-            });
+            .then((serveProcess$) => {
+              serveProcess$
+                .subscribe((serveProcess: any) => {
+                  serveProcess.stdout.on('data', function (data: any) {
+                    if (data.toString().trim() == "Complete file format generation") {
+                      serveProcess.kill();
+                      process.chdir(originalFolderPath);
+                      done();
+                    }
+                  });
+                });
+            })
         });
       });
 
