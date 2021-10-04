@@ -34,7 +34,7 @@ const convertLatexToHtml = () => {
     '-i',
     path.join(cwd, '/content/index.tex'),
     '-o',
-    path.join(cwd, '/index.html'),
+    path.join(cwd, '/content/index.html'),
     '-p',
     args
   ]);

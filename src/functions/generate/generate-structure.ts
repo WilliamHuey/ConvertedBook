@@ -4,15 +4,15 @@ export class GenerateStructureOutline {
       /project-name
         .gitignore
         /config
-          /styles
-            index.scss
           /templates
             default.html5
-          main.js
         /plugins
           latex.js
         /content
+          /styles
+            index.scss
           index.tex
+          main.js
         index.html
         package.json
         server.js
@@ -25,17 +25,6 @@ export class GenerateStructureOutline {
           content: {
             folders: [
               {
-                name: 'styles',
-                content: {
-                  files: [
-                    {
-                      name: 'index.module.scss',
-                      fileContent: 'configStylesIndex'
-                    }
-                  ]
-                }
-              },
-              {
                 name: 'templates',
                 content: {
                   files: [
@@ -45,12 +34,6 @@ export class GenerateStructureOutline {
                     }
                   ],
                 }
-              }
-            ],
-            files: [
-              {
-                name: 'main.js',
-                fileContent: 'indexJs'
               }
             ]
           },
@@ -69,11 +52,32 @@ export class GenerateStructureOutline {
         {
           name: 'content',
           content: {
+            folders: [
+              {
+                name: 'styles',
+                content: {
+                  files: [
+                    {
+                      name: 'index.module.scss',
+                      fileContent: 'configStylesIndex'
+                    }
+                  ]
+                }
+              }
+            ],
             files: [
               {
                 name: 'index.tex',
                 fileContent: 'indexTex',
               },
+              {
+                name: 'index.html',
+                fileContent: 'indexHtml'
+              },
+              {
+                name: 'main.js',
+                fileContent: 'indexJs'
+              }
             ],
           },
         }
@@ -82,10 +86,6 @@ export class GenerateStructureOutline {
         {
           name: '.gitignore',
           fileContent: 'gitignore',
-        },
-        {
-          name: 'index.html',
-          fileContent: 'indexHtml'
         },
         {
           name: 'package.json',
