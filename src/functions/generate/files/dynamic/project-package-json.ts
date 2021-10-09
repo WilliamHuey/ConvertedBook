@@ -8,7 +8,7 @@ export class ProjectPackageJson {
       author: '',
       license: 'ISC',
       dependencies: {
-        snowpack: '^3.8.3',
+        snowpack: '^3.8.8',
         '@snowpack/plugin-sass': '^1.4.0'
       },
       scripts: {

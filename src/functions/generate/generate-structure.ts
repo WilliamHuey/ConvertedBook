@@ -3,12 +3,12 @@ export class GenerateStructureOutline {
     /*
       /project-name
         .gitignore
-        /config
-          /templates
-            default.html5
         /plugins
           latex.js
         /content
+          /config
+            /templates
+              default.html5
           /styles
             index.scss
           index.tex
@@ -20,24 +20,6 @@ export class GenerateStructureOutline {
     */
     Object.assign(this, {
       folders: [
-        {
-          name: 'config',
-          content: {
-            folders: [
-              {
-                name: 'templates',
-                content: {
-                  files: [
-                    {
-                      name: 'default.html5',
-                      fileContent: 'texHtml5Template'
-                    }
-                  ],
-                }
-              }
-            ]
-          },
-        },
         {
           name: 'plugins',
           content: {
@@ -53,6 +35,24 @@ export class GenerateStructureOutline {
           name: 'content',
           content: {
             folders: [
+              {
+                name: 'config',
+                content: {
+                  folders: [
+                    {
+                      name: 'templates',
+                      content: {
+                        files: [
+                          {
+                            name: 'default.html5',
+                            fileContent: 'texHtml5Template'
+                          }
+                        ],
+                      }
+                    }
+                  ]
+                },
+              },
               {
                 name: 'styles',
                 content: {

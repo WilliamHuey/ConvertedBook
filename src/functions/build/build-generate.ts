@@ -12,15 +12,23 @@ import { BuildCheckGoodResults } from './build-checks';
 import { AsyncCheckResults, FileOutputExistence } from './build-cli-input-async-checks';
 import { truncateFilePath } from './build-utilities';
 
+const baseDir = process.cwd();
+
 function generateFormat(input: string,
   normalizedOutputPath: string,
   format: string,
   fileOutputExistence: FileOutputExistence,
   flags: Record<string, any>,
   fromServerCli: boolean) {
+
+  // Need to match the directory in which
+  // pandoc is referring to for proper
+  // inclusion of files in latex
+  process.chdir(`${baseDir}/content`);
+
   const pandocAdditionalOptions = flags.pandoc ?
     JSON.parse(flags.pandoc).pandoc : null;
-  const pandocDefaultOptions = [`--data-dir=${process.cwd()}/config/`, '--template=default.html5', '-o', `${normalizedOutputPath}.${format}`, input, '-s'];
+  const pandocDefaultOptions = [`--data-dir=${baseDir}/content/config`, '--template=default.html5', input, '-o', `${normalizedOutputPath}.${format}`, '-s'];
 
   // Add in more options for Pandoc when specified
   const allPandocOptions = pandocAdditionalOptions ?
