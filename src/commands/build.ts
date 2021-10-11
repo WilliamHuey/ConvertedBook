@@ -42,6 +42,11 @@ export default class Build extends Command {
 
   static flags = {
     help: flags.help({ char: 'h' }),
+    force: flags.boolean({
+      char: 'f',
+      default: false,
+      description: 'overwrite an existing output file'
+    }),
     input: flags.string({
       char: 'i',
       description: 'path of the input file to convert'
@@ -149,6 +154,9 @@ export default class Build extends Command {
         this.log(buildCli.msg.trim());
         this.log(buildAsyncResults.msg.trim());
       },
+      force: (([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
+        buildRunMap.default([buildCli, buildAsyncResults]);
+      }),
       pandoc: ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
         buildRunMap.default([{ ...buildCli, fromServerCli: true }, buildAsyncResults]);
       },
