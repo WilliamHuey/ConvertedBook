@@ -10,6 +10,8 @@ import { AsyncCheckResults } from '../../src/functions/build/build-cli-input-asy
 import { buildGenerate } from '../../src/functions/build/build-generate';
 import CheckResults from '../fixtures/objects/check-results';
 import AsyncCheckRes from '../fixtures/objects/async-check-results';
+import ForcedCheckResults from '../fixtures/objects/forced-check-results';
+import ForcedAsyncCheckRes from '../fixtures/objects/forced-async-check-results';
 import { retryTest, baseTempFolder, dryFlag, testDataDirectory } from './test-utilities';
 
 describe('Build', () => {
@@ -156,6 +158,33 @@ describe('Build', () => {
 
     const checkResults = new CheckResults();
     const asyncCheckRes = new AsyncCheckRes();
+
+    const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
+      .pandocClose$
+      .pipe(takeLast(1));
+
+    pd
+      .subscribe({
+        next: () => {
+          // Able to reach completion is a good sign
+          // and use this as a marker for a
+          // successful file generation
+          ctx();
+          process.chdir(originalFolderPath);
+        },
+        error: (e: any) => {
+          console.log('Error', e);
+        }
+      });
+  });
+
+  it('force generate function goes to "completion" status', ctx => {
+    const originalFolderPath = process.cwd();
+    const generationPathProjectGenerate = `${baseTempFolder}no-downloads/`;
+    process.chdir(generationPathProjectGenerate);
+
+    const checkResults = new ForcedCheckResults();
+    const asyncCheckRes = new ForcedAsyncCheckRes();
 
     const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
       .pandocClose$
