@@ -44,7 +44,6 @@ export default class Build extends Command {
     help: flags.help({ char: 'h' }),
     force: flags.boolean({
       char: 'f',
-      default: false,
       description: 'overwrite an existing output file'
     }),
     input: flags.string({
