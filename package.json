@@ -71,7 +71,6 @@
   },
   "repository": "WilliamHuey/ConvertedBook",
   "scripts": {
-    "complex": "./node_modules/.bin/ts-plato -r -d ./report src",
     "postpack": "rm -f oclif.manifest.json",
     "lint": "eslint . --ext .ts --config .eslintrc",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
