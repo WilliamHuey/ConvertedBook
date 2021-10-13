@@ -1,6 +1,7 @@
 module.exports = {
   mount: {
-    "content": { url: '/' }
+    "content": { url: '/' },
+    'node_modules/latex.css/fonts': '/fonts'
   },
   plugins: [
     ['./plugins/latex.js', {/* pluginOptions */ }],
