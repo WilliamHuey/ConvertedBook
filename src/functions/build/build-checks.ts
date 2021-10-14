@@ -18,6 +18,7 @@ export type BuildCheckGoodResults = {
   continue: boolean;
   conditions: CondsFlagsArgv;
   fromServerCli?: boolean;
+  exactPdf?: boolean;
 }
 
 export type BuildCheckResults = XOR<BuildCheckBadResults, BuildCheckGoodResults>

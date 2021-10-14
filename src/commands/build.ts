@@ -46,6 +46,10 @@ export default class Build extends Command {
       char: 'f',
       description: 'overwrite an existing output file'
     }),
+    exact: flags.boolean({
+      char: 'e',
+      description: 'Only for pdf output. Generate pdf based on html instead of using Pandoc'
+    }),
     input: flags.string({
       char: 'i',
       description: 'path of the input file to convert'
@@ -153,6 +157,9 @@ export default class Build extends Command {
         this.log(buildCli.msg.trim());
         this.log(buildAsyncResults.msg.trim());
       },
+      exact: (([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
+        buildRunMap.default([{ ...buildCli, exactPdf: true }, buildAsyncResults]);
+      }),
       force: (([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
         buildRunMap.default([buildCli, buildAsyncResults]);
       }),
