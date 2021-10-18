@@ -3,14 +3,64 @@ import { spawn } from 'child_process';
 import { unlinkSync } from 'fs';
 
 // Third party modules
-import { bindCallback } from 'rxjs';
+import { forkJoin, bindCallback } from 'rxjs';
+import { first } from 'rxjs/operators';
 
 // Library modules
 import { FileOutputExistence } from './build-cli-input-async-checks';
+import { CommandFlagKeys } from './build-checks';
+
+interface BuildGeneratePandoc {
+  input: string;
+  normalizedFormats: string[];
+  flags: CommandFlagKeys;
+  fileOutputExistence: FileOutputExistence;
+  checkFromServerCli: boolean;
+  normalizedOutputPath: string;
+}
 
 // Directory for pandoc process
 const baseDir = process.cwd(),
   baseContentDir = `${baseDir}/content`;
+
+export function pandocGenerated({ input,
+  normalizedFormats,
+  flags,
+  fileOutputExistence,
+  checkFromServerCli,
+  normalizedOutputPath }: BuildGeneratePandoc) {
+  const generated = normalizedFormats
+    .map(format => {
+      return pandocGenerateFormat(input, normalizedOutputPath, format, fileOutputExistence, flags, checkFromServerCli);
+    });
+
+  const pandocGen = generated.reduce((acc, el): any => {
+    return {
+      pandocServiceGroup: [...acc.pandocServiceGroup, el.pandocService],
+      pandocCloseGroup: [...acc.pandocCloseGroup, el.pandocClose$]
+    };
+  }, { pandocServiceGroup: [], pandocCloseGroup: [] });
+
+  const {
+    pandocCloseGroup: pandocCloseGroup$,
+    pandocServiceGroup
+  } = pandocGen;
+
+  // Treat the input file types as a group even though
+  // one might only be present for easier processing
+  const groupFormatsGenerated$ = forkJoin(pandocCloseGroup$)
+    .pipe(first());
+
+  groupFormatsGenerated$
+    .subscribe(() => {
+      console.log('Complete file format generation');
+    });
+
+  return {
+    pandocClose$: groupFormatsGenerated$,
+    pandocServiceGroup
+  };
+}
 
 export function pandocGenerateFormat(input: string,
   normalizedOutputPath: string,
