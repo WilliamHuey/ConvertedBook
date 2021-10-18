@@ -36,7 +36,7 @@ export function pandocGenerated({ input,
 
   const pandocGen = generated.reduce((acc, el): any => {
     return {
-      pandocServiceGroup: [...acc.pandocServiceGroup, el.pandocService],
+      pandocServiceGroup: [...acc.pandocServiceGroup],
       pandocCloseGroup: [...acc.pandocCloseGroup, el.pandocClose$]
     };
   }, { pandocServiceGroup: [], pandocCloseGroup: [] });
@@ -116,7 +116,6 @@ export function pandocGenerateFormat(input: string,
     });
 
   return {
-    pandocClose$,
-    pandocService
+    pandocClose$
   };
 }
