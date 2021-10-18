@@ -7,7 +7,7 @@ const del = require('del');
 // Library modules
 import { BuildCheckGoodResults } from '../../src/functions/build/build-checks';
 import { AsyncCheckResults } from '../../src/functions/build/build-cli-input-async-checks';
-import { buildGenerate } from '../../src/functions/build/build-generate-pandoc';
+import { buildGenerate } from '../../src/functions/build/build-generate';
 import CheckResults from '../fixtures/objects/check-results';
 import AsyncCheckRes from '../fixtures/objects/async-check-results';
 import ForcedCheckResults from '../fixtures/objects/forced-check-results';
