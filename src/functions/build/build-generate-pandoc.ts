@@ -36,14 +36,12 @@ export function pandocGenerated({ input,
 
   const pandocGen = generated.reduce((acc, el): any => {
     return {
-      pandocServiceGroup: [...acc.pandocServiceGroup],
       pandocCloseGroup: [...acc.pandocCloseGroup, el.pandocClose$]
     };
-  }, { pandocServiceGroup: [], pandocCloseGroup: [] });
+  }, { pandocCloseGroup: [] });
 
   const {
-    pandocCloseGroup: pandocCloseGroup$,
-    pandocServiceGroup
+    pandocCloseGroup: pandocCloseGroup$
   } = pandocGen;
 
   // Treat the input file types as a group even though
@@ -57,8 +55,7 @@ export function pandocGenerated({ input,
     });
 
   return {
-    pandocClose$: groupFormatsGenerated$,
-    pandocServiceGroup
+    pandocClose$: groupFormatsGenerated$
   };
 }
 
