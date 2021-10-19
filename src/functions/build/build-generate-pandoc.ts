@@ -83,7 +83,12 @@ export function pandocGenerateFormat(input: string,
 
   // Remove the existing file if the a force flag is present
   // because the overwriting option is not available in pandoc
-  if (flags.force) unlinkSync(`${normalizedOutputPath}.${format}`);
+  try {
+    if (flags.force) unlinkSync(`${normalizedOutputPath}.${format}`);
+  } catch (_) {
+    // File does not exists when the force flag is used,
+    // however, do not error out as that is not useful
+  }
 
   // Start the pandoc service
   const pandocService = spawn('pandoc', allPandocOptions);
