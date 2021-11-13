@@ -4,7 +4,7 @@ import Build from '../../commands/build';
 // Third party modules
 import { match, when } from 'ts-pattern';
 import { isString, isFunction } from 'is-what';
-const plur = require('plur');
+const inflection = require('inflection');
 
 export enum action {
   check,
@@ -33,7 +33,7 @@ const messages: { [index: string]: string | ((options: { data: { quantity: numbe
   someRequiredFlagsFound: 'Build failed: Missing a required "--input" or "--output"',
   buildingStartPrefix: 'Start building: ',
   createOutputFile: options => {
-    return `Creating output ${plur('file', options?.data?.quantity)}`;
+    return `Creating output ${inflection.inflect('file', options?.data?.quantity)}`;
   },
   invalidInputFile: 'Build failed: Invalid input file',
   invalidOutputFolderOrFile: 'Build failed: Invalid output folder/file',
