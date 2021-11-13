@@ -1,5 +1,5 @@
 // Library modules
-import typeCheck from '@utilities/type-check';
+import { typeCheck, stringTypes } from '@utilities/type-check';
 import Build from '../../commands/build';
 import { BuildCheckGoodResults } from './build-checks';
 import { AsyncCheckResults } from './build-cli-input-async-checks';
@@ -17,7 +17,7 @@ export function buildGenerate(this: Build,
       `${truncateFilePath(outputPath).filePathFolder}/${outputFilename}` :
       `${outputPath}${outputFilename}`;
 
-  const checkFromServerCli = typeCheck(fromServerCli, 'Undefined') ?
+  const checkFromServerCli = typeCheck(fromServerCli, stringTypes.Undefined) ?
     false : true;
 
   return pandocGenerated({

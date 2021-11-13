@@ -1,12 +1,18 @@
 // Third party modules
 import { type as checkType } from 'ramda';
 
-type stringTypes = 'Object' | 'Number' |
-    'Boolean' | 'String' | 'Null' | 'Array' | 'RegExp' |
-    'Function' | 'Undefined';
-
-const typeCheck = (val: any, type: stringTypes): boolean => {
-    return checkType(val) === type;
+export enum stringTypes {
+  'Object',
+  'Number',
+  'Boolean',
+  'String',
+  'Null',
+  'Array',
+  'RegExp',
+  'Function',
+  'Undefined'
 }
 
-export default typeCheck;
+export function typeCheck(val: any, type: stringTypes): boolean {
+  return checkType(val) === stringTypes[type];
+}

@@ -1,5 +1,5 @@
 // Library modules
-import typeCheck from '@utilities/type-check';
+import { typeCheck, stringTypes } from '@utilities/type-check';
 import Build from '../../commands/build';
 
 // Third party modules
@@ -50,18 +50,18 @@ export function buildLog(this: Build, buildOptions: BuildOptions) {
     .with({
       action: action.check,
       log: when(log => {
-        return typeCheck(log, 'String');
+        return typeCheck(log, stringTypes.String);
       })
     }, () => {
       const { log, data } = buildOptions as Check;
-      return typeCheck(messages[log], 'Function') ?
+      return typeCheck(messages[log], stringTypes.Function) ?
         (messages[log] as Function)({ data }) :
         `${messages[log]}${data || ''}`;
     })
     .with({
       action: action.ready,
       buildFormats: when(buildFormats => {
-        return typeCheck(buildFormats, 'String');
+        return typeCheck(buildFormats, stringTypes.String);
       })
     }, () => {
       return `${messages.buildingStartPrefix}${(buildOptions as BuildFormat).buildFormats}`;

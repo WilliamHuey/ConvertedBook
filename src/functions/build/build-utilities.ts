@@ -2,7 +2,7 @@
 import { init, head, last } from 'ramda';
 
 // Libraries modules
-import typeCheck from '@utilities/type-check';
+import { typeCheck, stringTypes } from '@utilities/type-check';
 
 export function supposedFileName(fullPath: string) {
   const fullPathSplit = fullPath.split('/');
@@ -11,7 +11,11 @@ export function supposedFileName(fullPath: string) {
 
 export function getFileNameFromParts(supposeFileParts: string[] | undefined): string |
   undefined {
-  const validStringArray: string[] = typeCheck(supposeFileParts, 'Array') && typeof supposeFileParts != 'undefined' ? supposeFileParts : [];
+
+  // Using the default typeof undefined check since TypeScript is not able to
+  // infer the valid meaning of passing the running of typeCheck
+  // against undefined.
+  const validStringArray: string[] = typeCheck(supposeFileParts, stringTypes.Array) && typeof supposeFileParts != 'undefined' ? supposeFileParts : [];
 
   return validStringArray ? head(validStringArray) : '';
 }

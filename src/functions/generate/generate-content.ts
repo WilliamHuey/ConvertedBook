@@ -1,7 +1,7 @@
 // Native modules
 import * as path from 'path';
 import * as fs from 'fs';
-import typeCheck from '@utilities/type-check';
+import { typeCheck, stringTypes } from '@utilities/type-check';
 
 // Third party modules
 import { concat, Observable, BehaviorSubject, of, bindNodeCallback } from 'rxjs';
@@ -168,7 +168,7 @@ class GenerateContent implements GenerateStructure {
       const createFile$ = fileContent$
         .pipe(
           filter(fileContent => {
-            return typeCheck(fileContent, 'String');
+            return typeCheck(fileContent, stringTypes.String);
           }),
           map(fileContent => {
             return fileContent;

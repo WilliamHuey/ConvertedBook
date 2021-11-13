@@ -5,10 +5,9 @@ import * as path from 'path';
 import { of, Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { readFile } from '@rxnode/fs';
-import { isString, isFunction, isUndefined } from 'is-what';
 
 // Library modules
-import typeCheck from '@utilities/type-check';
+import { typeCheck, stringTypes } from '@utilities/type-check';
 import { ProjectPackageJson } from './files/dynamic/project-package-json';
 
 interface FileContentNameValueType {
@@ -53,13 +52,13 @@ export function fileContentObservable(key: string, data: Record<string, any>): O
   if (key === '')
     return of('');
 
-  if (typeCheck(fileContent[key], 'Undefined'))
+  if (typeCheck(fileContent[key], stringTypes.Undefined))
     return of({});
 
-  if (typeCheck(asFn.content, 'Function'))
+  if (typeCheck(asFn.content, stringTypes.Function))
     return of(asFn.content(data));
 
-  if (typeCheck(asStr.name, 'String'))
+  if (typeCheck(asStr.name, stringTypes.String))
     return readFile(path.join(__dirname, `/files/${asStr.name}`), 'utf8')
       .pipe(share());
 

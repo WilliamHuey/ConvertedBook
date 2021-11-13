@@ -13,7 +13,7 @@ import { match } from 'ts-pattern';
 const IsThere = require('is-there');
 
 // Libraries modules
-import typeCheck from '@utilities/type-check';
+import { typeCheck, stringTypes } from '@utilities/type-check';
 import { GenerateContent } from '../functions/generate/generate-content';
 import { mkdir } from '@rxnode/fs';
 import { truncateFilePath, supposedFileName } from '../functions/build/build-utilities';
@@ -108,7 +108,7 @@ export default class Generate extends Command {
 
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
-    const normalizedFolder = typeCheck(folderName, 'Undefined') ||
+    const normalizedFolder = typeCheck(folderName, stringTypes.Undefined) ||
       folderName?.length === 0 ?
       'New Folder' :
       folderName;

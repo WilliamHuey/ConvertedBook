@@ -5,7 +5,7 @@ import { filter, map, take } from 'rxjs/operators';
 const { lookpath } = require('lookpath');
 
 // Library modules
-import typeCheck from '@utilities/type-check';
+import { typeCheck, stringTypes } from '@utilities/type-check';
 import Build from '../../commands/build';
 
 export function buildDependencies(this: Build) {
@@ -24,7 +24,7 @@ export function buildDependencies(this: Build) {
     .pipe(
       filter((result: Array<any>) => {
         return all((resItem: string | undefined) => {
-          return typeCheck(resItem, 'String');
+          return typeCheck(resItem, stringTypes.String);
         }, result);
       })
     );
@@ -34,7 +34,7 @@ export function buildDependencies(this: Build) {
     .pipe(
       map((result: Array<any>) => {
         return result.map((resItem, resItemIndex) => {
-          return typeCheck(resItem, 'Undefined') ?
+          return typeCheck(resItem, stringTypes.Undefined) ?
             Build.requiredExternalDeps[resItemIndex] : '';
         });
       }),
