@@ -1,6 +1,8 @@
 // Third party modules
 import { init, head, last } from 'ramda';
-import { isArray } from 'is-what';
+
+// Libraries modules
+import typeCheck from '@utilities/type-check';
 
 export function supposedFileName(fullPath: string) {
   const fullPathSplit = fullPath.split('/');
@@ -9,8 +11,9 @@ export function supposedFileName(fullPath: string) {
 
 export function getFileNameFromParts(supposeFileParts: string[] | undefined): string |
   undefined {
-  return isArray(supposeFileParts) ?
-    head(supposeFileParts) : '';
+  const validStringArray: string[] = typeCheck(supposeFileParts, 'Array') && typeof supposeFileParts != 'undefined' ? supposeFileParts : [];
+
+  return validStringArray ? head(validStringArray) : '';
 }
 
 export function truncateFilePath(filePath: string) {

@@ -16,9 +16,9 @@
     "file-type": "^16.5.3",
     "inflection": "^1.13.1",
     "is-there": "^4.5.1",
-    "is-what": "^3.14.1",
     "listify": "^1.0.3",
     "lookpath": "^1.2.2",
+    "module-alias": "^2.2.2",
     "puppeteer": "^11.0.0",
     "ramda": "^0.27.1",
     "rxjs": "^7.4.0",
@@ -82,5 +82,8 @@
     "nyctest-commands-download": "nyc --extension .ts  mocha \"test/commands-download/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md"
   },
-  "types": "lib/index.d.ts"
+  "types": "lib/index.d.ts",
+  "_moduleAliases": {
+    "@utilities": "src/utilities"
+  }
 }

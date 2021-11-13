@@ -1,9 +1,9 @@
 // Library modules
+import typeCheck from '@utilities/type-check';
 import Build from '../../commands/build';
 
 // Third party modules
 import { match, when } from 'ts-pattern';
-import { isString, isFunction } from 'is-what';
 const inflection = require('inflection');
 
 export enum action {
@@ -50,18 +50,18 @@ export function buildLog(this: Build, buildOptions: BuildOptions) {
     .with({
       action: action.check,
       log: when(log => {
-        return isString(log);
+        return typeCheck(log, 'String');
       })
     }, () => {
       const { log, data } = buildOptions as Check;
-      return isFunction(messages[log]) ?
+      return typeCheck(messages[log], 'Function') ?
         (messages[log] as Function)({ data }) :
         `${messages[log]}${data || ''}`;
     })
     .with({
       action: action.ready,
       buildFormats: when(buildFormats => {
-        return isString(buildFormats);
+        return typeCheck(buildFormats, 'String');
       })
     }, () => {
       return `${messages.buildingStartPrefix}${(buildOptions as BuildFormat).buildFormats}`;

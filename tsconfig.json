@@ -9,9 +9,15 @@
     "target": "es2017",
     "types": [
       "node"
-    ]
+    ],
+    "baseUrl": "./src",
+    "paths": {
+      "@utilities/*": [
+        "utilities/*"
+      ]
+    }
   },
   "include": [
-    "src/**/*"
+    "src"
   ]
 }

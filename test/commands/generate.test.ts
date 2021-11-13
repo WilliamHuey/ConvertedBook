@@ -1,4 +1,5 @@
-// Third party modules
+// Third party module
+import 'module-alias/register';
 import { expect, test } from '@oclif/test';
 import { unnest } from 'ramda';
 import { share } from 'rxjs/operators';

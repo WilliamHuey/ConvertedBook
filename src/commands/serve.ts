@@ -1,3 +1,6 @@
+// Third party module
+import 'module-alias/register';
+
 // Native modules
 import * as childProcess from 'child_process';
 const { spawn } = childProcess;
@@ -46,7 +49,7 @@ export default class Serve extends Command {
       .subscribe({
         next: () => {
           const server = spawn('node', [Serve.serverFilenamePath,
-            JSON.stringify(flags)]);
+          JSON.stringify(flags)]);
 
           server.stdout.on('data', (data: any) => {
             console.error(`Info: ${data}`);

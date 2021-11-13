@@ -8,6 +8,7 @@ import { readFile } from '@rxnode/fs';
 import { isString, isFunction, isUndefined } from 'is-what';
 
 // Library modules
+import typeCheck from '@utilities/type-check';
 import { ProjectPackageJson } from './files/dynamic/project-package-json';
 
 interface FileContentNameValueType {
@@ -52,13 +53,13 @@ export function fileContentObservable(key: string, data: Record<string, any>): O
   if (key === '')
     return of('');
 
-  if (isUndefined(fileContent[key]))
+  if (typeCheck(fileContent[key], 'Undefined'))
     return of({});
 
-  if (isFunction(asFn.content))
+  if (typeCheck(asFn.content, 'Function'))
     return of(asFn.content(data));
 
-  if (isString(asStr.name))
+  if (typeCheck(asStr.name, 'String'))
     return readFile(path.join(__dirname, `/files/${asStr.name}`), 'utf8')
       .pipe(share());
 

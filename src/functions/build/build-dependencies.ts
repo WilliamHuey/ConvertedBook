@@ -1,11 +1,11 @@
 // Third party modules
 import { all } from 'ramda';
-import { isString, isUndefined } from 'is-what';
 import { forkJoin, from, Observable } from 'rxjs';
 import { filter, map, take } from 'rxjs/operators';
 const { lookpath } = require('lookpath');
 
 // Library modules
+import typeCheck from '@utilities/type-check';
 import Build from '../../commands/build';
 
 export function buildDependencies(this: Build) {
@@ -24,7 +24,7 @@ export function buildDependencies(this: Build) {
     .pipe(
       filter((result: Array<any>) => {
         return all((resItem: string | undefined) => {
-          return isString(resItem);
+          return typeCheck(resItem, 'String');
         }, result);
       })
     );
@@ -34,7 +34,7 @@ export function buildDependencies(this: Build) {
     .pipe(
       map((result: Array<any>) => {
         return result.map((resItem, resItemIndex) => {
-          return isUndefined(resItem) ?
+          return typeCheck(resItem, 'Undefined') ?
             Build.requiredExternalDeps[resItemIndex] : '';
         });
       }),

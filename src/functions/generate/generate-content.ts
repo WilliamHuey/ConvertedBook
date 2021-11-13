@@ -1,13 +1,13 @@
 // Native modules
 import * as path from 'path';
 import * as fs from 'fs';
+import typeCheck from '@utilities/type-check';
 
 // Third party modules
 import { concat, Observable, BehaviorSubject, of, bindNodeCallback } from 'rxjs';
 import { share, scan, takeLast, skipWhile, mergeMap, map, filter, takeUntil } from 'rxjs/operators';
 import { writeFile, mkdir } from '@rxnode/fs';
 import { match, __ } from 'ts-pattern';
-import { isString } from 'is-what';
 
 // RxJs wrapped fs remove
 const remove = bindNodeCallback(fs.rm);
@@ -168,7 +168,7 @@ class GenerateContent implements GenerateStructure {
       const createFile$ = fileContent$
         .pipe(
           filter(fileContent => {
-            return isString(fileContent);
+            return typeCheck(fileContent, 'String');
           }),
           map(fileContent => {
             return fileContent;

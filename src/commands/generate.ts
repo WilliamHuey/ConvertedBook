@@ -1,3 +1,6 @@
+// Third party module
+import 'module-alias/register';
+
 // Native modules
 import { spawn } from 'child_process';
 import * as path from 'path';
@@ -6,11 +9,11 @@ import * as path from 'path';
 import { Command, flags } from '@oclif/command';
 import { bindCallback, of, from, merge } from 'rxjs';
 import { tap, mergeMap, share, takeUntil, catchError, filter, takeLast, take } from 'rxjs/operators';
-import { isUndefined } from 'is-what';
 import { match } from 'ts-pattern';
 const IsThere = require('is-there');
 
 // Libraries modules
+import typeCheck from '@utilities/type-check';
 import { GenerateContent } from '../functions/generate/generate-content';
 import { mkdir } from '@rxnode/fs';
 import { truncateFilePath, supposedFileName } from '../functions/build/build-utilities';
@@ -105,10 +108,10 @@ export default class Generate extends Command {
 
     // Generate the top folder project first, before using a recursive
     // pattern creation of other files
-    const normalizedFolder =
-      isUndefined(folderName) || folderName?.length === 0 ?
-        'New Folder' :
-        folderName;
+    const normalizedFolder = typeCheck(folderName, 'Undefined') ||
+      folderName?.length === 0 ?
+      'New Folder' :
+      folderName;
 
     // Determine the project folder name
     const {

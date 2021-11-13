@@ -1,3 +1,6 @@
+// Third party module
+import 'module-alias/register';
+
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { unnest, difference } from 'ramda';
