@@ -10,7 +10,8 @@ export class ProjectPackageJson {
       dependencies: {
         snowpack: '^3.8.8',
         "latex.css": "^1.5.0",
-        '@snowpack/plugin-sass': '^1.4.0'
+        '@snowpack/plugin-sass': '^1.4.0',
+        "lookpath": "^1.2.2",
       },
       scripts: {
         start: 'snowpack dev',
