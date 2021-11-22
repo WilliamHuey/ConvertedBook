@@ -1,15 +1,25 @@
 // Library modules
 import { typeCheck, stringTypes } from '@utilities/type-check';
 import Build from '../../commands/build';
-import { BuildCheckGoodResults } from './build-checks';
-import { AsyncCheckResults } from './build-cli-input-async-checks';
+import { BuildCheckGoodResults, CommandFlagKeys } from './build-checks';
+import { AsyncCheckResults, FileOutputExistence } from './build-cli-input-async-checks';
 import { truncateFilePath } from './build-utilities';
 import { pandocGenerated } from './build-generate-pandoc';
+import { puppeteerGenerated } from './build-generate-puppeteer';
+
+export interface BuildGenerate {
+  input: string;
+  normalizedFormats: string[];
+  flags: CommandFlagKeys;
+  fileOutputExistence: FileOutputExistence;
+  checkFromServerCli: boolean;
+  normalizedOutputPath: string;
+}
 
 export function buildGenerate(results: BuildCheckGoodResults, asyncResults: AsyncCheckResults): any
 export function buildGenerate(this: Build,
   results: BuildCheckGoodResults, asyncResults: AsyncCheckResults) {
-  const { conditions, fromServerCli } = results,
+  const { conditions, fromServerCli, exactPdf } = results,
     { input, output: outputPath } = conditions.flags,
     { normalizedFormats, flags } = conditions,
     { truncateOutput, outputFilename, fileOutputExistence } = asyncResults,
@@ -20,6 +30,21 @@ export function buildGenerate(this: Build,
   const checkFromServerCli = typeCheck(fromServerCli, stringTypes.Undefined) ?
     false : true;
 
+  if (exactPdf) {
+    // TODO: Run the 'puppeteer' build for the exact pdf generation
+    puppeteerGenerated({
+      input,
+      normalizedFormats,
+      flags,
+      fileOutputExistence,
+      checkFromServerCli,
+      normalizedOutputPath
+    });
+  }
+
+  // Genrally run the pandoc generation when converting any file type,
+  // except for when an 'exact' pdf is requested to mirror the look of
+  // of the html
   return pandocGenerated({
     input,
     normalizedFormats,

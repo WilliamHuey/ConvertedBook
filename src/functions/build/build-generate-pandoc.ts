@@ -8,16 +8,7 @@ import { first } from 'rxjs/operators';
 
 // Library modules
 import { FileOutputExistence } from './build-cli-input-async-checks';
-import { CommandFlagKeys } from './build-checks';
-
-interface BuildGeneratePandoc {
-  input: string;
-  normalizedFormats: string[];
-  flags: CommandFlagKeys;
-  fileOutputExistence: FileOutputExistence;
-  checkFromServerCli: boolean;
-  normalizedOutputPath: string;
-}
+import { BuildGenerate } from './build-generate';
 
 // Directory for pandoc process
 const baseDir = process.cwd(),
@@ -28,7 +19,7 @@ export function pandocGenerated({ input,
   flags,
   fileOutputExistence,
   checkFromServerCli,
-  normalizedOutputPath }: BuildGeneratePandoc) {
+  normalizedOutputPath }: BuildGenerate) {
   const generated = normalizedFormats
     .map(format => {
       return pandocGenerateFormat(input, normalizedOutputPath, format, fileOutputExistence, flags, checkFromServerCli);
