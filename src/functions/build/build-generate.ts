@@ -42,9 +42,17 @@ export function buildGenerate(this: Build,
     });
   }
 
-  // Genrally run the pandoc generation when converting any file type,
+  // TODO: check for other format types ahead of time
+
+  // Generally run the pandoc generation when converting any file type,
   // except for when an 'exact' pdf is requested to mirror the look of
-  // of the html
+  // of the html.
+
+  // Allow pandoc to convert to other file formats when they are specified,
+  // even when the exactpdf option is present because conversion shouldn't
+  // be limited by the exactpdf options for other file formats.
+
+  // TODO: (exactpdf and other file formats present) || !exactpdf
   return pandocGenerated({
     input,
     normalizedFormats,
