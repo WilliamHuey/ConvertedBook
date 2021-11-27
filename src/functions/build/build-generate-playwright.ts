@@ -1,7 +1,7 @@
 // Library modules
 import { BuildGenerate } from './build-generate';
 
-export function puppeteerGenerated({
+export function playwrightGenerated({
     input,
     normalizedFormats,
     flags,

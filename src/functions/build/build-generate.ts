@@ -5,7 +5,7 @@ import { BuildCheckGoodResults, CommandFlagKeys } from './build-checks';
 import { AsyncCheckResults, FileOutputExistence } from './build-cli-input-async-checks';
 import { truncateFilePath } from './build-utilities';
 import { pandocGenerated } from './build-generate-pandoc';
-import { puppeteerGenerated } from './build-generate-puppeteer';
+import { playwrightGenerated } from './build-generate-playwright';
 
 export interface BuildGenerate {
   input: string;
@@ -31,8 +31,8 @@ export function buildGenerate(this: Build,
     false : true;
 
   if (exactPdf) {
-    // TODO: Run the 'puppeteer' build for the exact pdf generation
-    puppeteerGenerated({
+    // TODO: Run the 'playwright' build for the exact pdf generation
+    playwrightGenerated({
       input,
       normalizedFormats,
       flags,

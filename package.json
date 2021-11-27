@@ -11,6 +11,7 @@
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.3",
+    "@raminjafary/sura": "^0.1.8",
     "@rxnode/core": "^0.5.3",
     "@rxnode/fs": "^0.5.4",
     "file-type": "^16.5.3",
@@ -19,7 +20,6 @@
     "listify": "^1.0.3",
     "lookpath": "^1.2.2",
     "module-alias": "^2.2.2",
-    "puppeteer": "^11.0.0",
     "ramda": "^0.27.1",
     "rxjs": "^7.4.0",
     "ts-pattern": "^3.3.3",
@@ -69,6 +69,7 @@
       "@oclif/plugin-help"
     ]
   },
+  "type": "module",
   "repository": "WilliamHuey/ConvertedBook",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
