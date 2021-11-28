@@ -68,7 +68,6 @@
       "@oclif/plugin-help"
     ]
   },
-  "type": "module",
   "repository": "WilliamHuey/ConvertedBook",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
