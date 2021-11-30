@@ -1,5 +1,5 @@
 // Third party modules
-import { generateFile } from '@raminjafary/sura';
+import { chromium } from 'playwright';
 
 // Library modules
 import { BuildGenerate } from './build-generate';
@@ -11,6 +11,21 @@ const snowpackDevServerPort = 8080;
 const simpleServerPort = 9000;
 
 const createExactPdf = () => {
+  const server = createServer();
+  server.listen(simpleServerPort, () => {
+    (async () => {
+      const browser = await chromium.launch()
+      const page = await browser.newPage()
+      await page.goto('https://duckduckgo.com')
+      await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        path: '/output/test.pdf'
+      });
+      await browser.close();
+      server.close();
+    })();
+  });
 }
 
 export function playwrightGenerated({
@@ -21,9 +36,8 @@ export function playwrightGenerated({
   checkFromServerCli,
   normalizedOutputPath
 }: BuildGenerate) {
-  const server = createServer();
-  server.listen(simpleServerPort, () => {
-    console.log('Server started');
-  });
+  createExactPdf();
+
+
 
 }
