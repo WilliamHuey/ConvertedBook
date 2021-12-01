@@ -5,22 +5,27 @@ import { chromium } from 'playwright';
 import { BuildGenerate } from './build-generate';
 import { createServer } from './build-server';
 
+interface CreateExactPdf {
+  port: string | Number;
+  fileName: string;
+}
+
 // TODO: Read the server port from snowpack dynamically
 
 const snowpackDevServerPort = 8080;
 const simpleServerPort = 9000;
 
-const createExactPdf = () => {
+const createExactPdf = ({ port, fileName }: CreateExactPdf) => {
   const server = createServer();
   server.listen(simpleServerPort, () => {
     (async () => {
-      const browser = await chromium.launch()
-      const page = await browser.newPage()
-      await page.goto('https://duckduckgo.com')
+      const browser = await chromium.launch();
+      const page = await browser.newPage();
+      await page.goto(`localhost:${port}`);
       await page.pdf({
         format: 'A4',
         printBackground: true,
-        path: '/output/test.pdf'
+        path: `${process.cwd()}/${fileName}.pdf`
       });
       await browser.close();
       server.close();
@@ -36,7 +41,11 @@ export function playwrightGenerated({
   checkFromServerCli,
   normalizedOutputPath
 }: BuildGenerate) {
-  createExactPdf();
+  createExactPdf({
+    port: simpleServerPort,
+    fileName: 'test'
+  });
+
 
 
 

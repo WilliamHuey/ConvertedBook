@@ -20,8 +20,6 @@ const mediaTypes: Record<string, string> = {
 
 const createServer = () => {
   const server = http.createServer(function (request: any, response: any) {
-    console.log(request.method + ' ' + request.url)
-
     const filepath = path.join(publicFolder, request.url)
 
     fs.readFile(filepath, function (err: any, data: any) {
