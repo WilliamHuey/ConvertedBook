@@ -25,7 +25,7 @@ const createServer = () => {
     fs.readFile(filepath, function (err: any, data: any) {
       if (err) {
         response.statusCode = 404
-        return response.end('File not found or you made an invalid request.')
+        return response.end('File not found or invalid request made.')
       }
 
       let mediaType = 'text/html'

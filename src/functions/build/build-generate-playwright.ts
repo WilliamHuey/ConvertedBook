@@ -33,6 +33,7 @@ const createExactPdf = ({ port, fileName }: CreateExactPdf) => {
   });
 }
 
+// TODO: Run the 'playwright' build for the exact pdf generation
 export function playwrightGenerated({
   input,
   normalizedFormats,
@@ -41,10 +42,11 @@ export function playwrightGenerated({
   checkFromServerCli,
   normalizedOutputPath
 }: BuildGenerate) {
-  createExactPdf({
-    port: simpleServerPort,
-    fileName: 'test'
-  });
+
+  // createExactPdf({
+  //   port: simpleServerPort,
+  //   fileName: 'test'
+  // });
 
 
 

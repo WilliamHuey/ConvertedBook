@@ -30,8 +30,11 @@ export function buildGenerate(this: Build,
   const checkFromServerCli = typeCheck(fromServerCli, stringTypes.Undefined) ?
     false : true;
 
-  if (exactPdf) {
-    // TODO: Run the 'playwright' build for the exact pdf generation
+  // Exact pdf creation will require playwright
+
+  // TODO: merge the output of the playwright generation with pandoc
+  // as an observable for completion management.
+  if (exactPdf && normalizedFormats.includes('pdf')) {
     playwrightGenerated({
       input,
       normalizedFormats,
