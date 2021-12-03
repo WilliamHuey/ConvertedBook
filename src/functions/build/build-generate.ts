@@ -1,3 +1,6 @@
+// Third party modules
+import { ReplaySubject } from 'rxjs';
+
 // Library modules
 import { typeCheck, stringTypes } from '@utilities/type-check';
 import Build from '../../commands/build';
@@ -14,6 +17,7 @@ export interface BuildGenerate {
   fileOutputExistence: FileOutputExistence;
   checkFromServerCli: boolean;
   normalizedOutputPath: string;
+  buildDocuments$: ReplaySubject<any>;
 }
 
 export function buildGenerate(results: BuildCheckGoodResults, asyncResults: AsyncCheckResults): any
@@ -33,7 +37,10 @@ export function buildGenerate(this: Build,
   // Exact pdf creation will require playwright
 
   // TODO: merge the output of the playwright generation with pandoc
-  // as an observable for completion management.
+  // as an observable for completion management. Create generatedClose$
+  // observable.
+  const buildDocuments$ = new ReplaySubject(undefined);
+
   if (exactPdf && normalizedFormats.includes('pdf')) {
     playwrightGenerated({
       input,
@@ -41,7 +48,8 @@ export function buildGenerate(this: Build,
       flags,
       fileOutputExistence,
       checkFromServerCli,
-      normalizedOutputPath
+      normalizedOutputPath,
+      buildDocuments$
     });
   }
 
@@ -62,6 +70,7 @@ export function buildGenerate(this: Build,
     flags,
     fileOutputExistence,
     checkFromServerCli,
-    normalizedOutputPath
+    normalizedOutputPath,
+    buildDocuments$
   });
 }

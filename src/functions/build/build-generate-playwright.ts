@@ -28,6 +28,7 @@ const createExactPdf = ({ port, fileName }: CreateExactPdf) => {
         path: `${process.cwd()}/${fileName}.pdf`
       });
       await browser.close();
+      console.log('gen');
       server.close();
     })();
   });
@@ -43,10 +44,10 @@ export function playwrightGenerated({
   normalizedOutputPath
 }: BuildGenerate) {
 
-  // createExactPdf({
-  //   port: simpleServerPort,
-  //   fileName: 'test'
-  // });
+  createExactPdf({
+    port: simpleServerPort,
+    fileName: 'test'
+  });
 
 
 
