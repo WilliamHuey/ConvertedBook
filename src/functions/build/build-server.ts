@@ -4,38 +4,37 @@ const http = require('http')
 const fs = require('fs')
 const path = require('path')
 
-process.on('uncaughtException',
-  err => console.error('uncaughtException', err))
-process.on('unhandledRejection',
-  err => console.error('unhandledRejection', err))
+interface CreateServer {
+  fileName: string;
+}
 
-const publicFolder = '.'
+process.on('uncaughtException',
+  err => console.error('uncaughtException', err));
+process.on('unhandledRejection',
+  err => console.error('unhandledRejection', err));
 
 const mediaTypes: Record<string, string> = {
   zip: 'application/zip',
   jpg: 'image/jpeg',
   html: 'text/html',
-  /* add more media types */
 }
 
-const createServer = () => {
-  const server = http.createServer(function (request: any, response: any) {
-    const filepath = path.join(publicFolder, request.url)
-
-    fs.readFile(filepath, function (err: any, data: any) {
+const createServer = ({ fileName }: CreateServer) => {
+  const server = http.createServer(function (_request: any, response: any) {
+    fs.readFile(fileName, function (err: any, data: any) {
       if (err) {
-        response.statusCode = 404
-        return response.end('File not found or invalid request made.')
+        response.statusCode = 404;
+        return response.end('File not found or invalid request made.');
       }
 
-      let mediaType = 'text/html'
-      const ext = path.extname(filepath)
+      let mediaType = 'text/html';
+      const ext = path.extname(fileName);
       if (ext.length > 0 && mediaTypes.hasOwnProperty(ext.slice(1))) {
-        mediaType = mediaTypes[ext.slice(1)]
+        mediaType = mediaTypes[ext.slice(1)];
       }
 
-      response.setHeader('Content-Type', mediaType)
-      response.end(data)
+      response.setHeader('Content-Type', mediaType);
+      response.end(data);
     })
   });
 

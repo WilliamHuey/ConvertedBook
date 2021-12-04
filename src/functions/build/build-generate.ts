@@ -42,6 +42,9 @@ export function buildGenerate(this: Build,
   const buildDocuments$ = new ReplaySubject(undefined);
 
   if (exactPdf && normalizedFormats.includes('pdf')) {
+
+    // TODO 1: pandoc generate html first before converting to pdf
+
     playwrightGenerated({
       input,
       normalizedFormats,
