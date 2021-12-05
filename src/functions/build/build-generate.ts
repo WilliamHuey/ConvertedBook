@@ -1,3 +1,6 @@
+// Native modules
+import * as path from 'path';
+
 // Third party modules
 import { ReplaySubject } from 'rxjs';
 
@@ -41,9 +44,23 @@ export function buildGenerate(this: Build,
   // observable.
   const buildDocuments$ = new ReplaySubject(undefined);
 
-  if (exactPdf && normalizedFormats.includes('pdf')) {
+  const playWrightPdfGeneration = exactPdf && normalizedFormats.includes('pdf');
 
-    // TODO 1: pandoc generate html first before converting to pdf
+  if (playWrightPdfGeneration) {
+
+    // Use pandoc to create the html document because playwright
+    // will depend on it for the exact pdf generation.
+
+    // Manipulate the settings to only generate the html with pandoc
+    pandocGenerated({
+      input,
+      normalizedFormats: ['html'],
+      flags: Object.assign(flags, { output: path.parse(flags.input).name }),
+      fileOutputExistence,
+      checkFromServerCli,
+      normalizedOutputPath,
+      buildDocuments$
+    });
 
     playwrightGenerated({
       input,

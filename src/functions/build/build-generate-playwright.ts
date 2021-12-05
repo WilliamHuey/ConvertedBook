@@ -3,6 +3,7 @@ import * as path from 'path';
 
 // Third party modules
 import { chromium } from 'playwright';
+import { take } from 'rxjs/operators';
 
 // Library modules
 import { BuildGenerate } from './build-generate';
@@ -42,16 +43,19 @@ const createExactPdf = ({
 // TODO: Run the 'playwright' build for the exact pdf generation
 export function playwrightGenerated({
   flags,
-  normalizedOutputPath
+  normalizedOutputPath,
+  buildDocuments$
 }: BuildGenerate) {
 
-  createExactPdf({
-    port: simpleServerPort,
-    fileName: path.parse(flags.input).name,
-    outPutFileName: normalizedOutputPath
-  });
-
-
-
-
+  // TODO 1: output a common generation complete observable
+  // that is also compatible with the final pandoc generation
+  buildDocuments$
+    .pipe(take(1))
+    .subscribe(() => {
+      createExactPdf({
+        port: simpleServerPort,
+        fileName: path.parse(flags.input).name,
+        outPutFileName: normalizedOutputPath
+      });
+    });
 }

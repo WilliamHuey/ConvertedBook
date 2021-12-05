@@ -19,7 +19,8 @@ export function pandocGenerated({ input,
   flags,
   fileOutputExistence,
   checkFromServerCli,
-  normalizedOutputPath }: BuildGenerate) {
+  normalizedOutputPath,
+  buildDocuments$ }: BuildGenerate) {
   const generated = normalizedFormats
     .map(format => {
       return pandocGenerateFormat(input, normalizedOutputPath, format, fileOutputExistence, flags, checkFromServerCli);
@@ -42,6 +43,7 @@ export function pandocGenerated({ input,
 
   groupFormatsGenerated$
     .subscribe(() => {
+      buildDocuments$.next('Pandoc generated');
       console.log('Complete file format generation');
     });
 
