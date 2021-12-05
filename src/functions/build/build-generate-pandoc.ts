@@ -48,7 +48,7 @@ export function pandocGenerated({ input,
     });
 
   return {
-    pandocClose$: groupFormatsGenerated$
+    docsGenerated$: groupFormatsGenerated$
   };
 }
 

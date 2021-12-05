@@ -18,6 +18,8 @@ interface CreateExactPdf {
 // TODO: Read the server port from snowpack dynamically
 
 const snowpackDevServerPort = 8080;
+
+// TODO: Pick a random port which is available
 const simpleServerPort = 9000;
 
 const createExactPdf = ({

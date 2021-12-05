@@ -161,7 +161,7 @@ describe('Build', () => {
     const asyncCheckRes = new AsyncCheckRes();
 
     const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
-      .pandocClose$
+      .docsGenerated$
       .pipe(takeLast(1));
 
     pd
@@ -188,7 +188,7 @@ describe('Build', () => {
     const asyncCheckRes = new ForcedAsyncCheckRes();
 
     const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
-      .pandocClose$
+      .docsGenerated$
       .pipe(takeLast(1));
 
     pd
