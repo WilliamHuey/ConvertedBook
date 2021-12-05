@@ -23,6 +23,10 @@ export interface BuildGenerate {
   buildDocuments$: ReplaySubject<any>;
 }
 
+export interface BuildGeneratePlaywright extends BuildGenerate {
+  docsGenerated$: ReplaySubject<any>
+}
+
 export function buildGenerate(results: BuildCheckGoodResults, asyncResults: AsyncCheckResults): any
 export function buildGenerate(this: Build,
   results: BuildCheckGoodResults, asyncResults: AsyncCheckResults) {
@@ -43,6 +47,7 @@ export function buildGenerate(this: Build,
   // as an observable for completion management. Create generatedClose$
   // observable.
   const buildDocuments$ = new ReplaySubject(undefined);
+  const docsGenerated$ = new ReplaySubject(undefined);
 
   const playWrightPdfGeneration = exactPdf && normalizedFormats.includes('pdf');
 
@@ -69,9 +74,11 @@ export function buildGenerate(this: Build,
       fileOutputExistence,
       checkFromServerCli,
       normalizedOutputPath,
-      buildDocuments$
+      buildDocuments$,
+      docsGenerated$
     });
   }
+
 
   // TODO: check for other format types ahead of time
 

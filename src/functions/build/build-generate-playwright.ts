@@ -4,15 +4,17 @@ import * as path from 'path';
 // Third party modules
 import { chromium } from 'playwright';
 import { take } from 'rxjs/operators';
+import { ReplaySubject } from 'rxjs';
 
 // Library modules
-import { BuildGenerate } from './build-generate';
+import { BuildGeneratePlaywright } from './build-generate';
 import { createServer } from './build-server';
 
 interface CreateExactPdf {
   port: string | Number;
   fileName: string;
   outPutFileName: string;
+  docsGenerated$: ReplaySubject<any>;
 }
 
 // TODO: Read the server port from snowpack dynamically
@@ -23,7 +25,7 @@ const snowpackDevServerPort = 8080;
 const simpleServerPort = 9000;
 
 const createExactPdf = ({
-  port, fileName, outPutFileName
+  port, fileName, outPutFileName, docsGenerated$
 }: CreateExactPdf) => {
   const server = createServer({ fileName: `${fileName}.html` });
   server.listen(simpleServerPort, () => {
@@ -38,26 +40,33 @@ const createExactPdf = ({
       });
       await browser.close();
       server.close();
+
+      // Signal the completion of the exact pdf document
+      // generation for the build generate
+
+      // TODO 1: Only trigger the replaysubject later on in
+      // an outer branch pandoc once its known that pandoc has completed
+      // its checks and generation.
+      docsGenerated$.next('Generated exact pdf document');
+      docsGenerated$.complete();
     })();
   });
 }
 
-// TODO: Run the 'playwright' build for the exact pdf generation
 export function playwrightGenerated({
   flags,
   normalizedOutputPath,
-  buildDocuments$
-}: BuildGenerate) {
-
-  // TODO 1: output a common generation complete observable
-  // that is also compatible with the final pandoc generation
+  buildDocuments$,
+  docsGenerated$
+}: BuildGeneratePlaywright) {
   buildDocuments$
     .pipe(take(1))
     .subscribe(() => {
       createExactPdf({
         port: simpleServerPort,
         fileName: path.parse(flags.input).name,
-        outPutFileName: normalizedOutputPath
+        outPutFileName: normalizedOutputPath,
+        docsGenerated$
       });
     });
 }
