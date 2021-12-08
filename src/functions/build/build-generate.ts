@@ -53,7 +53,10 @@ export function buildGenerate(this: Build,
 
   const hasPdfFormat = normalizedFormats.includes('pdf'),
     hasHtmlFormat = normalizedFormats.includes('html'),
-    hasFormatsOtherThanPdfandHtml = normalizedFormats.length > 2;
+    onlyTwoFormats = normalizedFormats.length === 2,
+    moreThanTwoFormats = normalizedFormats.length > 2,
+    hasFormatsOtherThanPdfandHtml = moreThanTwoFormats &&
+      (hasHtmlFormat && hasPdfFormat);
 
   const playWrightPdfGeneration = exactPdf && hasPdfFormat;
 
@@ -72,7 +75,7 @@ export function buildGenerate(this: Build,
       normalizedOutputPath,
       buildDocuments$,
       docsGenerated$,
-      suppressLog: true
+      suppressLog: onlyTwoFormats ? false : true
     });
 
     // Pass in additional argument to distinguish the branch type generation
