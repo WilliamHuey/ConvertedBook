@@ -20,7 +20,9 @@ export interface BuildGenerate {
   fileOutputExistence: FileOutputExistence;
   checkFromServerCli: boolean;
   normalizedOutputPath: string;
+  suppressLog?: boolean;
   buildDocuments$: ReplaySubject<any>;
+  docsGenerated$?: ReplaySubject<any>;
 }
 
 export interface BuildGeneratePlaywright extends BuildGenerate {
@@ -49,7 +51,11 @@ export function buildGenerate(this: Build,
   const buildDocuments$ = new ReplaySubject(undefined);
   const docsGenerated$ = new ReplaySubject(undefined);
 
-  const playWrightPdfGeneration = exactPdf && normalizedFormats.includes('pdf');
+  const hasPdfFormat = normalizedFormats.includes('pdf'),
+    hasHtmlFormat = normalizedFormats.includes('html'),
+    hasFormatsOtherThanPdfandHtml = normalizedFormats.length > 2;
+
+  const playWrightPdfGeneration = exactPdf && hasPdfFormat;
 
   if (playWrightPdfGeneration) {
 
@@ -64,9 +70,12 @@ export function buildGenerate(this: Build,
       fileOutputExistence,
       checkFromServerCli,
       normalizedOutputPath,
-      buildDocuments$
+      buildDocuments$,
+      docsGenerated$,
+      suppressLog: true
     });
 
+    // Pass in additional argument to distinguish the branch type generation
     playwrightGenerated({
       input,
       normalizedFormats,
@@ -74,13 +83,9 @@ export function buildGenerate(this: Build,
       fileOutputExistence,
       checkFromServerCli,
       normalizedOutputPath,
-      buildDocuments$,
-      docsGenerated$
+      buildDocuments$
     });
   }
-
-
-  // TODO: check for other format types ahead of time
 
   // Generally run the pandoc generation when converting any file type,
   // except for when an 'exact' pdf is requested to mirror the look of
@@ -89,15 +94,32 @@ export function buildGenerate(this: Build,
   // Allow pandoc to convert to other file formats when they are specified,
   // even when the exactpdf option is present because conversion shouldn't
   // be limited by the exactpdf options for other file formats.
+  if (!exactPdf) {
+    return pandocGenerated({
+      input,
+      normalizedFormats,
+      flags,
+      fileOutputExistence,
+      checkFromServerCli,
+      normalizedOutputPath,
+      buildDocuments$
+    });
+  } else {
+    const fileOutputExistenceUpdate = Object.assign(fileOutputExistence,
+      { html: false, pdf: false });
 
-  // TODO: (exactpdf and other file formats present) || !exactpdf
-  return pandocGenerated({
-    input,
-    normalizedFormats,
-    flags,
-    fileOutputExistence,
-    checkFromServerCli,
-    normalizedOutputPath,
-    buildDocuments$
-  });
+    // Still generate all other files that was indicated for conversion
+    // only pandoc will be able to create these files.
+    if (hasFormatsOtherThanPdfandHtml) {
+      return pandocGenerated({
+        input,
+        normalizedFormats,
+        flags,
+        fileOutputExistence: fileOutputExistenceUpdate,
+        checkFromServerCli,
+        normalizedOutputPath,
+        buildDocuments$
+      });
+    }
+  }
 }

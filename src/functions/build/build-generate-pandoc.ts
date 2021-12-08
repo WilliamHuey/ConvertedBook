@@ -20,10 +20,12 @@ export function pandocGenerated({ input,
   fileOutputExistence,
   checkFromServerCli,
   normalizedOutputPath,
-  buildDocuments$ }: BuildGenerate) {
+  buildDocuments$,
+  docsGenerated$,
+  suppressLog = false }: BuildGenerate) {
   const generated = normalizedFormats
     .map(format => {
-      return pandocGenerateFormat(input, normalizedOutputPath, format, fileOutputExistence, flags, checkFromServerCli);
+      return pandocGenerateFormat(input, normalizedOutputPath, format, fileOutputExistence, flags, checkFromServerCli, suppressLog);
     });
 
   const pandocGen = generated.reduce((acc, el): any => {
@@ -44,7 +46,12 @@ export function pandocGenerated({ input,
   groupFormatsGenerated$
     .subscribe(() => {
       buildDocuments$.next('Pandoc generated');
-      console.log('Complete file format generation');
+      if (docsGenerated$) {
+        docsGenerated$.next('Generated exact pdf document');
+        docsGenerated$.complete();
+      }
+      if (!suppressLog)
+        console.log('Complete file format generation');
     });
 
   return {
@@ -57,7 +64,8 @@ export function pandocGenerateFormat(input: string,
   format: string,
   fileOutputExistence: FileOutputExistence,
   flags: Record<string, any>,
-  fromServerCli: boolean) {
+  fromServerCli: boolean,
+  suppressLog: boolean) {
 
   // Need to match the directory in which
   // pandoc is referring to for proper
@@ -99,11 +107,13 @@ export function pandocGenerateFormat(input: string,
   pandocClose$
     .subscribe({
       next: () => {
-        console.log(`Generated ${format}`);
+        if (!suppressLog) {
+          console.log(`Generated ${format}`);
 
-        // Warn on existing file format with the name of the output path
-        if (fileOutputExistence[format] && !fromServerCli && !flags.force)
-          console.log(`Warning: ${format} file type exists`);
+          // Warn on existing file format with the name of the output path
+          if (fileOutputExistence[format] && !fromServerCli && !flags.force)
+            console.log(`Warning: ${format} file type exists`);
+        }
       },
       error: (e: any) => {
         console.log('Error', e);

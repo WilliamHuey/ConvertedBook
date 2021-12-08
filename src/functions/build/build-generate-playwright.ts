@@ -4,17 +4,15 @@ import * as path from 'path';
 // Third party modules
 import { chromium } from 'playwright';
 import { take } from 'rxjs/operators';
-import { ReplaySubject } from 'rxjs';
 
 // Library modules
-import { BuildGeneratePlaywright } from './build-generate';
+import { BuildGenerate } from './build-generate';
 import { createServer } from './build-server';
 
 interface CreateExactPdf {
   port: string | Number;
   fileName: string;
-  outPutFileName: string;
-  docsGenerated$: ReplaySubject<any>;
+  outPutFileName: string
 }
 
 // TODO: Read the server port from snowpack dynamically
@@ -25,7 +23,7 @@ const snowpackDevServerPort = 8080;
 const simpleServerPort = 9000;
 
 const createExactPdf = ({
-  port, fileName, outPutFileName, docsGenerated$
+  port, fileName, outPutFileName
 }: CreateExactPdf) => {
   const server = createServer({ fileName: `${fileName}.html` });
   server.listen(simpleServerPort, () => {
@@ -40,15 +38,6 @@ const createExactPdf = ({
       });
       await browser.close();
       server.close();
-
-      // Signal the completion of the exact pdf document
-      // generation for the build generate
-
-      // TODO 1: Only trigger the replaysubject later on in
-      // an outer branch pandoc once its known that pandoc has completed
-      // its checks and generation.
-      docsGenerated$.next('Generated exact pdf document');
-      docsGenerated$.complete();
     })();
   });
 }
@@ -56,17 +45,15 @@ const createExactPdf = ({
 export function playwrightGenerated({
   flags,
   normalizedOutputPath,
-  buildDocuments$,
-  docsGenerated$
-}: BuildGeneratePlaywright) {
+  buildDocuments$
+}: BuildGenerate) {
   buildDocuments$
     .pipe(take(1))
     .subscribe(() => {
       createExactPdf({
         port: simpleServerPort,
         fileName: path.parse(flags.input).name,
-        outPutFileName: normalizedOutputPath,
-        docsGenerated$
+        outPutFileName: normalizedOutputPath
       });
     });
 }
