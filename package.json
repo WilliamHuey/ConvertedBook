@@ -19,6 +19,7 @@
     "lookpath": "^1.2.2",
     "module-alias": "^2.2.2",
     "playwright": "^1.16.3",
+    "port-scout": "^1.1.2",
     "ramda": "^0.27.1",
     "rxjs": "^7.4.0",
     "ts-pattern": "^3.3.3",
