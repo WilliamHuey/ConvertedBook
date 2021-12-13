@@ -3,6 +3,7 @@ import * as path from 'path';
 
 // Third party modules
 import { ReplaySubject } from 'rxjs';
+import { reject } from 'ramda';
 
 // Library modules
 import { typeCheck, stringTypes } from '@utilities/type-check';
@@ -28,6 +29,8 @@ export interface BuildGenerate {
 export interface BuildGeneratePlaywright extends BuildGenerate {
   docsGenerated$: ReplaySubject<any>
 }
+
+const pdfAndHtmlFormat = (n: string) => n === 'pdf' || n === 'html';
 
 export function buildGenerate(results: BuildCheckGoodResults, asyncResults: AsyncCheckResults): any
 export function buildGenerate(this: Build,
@@ -108,6 +111,7 @@ export function buildGenerate(this: Build,
       buildDocuments$
     });
   } else {
+
     const fileOutputExistenceUpdate = Object.assign(fileOutputExistence,
       { html: false, pdf: false });
 
@@ -116,7 +120,9 @@ export function buildGenerate(this: Build,
     if (hasFormatsOtherThanPdfandHtml) {
       return pandocGenerated({
         input,
-        normalizedFormats,
+        // Avoid generating the pdf and html again since its handled
+        // by the first branch's pandoc generation.
+        normalizedFormats: reject(pdfAndHtmlFormat, normalizedFormats),
         flags,
         fileOutputExistence: fileOutputExistenceUpdate,
         checkFromServerCli,
