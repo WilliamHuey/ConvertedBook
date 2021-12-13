@@ -192,10 +192,44 @@ export default class Build extends Command {
 
         // Apply any flags selectively one at a time,
         // for custom changes for each flag other than 'input' and 'output'
-        if (options.length > 0) {
-          options.forEach(opt => {
-            buildRunMap[opt]([buildCli, buildAsyncResults]);
-          });
+        const optionsLen = options.length;
+
+        if (optionsLen > 0) {
+
+          // Apply the option as is the since there is no possibility
+          // of interference from multiple options interactions
+          if (optionsLen === 1) {
+            buildRunMap[options[0]]([buildCli, buildAsyncResults]);
+          } else {
+
+            // Multiple options available
+            const hasDryRunOpt = options.includes('dry-run');
+            const hasExactOpt = options.includes('exact');
+            const hasForceOpt = options.includes('force');
+            const hasPandocOpt = options.includes('pandoc');
+
+            if (hasDryRunOpt) {
+
+              // Dry run should not apply any options due to its
+              // lack of actions behavior
+              buildRunMap['dry-run']([buildCli, buildAsyncResults]);
+            } else if (hasForceOpt) {
+              if (hasExactOpt) {
+                buildRunMap.default([{ ...buildCli, exactPdf: true }, buildAsyncResults]);
+              } else {
+                buildRunMap['force']([buildCli, buildAsyncResults]);
+              }
+            } else if (hasPandocOpt) {
+              if (hasExactOpt) {
+                buildRunMap.default([{ ...buildCli, exactPdf: true, fromServerCli: true }, buildAsyncResults]);
+              } else {
+                buildRunMap['pandoc']([buildCli, buildAsyncResults]);
+              }
+            } else if (hasExactOpt) {
+              buildRunMap['exact']([buildCli, buildAsyncResults]);
+            }
+
+          }
         } else {
 
           // Basic build command for generation
