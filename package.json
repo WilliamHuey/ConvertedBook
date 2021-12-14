@@ -77,7 +77,7 @@
     "test": "concurrently \"npm run test-commands\" \"npm run test-commands-download\"",
     "test-commands": "mocha \"test/commands/*.test.ts\"",
     "test-commands-download": "mocha \"test/commands-download/*.test.ts\"",
-    "nyctest": "concurrently \"npm run nyctest-commands\" \"npm run nyctest-commands-download\"",
+    "nyctest": "concurrently -m 1 \"npm run nyctest-commands-download\" \"npm run nyctest-commands\"",
     "nyctest-commands": "nyc --extension .ts  mocha \"test/commands/*.test.ts\"",
     "nyctest-commands-download": "nyc --extension .ts  mocha \"test/commands-download/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md"
