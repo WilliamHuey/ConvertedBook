@@ -22,7 +22,8 @@ export function pandocGenerated({ input,
   normalizedOutputPath,
   buildDocuments$,
   docsGenerated$,
-  suppressLog = false }: BuildGenerate) {
+  suppressLog = false,
+  exactPdf = false }: BuildGenerate) {
   const generated = normalizedFormats
     .map(format => {
       return pandocGenerateFormat(input, normalizedOutputPath, format, fileOutputExistence, flags, checkFromServerCli, suppressLog);
@@ -46,16 +47,14 @@ export function pandocGenerated({ input,
   groupFormatsGenerated$
     .subscribe(() => {
       buildDocuments$.next('Pandoc generated');
-      if (docsGenerated$) {
+      if (!exactPdf) {
         docsGenerated$.next('Generated exact pdf document');
         docsGenerated$.complete();
       }
-      if (!suppressLog)
-        console.log('Complete file format generation');
     });
 
   return {
-    docsGenerated$: groupFormatsGenerated$
+    docsGenerated$
   };
 }
 

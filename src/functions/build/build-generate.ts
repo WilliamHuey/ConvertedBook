@@ -23,11 +23,8 @@ export interface BuildGenerate {
   normalizedOutputPath: string;
   suppressLog?: boolean;
   buildDocuments$: ReplaySubject<any>;
-  docsGenerated$?: ReplaySubject<any>;
-}
-
-export interface BuildGeneratePlaywright extends BuildGenerate {
-  docsGenerated$: ReplaySubject<any>
+  docsGenerated$: ReplaySubject<any>;
+  exactPdf?: boolean;
 }
 
 const pdfAndHtmlFormat = (n: string) => n === 'pdf' || n === 'html';
@@ -47,10 +44,6 @@ export function buildGenerate(this: Build,
     false : true;
 
   // Exact pdf creation will require playwright
-
-  // TODO: merge the output of the playwright generation with pandoc
-  // as an observable for completion management. Create generatedClose$
-  // observable.
   const buildDocuments$ = new ReplaySubject(undefined);
   const docsGenerated$ = new ReplaySubject(undefined);
 
@@ -89,6 +82,7 @@ export function buildGenerate(this: Build,
       fileOutputExistence,
       checkFromServerCli,
       normalizedOutputPath,
+      docsGenerated$,
       buildDocuments$
     });
   }
@@ -100,6 +94,11 @@ export function buildGenerate(this: Build,
   // Allow pandoc to convert to other file formats when they are specified,
   // even when the exactpdf option is present because conversion shouldn't
   // be limited by the exactpdf options for other file formats.
+  docsGenerated$
+    .subscribe(() => {
+      console.log('Complete file format generation');
+    });
+
   if (!exactPdf) {
     return pandocGenerated({
       input,
@@ -108,18 +107,21 @@ export function buildGenerate(this: Build,
       fileOutputExistence,
       checkFromServerCli,
       normalizedOutputPath,
-      buildDocuments$
+      buildDocuments$,
+      exactPdf,
+      docsGenerated$
     });
   } else {
-
     const fileOutputExistenceUpdate = Object.assign(fileOutputExistence,
       { html: false, pdf: false });
 
     // Still generate all other files that was indicated for conversion
     // only pandoc will be able to create these files.
     if (hasFormatsOtherThanPdfandHtml) {
+
       return pandocGenerated({
         input,
+
         // Avoid generating the pdf and html again since its handled
         // by the first branch's pandoc generation.
         normalizedFormats: reject(pdfAndHtmlFormat, normalizedFormats),
@@ -127,8 +129,14 @@ export function buildGenerate(this: Build,
         fileOutputExistence: fileOutputExistenceUpdate,
         checkFromServerCli,
         normalizedOutputPath,
-        buildDocuments$
+        buildDocuments$,
+        docsGenerated$
       });
+    } else {
+
+      // Generation to complete before returning the document
+      // generation completion status
+      return docsGenerated$;
     }
   }
 }
