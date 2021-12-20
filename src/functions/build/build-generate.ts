@@ -21,7 +21,6 @@ export interface BuildGenerate {
   fileOutputExistence: FileOutputExistence;
   checkFromServerCli: boolean;
   normalizedOutputPath: string;
-  suppressLog?: boolean;
   buildDocuments$: ReplaySubject<any>;
   docsGenerated$: ReplaySubject<any>;
   exactPdf?: boolean;
@@ -49,8 +48,9 @@ export function buildGenerate(this: Build,
 
   const hasPdfFormat = normalizedFormats.includes('pdf'),
     hasHtmlFormat = normalizedFormats.includes('html'),
-    onlyTwoFormats = normalizedFormats.length === 2,
     moreThanTwoFormats = normalizedFormats.length > 2,
+
+    // inclusive of pdf format
     hasFormatsOtherThanPdfandHtml = moreThanTwoFormats &&
       (hasHtmlFormat && hasPdfFormat);
 
@@ -71,7 +71,7 @@ export function buildGenerate(this: Build,
       normalizedOutputPath,
       buildDocuments$,
       docsGenerated$,
-      suppressLog: onlyTwoFormats ? false : true
+      exactPdf: true
     });
 
     // Pass in additional argument to distinguish the branch type generation
@@ -118,7 +118,6 @@ export function buildGenerate(this: Build,
     // Still generate all other files that was indicated for conversion
     // only pandoc will be able to create these files.
     if (hasFormatsOtherThanPdfandHtml) {
-
       return pandocGenerated({
         input,
 
@@ -130,7 +129,8 @@ export function buildGenerate(this: Build,
         checkFromServerCli,
         normalizedOutputPath,
         buildDocuments$,
-        docsGenerated$
+        docsGenerated$,
+        exactPdf
       });
     } else {
 

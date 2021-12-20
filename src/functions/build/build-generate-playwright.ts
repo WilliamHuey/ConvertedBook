@@ -41,6 +41,9 @@ const createExactPdf = ({
     });
     console.log('Generated exact pdf');
     docsGenerated$.next('Generated exact pdf document');
+
+    // TODO: Delete the html if exact generation of pdf
+    // did not supply the html generation in the command cli
     docsGenerated$.complete();
     await browser.close();
     server.close();

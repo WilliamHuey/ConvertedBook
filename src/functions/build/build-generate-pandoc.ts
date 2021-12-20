@@ -22,11 +22,10 @@ export function pandocGenerated({ input,
   normalizedOutputPath,
   buildDocuments$,
   docsGenerated$,
-  suppressLog = false,
   exactPdf = false }: BuildGenerate) {
   const generated = normalizedFormats
     .map(format => {
-      return pandocGenerateFormat(input, normalizedOutputPath, format, fileOutputExistence, flags, checkFromServerCli, suppressLog);
+      return pandocGenerateFormat(input, normalizedOutputPath, format, fileOutputExistence, flags, checkFromServerCli, exactPdf);
     });
 
   const pandocGen = generated.reduce((acc, el): any => {
@@ -48,7 +47,7 @@ export function pandocGenerated({ input,
     .subscribe(() => {
       buildDocuments$.next('Pandoc generated');
       if (!exactPdf) {
-        docsGenerated$.next('Generated exact pdf document');
+        docsGenerated$.next('');
         docsGenerated$.complete();
       }
     });
@@ -64,7 +63,7 @@ export function pandocGenerateFormat(input: string,
   fileOutputExistence: FileOutputExistence,
   flags: Record<string, any>,
   fromServerCli: boolean,
-  suppressLog: boolean) {
+  exactPdf: boolean) {
 
   // Need to match the directory in which
   // pandoc is referring to for proper
@@ -106,7 +105,13 @@ export function pandocGenerateFormat(input: string,
   pandocClose$
     .subscribe({
       next: () => {
-        if (!suppressLog) {
+
+        // Exact pdf generation logging should be done
+        // by the exact pdf generator and not pandoc.
+        // TODO: Also avoid logging the html byproduct generation
+        // that is required by the exact pdf generation.
+        const avoidLogging = exactPdf && format === 'pdf';
+        if (!avoidLogging) {
           console.log(`Generated ${format}`);
 
           // Warn on existing file format with the name of the output path
