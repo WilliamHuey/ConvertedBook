@@ -112,8 +112,6 @@ export function buildGenerate(this: Build,
       docsGenerated$
     });
   } else {
-    const fileOutputExistenceUpdate = Object.assign(fileOutputExistence,
-      { html: false, pdf: false });
 
     // Still generate all other files that was indicated for conversion
     // only pandoc will be able to create these files.
@@ -125,7 +123,7 @@ export function buildGenerate(this: Build,
         // by the first branch's pandoc generation.
         normalizedFormats: reject(pdfAndHtmlFormat, normalizedFormats),
         flags,
-        fileOutputExistence: fileOutputExistenceUpdate,
+        fileOutputExistence,
         checkFromServerCli,
         normalizedOutputPath,
         buildDocuments$,
