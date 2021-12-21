@@ -18,6 +18,7 @@ export function pandocGenerated({ input,
   normalizedFormats,
   flags,
   fileOutputExistence,
+  htmlCliGenerate = false,
   checkFromServerCli,
   normalizedOutputPath,
   buildDocuments$,
@@ -25,7 +26,9 @@ export function pandocGenerated({ input,
   exactPdf = false }: BuildGenerate) {
   const generated = normalizedFormats
     .map(format => {
-      return pandocGenerateFormat(input, normalizedOutputPath, format, fileOutputExistence, flags, checkFromServerCli, exactPdf);
+      return pandocGenerateFormat(input, normalizedOutputPath, format,
+        fileOutputExistence, htmlCliGenerate, flags, checkFromServerCli,
+        exactPdf);
     });
 
   const pandocGen = generated.reduce((acc, el): any => {
@@ -61,6 +64,7 @@ export function pandocGenerateFormat(input: string,
   normalizedOutputPath: string,
   format: string,
   fileOutputExistence: FileOutputExistence,
+  htmlCliGenerate: boolean,
   flags: Record<string, any>,
   fromServerCli: boolean,
   exactPdf: boolean) {
@@ -109,16 +113,20 @@ export function pandocGenerateFormat(input: string,
 
         // Exact pdf generation logging should be done
         // by the exact pdf generator and not pandoc.
-        // TODO: Also avoid logging the html byproduct generation
+        // Also avoid logging the html byproduct generation
         // that is required by the exact pdf generation.
-        const avoidLogging = exactPdf && format === 'pdf';
-        if (!avoidLogging) {
-          console.log(`Generated ${format}`);
+        const noHtmlFormatLog = format === 'html' && exactPdf && !htmlCliGenerate;
+        const noPdfFormatLog = format === 'pdf' && exactPdf;
 
-          // Warn on existing file format with the name of the output path
-          if (fileOutputExistence[format] && !fromServerCli && !flags.force)
-            console.log(`Warning: ${format} file type exists`);
-        }
+        if (noPdfFormatLog) return
+        if (noHtmlFormatLog) return
+
+        console.log(`Generated ${format}`);
+
+        // Warn on existing file format with the name of the output path
+        if (fileOutputExistence[format] && !fromServerCli && !flags.force)
+          console.log(`Warning: ${format} file type exists`);
+
       },
       error: (e: any) => {
         console.log('Error', e);

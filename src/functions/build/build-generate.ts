@@ -19,6 +19,7 @@ export interface BuildGenerate {
   normalizedFormats: string[];
   flags: CommandFlagKeys;
   fileOutputExistence: FileOutputExistence;
+  htmlCliGenerate?: boolean,
   checkFromServerCli: boolean;
   normalizedOutputPath: string;
   buildDocuments$: ReplaySubject<any>;
@@ -64,7 +65,9 @@ export function buildGenerate(this: Build,
     // Manipulate the settings to only generate the html with pandoc
     pandocGenerated({
       input,
-      normalizedFormats: ['html'],
+      normalizedFormats: !normalizedFormats.includes('html') ?
+        [...normalizedFormats, 'html'] : normalizedFormats,
+      htmlCliGenerate: normalizedFormats.includes('html'),
       flags: Object.assign(flags, { output: path.parse(flags.input).name }),
       fileOutputExistence,
       checkFromServerCli,
