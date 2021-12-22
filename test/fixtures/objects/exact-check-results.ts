@@ -5,6 +5,7 @@ export default class ExactCheckResults {
   constructor() {
     Object.assign(this, {
       msg: 'Start building: pdf',
+      exactPdf: true,
       conditions: {
         exactMatchBuildOrder: false,
         additionalArgsOverBuildOrder: true,

@@ -13,8 +13,8 @@ import CheckResults from '../fixtures/objects/check-results';
 import AsyncCheckRes from '../fixtures/objects/async-check-results';
 import ForcedCheckResults from '../fixtures/objects/forced-check-results';
 import ForcedAsyncCheckRes from '../fixtures/objects/forced-async-check-results';
-import ExactCheckResults from '../fixtures/objects/forced-check-results';
-import ExactAsyncCheckRes from '../fixtures/objects/forced-async-check-results';
+import ExactCheckResults from '../fixtures/objects/exact-check-results';
+import ExactAsyncCheckRes from '../fixtures/objects/exact-async-check-results';
 import { retryTest, baseTempFolder, dryFlag, testDataDirectory } from './test-utilities';
 
 describe('Build', () => {
@@ -217,7 +217,6 @@ describe('Build', () => {
     const asyncCheckRes = new ExactAsyncCheckRes();
 
     const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
-      .docsGenerated$
       .pipe(takeLast(1));
 
     pd
