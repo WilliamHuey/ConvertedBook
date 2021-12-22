@@ -1,26 +1,26 @@
 // Native modules
 import * as path from 'path';
 
-export default class CheckResults {
+export default class ExactCheckResults {
   constructor() {
     Object.assign(this, {
-      msg: 'Start building: html, pdf, and epub',
+      msg: 'Start building: pdf',
       conditions: {
         exactMatchBuildOrder: false,
         additionalArgsOverBuildOrder: true,
-        onlyOneBuildFormat: false,
+        onlyOneBuildFormat: true,
         multipleArgsNotDependentBuildOrder: false,
         emptyArgsValidFlags: false,
         allRequiredFlagsRecognized: true,
         someFlagsRequiredRecognized: false,
-        recognizedFormats: ['html'],
-        normalizedFormats: ['html'],
+        recognizedFormats: ['pdf'],
+        normalizedFormats: ['pdf'],
         flags: {
           input: path.join(__dirname, '../../../README.md'),
           output: path.join(__dirname, '../../temp/no-downloads/'),
-          force: true
+          exact: true
         },
-        argv: ['html']
+        argv: ['pdf']
       },
       continue: true
     });
