@@ -10,8 +10,7 @@ import { BuildCheckGoodResults } from '../../src/functions/build/build-checks';
 import { AsyncCheckResults } from '../../src/functions/build/build-cli-input-async-checks';
 import { buildGenerate } from '../../src/functions/build/build-generate';
 import { CheckResults, AsyncCheckRes } from '../fixtures/objects/check-results';
-import ForcedCheckResults from '../fixtures/objects/forced-check-results';
-import ForcedAsyncCheckRes from '../fixtures/objects/forced-async-check-results';
+import { ForceCheckResults, ForceAsyncCheckResults } from '../fixtures/objects/forced-check-results';
 import ExactCheckResults from '../fixtures/objects/exact-check-results';
 import ExactAsyncCheckRes from '../fixtures/objects/exact-async-check-results';
 import { retryTest, baseTempFolder, dryFlag, testDataDirectory } from './test-utilities';
@@ -185,8 +184,8 @@ describe('Build', () => {
     const generationPathProjectGenerate = `${baseTempFolder}no-downloads/`;
     process.chdir(generationPathProjectGenerate);
 
-    const checkResults = new ForcedCheckResults();
-    const asyncCheckRes = new ForcedAsyncCheckRes();
+    const checkResults = new ForceCheckResults();
+    const asyncCheckRes = new ForceAsyncCheckResults();
 
     const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
       .docsGenerated$

@@ -1,18 +1,18 @@
 // Native modules
 import * as path from 'path';
 
-export default class CheckResults {
+// Third party modules
+import { clone } from 'ramda';
+
+// Library modules
+import { Results, AsyncResults } from './base-results';
+
+export class ForceCheckResults {
   constructor() {
-    Object.assign(this, {
+    Object.assign(this, clone(Results), {
       msg: 'Start building: html, pdf, and epub',
       conditions: {
-        exactMatchBuildOrder: false,
-        additionalArgsOverBuildOrder: true,
-        onlyOneBuildFormat: false,
-        multipleArgsNotDependentBuildOrder: false,
-        emptyArgsValidFlags: false,
-        allRequiredFlagsRecognized: true,
-        someFlagsRequiredRecognized: false,
+        onlyOneBuildFormat: true,
         recognizedFormats: ['html'],
         normalizedFormats: ['html'],
         flags: {
@@ -21,8 +21,17 @@ export default class CheckResults {
           force: true
         },
         argv: ['html']
-      },
-      continue: true
+      }
+    });
+  }
+}
+
+export class ForceAsyncCheckResults {
+  constructor() {
+    Object.assign(this, clone(AsyncResults), {
+      msg: 'Creating output file',
+      outputFilename: 'forced-stuff',
+      fileOutputExistence: { html: false }
     });
   }
 }
