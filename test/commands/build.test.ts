@@ -217,6 +217,7 @@ describe('Build', () => {
     const asyncCheckRes = new ExactAsyncCheckRes();
 
     const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
+      .docsGenerated$
       .pipe(takeLast(1));
 
     pd

@@ -137,7 +137,9 @@ export function buildGenerate(this: Build,
 
       // Generation to complete before returning the document
       // generation completion status
-      return docsGenerated$;
+      return {
+        docsGenerated$
+      }
     }
   }
 }
