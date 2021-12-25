@@ -11,7 +11,7 @@ import { AsyncCheckResults } from '../../src/functions/build/build-cli-input-asy
 import { buildGenerate } from '../../src/functions/build/build-generate';
 import { CheckResults, AsyncCheckRes } from '../fixtures/objects/check-results';
 import { ForceCheckResults, ForceAsyncCheckResults } from '../fixtures/objects/forced-check-results';
-import { ExactCheckResults, ExactAsyncCheckResults } from '../fixtures/objects/exact-check-results';
+import { ExactCheckResults, ExactAsyncCheckResults, ExactForceCheckResults, ExactForceAsyncCheckResults } from '../fixtures/objects/exact-check-results';
 import { retryTest, baseTempFolder, dryFlag, testDataDirectory } from './test-utilities';
 
 interface TestBuildGenerate {
@@ -201,6 +201,14 @@ describe('Build', () => {
     testBuildGenerate({
       checkResults: new ExactCheckResults(),
       asyncCheckRes: new ExactAsyncCheckResults(),
+      ctx
+    });
+  });
+
+  it('exact force generate function goes to "completion" status', ctx => {
+    testBuildGenerate({
+      checkResults: new ExactForceCheckResults(),
+      asyncCheckRes: new ExactForceAsyncCheckResults(),
       ctx
     });
   });

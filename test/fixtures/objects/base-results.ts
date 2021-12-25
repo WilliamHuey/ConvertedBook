@@ -14,13 +14,6 @@ export class Results {
   msg = '';
 
   conditions = {
-    exactMatchBuildOrder: true,
-    additionalArgsOverBuildOrder: false,
-    multipleArgsNotDependentBuildOrder: false,
-    allRequiredFlagsRecognized: true,
-    someFlagsRequiredRecognized: false,
-    onlyOneBuildFormat: true,
-    emptyArgsValidFlags: false,
     recognizedFormats: [''],
     normalizedFormats: [''],
     flags: {},
