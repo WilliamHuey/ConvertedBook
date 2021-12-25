@@ -11,9 +11,38 @@ import { AsyncCheckResults } from '../../src/functions/build/build-cli-input-asy
 import { buildGenerate } from '../../src/functions/build/build-generate';
 import { CheckResults, AsyncCheckRes } from '../fixtures/objects/check-results';
 import { ForceCheckResults, ForceAsyncCheckResults } from '../fixtures/objects/forced-check-results';
-import ExactCheckResults from '../fixtures/objects/exact-check-results';
-import ExactAsyncCheckRes from '../fixtures/objects/exact-async-check-results';
+import { ExactCheckResults, ExactAsyncCheckResults } from '../fixtures/objects/exact-check-results';
 import { retryTest, baseTempFolder, dryFlag, testDataDirectory } from './test-utilities';
+
+interface TestBuildGenerate {
+  checkResults: BuildCheckGoodResults;
+  asyncCheckRes: AsyncCheckResults;
+  ctx: Function;
+}
+
+const testBuildGenerate = ({ checkResults, asyncCheckRes, ctx }: TestBuildGenerate) => {
+  const originalFolderPath = process.cwd();
+  const generationPathProjectGenerate = `${baseTempFolder}no-downloads/`;
+  process.chdir(generationPathProjectGenerate);
+
+  const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
+    .docsGenerated$
+    .pipe(takeLast(1));
+
+  pd
+    .subscribe({
+      next: () => {
+        // Able to reach completion is a good sign
+        // and use this as a marker for a
+        // successful file generation
+        ctx();
+        process.chdir(originalFolderPath);
+      },
+      error: (e: any) => {
+        console.log('Error', e);
+      }
+    });
+};
 
 describe('Build', () => {
   const invalidInputFlag = `--input=${testDataDirectory}zz`;
@@ -153,86 +182,27 @@ describe('Build', () => {
     });
 
   it('generate function goes to "completion" status', ctx => {
-    const originalFolderPath = process.cwd();
-    const generationPathProjectGenerate = `${baseTempFolder}no-downloads/`;
-    process.chdir(generationPathProjectGenerate);
-
-    const checkResults = new CheckResults();
-    const asyncCheckRes = new AsyncCheckRes();
-
-    const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
-      .docsGenerated$
-      .pipe(takeLast(1));
-
-    pd
-      .subscribe({
-        next: () => {
-          // Able to reach completion is a good sign
-          // and use this as a marker for a
-          // successful file generation
-          ctx();
-          process.chdir(originalFolderPath);
-        },
-        error: (e: any) => {
-          console.log('Error', e);
-        }
-      });
+    testBuildGenerate({
+      checkResults: new CheckResults(),
+      asyncCheckRes: new AsyncCheckRes(),
+      ctx
+    });
   });
 
   it('force generate function goes to "completion" status', ctx => {
-    const originalFolderPath = process.cwd();
-    const generationPathProjectGenerate = `${baseTempFolder}no-downloads/`;
-    process.chdir(generationPathProjectGenerate);
-
-    const checkResults = new ForceCheckResults();
-    const asyncCheckRes = new ForceAsyncCheckResults();
-
-    const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
-      .docsGenerated$
-      .pipe(takeLast(1));
-
-    pd
-      .subscribe({
-        next: () => {
-          // Able to reach completion is a good sign
-          // and use this as a marker for a
-          // successful file generation
-          ctx();
-          process.chdir(originalFolderPath);
-        },
-        error: (e: any) => {
-          console.log('Error', e);
-        }
-      });
+    testBuildGenerate({
+      checkResults: new ForceCheckResults(),
+      asyncCheckRes: new ForceAsyncCheckResults(),
+      ctx
+    });
   });
 
   it('exact generate function goes to "completion" status', ctx => {
-    const originalFolderPath = process.cwd();
-    const generationPathProjectGenerate = `${baseTempFolder}no-downloads/`;
-    process.chdir(generationPathProjectGenerate);
-
-    const checkResults = new ExactCheckResults();
-    const asyncCheckRes = new ExactAsyncCheckRes();
-
-    const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
-      .docsGenerated$
-      .pipe(takeLast(1));
-
-    pd
-      .subscribe({
-        next: () => {
-          // Able to reach completion is a good sign
-          // and use this as a marker for a
-          // successful file generation
-          ctx();
-          process.chdir(originalFolderPath);
-        },
-        error: (e: any) => {
-          console.log('Error', e);
-        }
-      });
+    testBuildGenerate({
+      checkResults: new ExactCheckResults(),
+      asyncCheckRes: new ExactAsyncCheckResults(),
+      ctx
+    });
   });
-
-
 
 });

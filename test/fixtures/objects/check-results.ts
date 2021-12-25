@@ -1,36 +1,34 @@
 // Native modules
 import * as path from 'path';
 
-// Third party modules
-import { clone } from 'ramda';
-
 // Library modules
-import { Results, AsyncResults } from './base-results';
+import { Results, AsyncResults, additionalCond } from './base-results';
 
-export class CheckResults {
+export class CheckResults extends Results {
   constructor() {
-    Object.assign(this, clone(Results), {
-      msg: 'Start building: html, pdf, and epub',
-      conditions: {
-        flags: {
-          input: path.join(__dirname, '../../../README.md'),
-          output: path.join(__dirname, '../../temp/no-downloads/')
-        },
-        recognizedFormats: ['html', 'pdf', 'epub'],
-        normalizedFormats: ['html', 'pdf', 'epub'],
-        argv: ['html', 'pdf', 'epub']
-      },
-      continue: true
-    });
+    super();
   }
+
+  msg = 'Start building: html, pdf, and epub';
+  exactPdf = false;
+  conditions = Object.assign({
+    flags: {
+      input: path.join(__dirname, '../../../README.md'),
+      output: path.join(__dirname, '../../temp/no-downloads/'),
+      'dry-run': 'false'
+    },
+    recognizedFormats: ['html', 'pdf', 'epub'],
+    normalizedFormats: ['html', 'pdf', 'epub'],
+    argv: ['html', 'pdf', 'epub']
+  }, additionalCond);
 }
 
-export class AsyncCheckRes {
+export class AsyncCheckRes extends AsyncResults {
   constructor() {
-    Object.assign(this, clone(AsyncResults), {
-      msg: 'Creating output file',
-      outputFilename: 'stuff',
-      fileOutputExistence: { html: false, pdf: false, epub: false }
-    });
+    super();
   }
+
+  msg = 'Creating output file';
+  outputFilename = 'stuff';
+  fileOutputExistence = { html: false, pdf: false, epub: false };
 }
