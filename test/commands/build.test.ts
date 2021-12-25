@@ -3,11 +3,17 @@ import 'module-alias/register';
 import { expect } from '@oclif/test';
 import { takeLast } from 'rxjs/operators';
 import { unnest } from 'ramda';
+import { fancy } from 'fancy-test';
+const request = require('supertest');
 const del = require('del');
+
+// Native modules
+import * as path from 'path';
 
 // Library modules
 import { BuildCheckGoodResults } from '../../src/functions/build/build-checks';
 import { AsyncCheckResults } from '../../src/functions/build/build-cli-input-async-checks';
+import { createServer } from '../../src/functions/build/build-server';
 import { buildGenerate } from '../../src/functions/build/build-generate';
 import { CheckResults, AsyncCheckRes } from '../fixtures/objects/check-results';
 import { ForceCheckResults, ForceAsyncCheckResults } from '../fixtures/objects/forced-check-results';
@@ -213,4 +219,38 @@ describe('Build', () => {
     });
   });
 
+  fancy
+    .it('static server serves found html content', (_, done) => {
+      const server = createServer({
+        fileName: path.join(__dirname, '../fixtures/io/test.html')
+      });
+      request(server)
+        .get('/')
+        .expect('Content-Type', 'text/html')
+        .expect(200)
+        .end(function (err: any, _res: any) {
+          if (err) {
+            console.log('Error in the serving of the static html file.');
+            return done(err);
+          }
+          return done();
+        });
+    });
+
+  fancy
+    .it('static server serves error on html content not found', (_, done) => {
+      const server = createServer({
+        fileName: path.join(__dirname, '../fixtures/io/missing.html')
+      });
+      request(server)
+        .get('/')
+        .expect(404)
+        .end(function (err: any, _res: any) {
+          if (err) {
+            console.log('Error in the serving of the static html file.');
+            return done(err);
+          }
+          return done();
+        });
+    });
 });

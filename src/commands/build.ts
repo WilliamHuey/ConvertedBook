@@ -152,6 +152,9 @@ export default class Build extends Command {
         })
       );
 
+    // TODO1: Replay subject pass as immediate return object
+    // and pass this subject into buildRunMap default branch
+
     const buildRunMap: Record<string, Function> = {
       'dry-run': ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
 
