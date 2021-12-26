@@ -1,8 +1,9 @@
 // From https://stackoverflow.com/questions/16333790/node-js-quick-file-server-static-files-over-http/59088331#59088331
 
-const http = require('http')
-const fs = require('fs')
-const path = require('path')
+import * as http from 'http';
+import { IncomingMessage, ServerResponse } from 'http';
+import * as fs from 'fs';
+import * as path from 'path';
 
 interface CreateServer {
   fileName: string;
@@ -20,8 +21,8 @@ const mediaTypes: Record<string, string> = {
 }
 
 const createServer = ({ fileName }: CreateServer) => {
-  const server = http.createServer(function (_request: any, response: any) {
-    fs.readFile(fileName, function (err: any, data: any) {
+  const server = http.createServer(function (_request: IncomingMessage, response: ServerResponse) {
+    fs.readFile(fileName, function (err: NodeJS.ErrnoException | null, data: Buffer) {
       if (err) {
         response.statusCode = 404;
         return response.end('File not found or invalid request made.');
@@ -44,4 +45,3 @@ const createServer = ({ fileName }: CreateServer) => {
 export {
   createServer
 };
-
