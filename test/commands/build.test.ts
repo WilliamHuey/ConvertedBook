@@ -1,8 +1,8 @@
 // Third party module
 import 'module-alias/register';
 import { expect } from '@oclif/test';
-import { ReplaySubject } from 'rxjs';
-import { takeLast } from 'rxjs/operators';
+import { from } from 'rxjs';
+import { take, share, mergeMap } from 'rxjs/operators';
 import { unnest } from 'ramda';
 import { fancy } from 'fancy-test';
 const request = require('supertest');
@@ -12,45 +12,9 @@ const del = require('del');
 import * as path from 'path';
 
 // Library modules
-import { BuildCheckGoodResults } from '../../src/functions/build/build-checks';
-import { AsyncCheckResults } from '../../src/functions/build/build-cli-input-async-checks';
+import build from '../../src/commands/build';
 import { createServer } from '../../src/functions/build/build-server';
-import { buildGenerate } from '../../src/functions/build/build-generate';
-import { CheckResults, AsyncCheckRes } from '../fixtures/objects/check-results';
-import { ForceCheckResults, ForceAsyncCheckResults } from '../fixtures/objects/forced-check-results';
-import { ExactCheckResults, ExactAsyncCheckResults, ExactForceCheckResults, ExactForceAsyncCheckResults } from '../fixtures/objects/exact-check-results';
 import { retryTest, baseTempFolder, dryFlag, testDataDirectory } from './test-utilities';
-
-interface TestBuildGenerate {
-  checkResults: BuildCheckGoodResults;
-  asyncCheckRes: AsyncCheckResults;
-  ctx: Function;
-}
-
-const testBuildGenerate = ({ checkResults, asyncCheckRes, ctx }: TestBuildGenerate) => {
-  const originalFolderPath = process.cwd();
-  const generationPathProjectGenerate = `${baseTempFolder}no-downloads/`;
-  process.chdir(generationPathProjectGenerate);
-
-  const docsGenerated$ = new ReplaySubject(undefined);
-  const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults, docsGenerated$)
-    .docsGenerated$
-    .pipe(takeLast(1));
-
-  pd
-    .subscribe({
-      next: () => {
-        // Able to reach completion is a good sign
-        // and use this as a marker for a
-        // successful file generation
-        ctx();
-        process.chdir(originalFolderPath);
-      },
-      error: (e: any) => {
-        console.log('Error', e);
-      }
-    });
-};
 
 describe('Build', () => {
   const invalidInputFlag = `--input=${testDataDirectory}zz`;
@@ -189,45 +153,13 @@ describe('Build', () => {
       expect(ctx.stdout.trim()).to.contain('Build failed: No required flags found (--input, --output)');
     });
 
-  it('generate function goes to "completion" status', ctx => {
-    testBuildGenerate({
-      checkResults: new CheckResults(),
-      asyncCheckRes: new AsyncCheckRes(),
-      ctx
-    });
-  });
-
-  it('force generate function goes to "completion" status', ctx => {
-    testBuildGenerate({
-      checkResults: new ForceCheckResults(),
-      asyncCheckRes: new ForceAsyncCheckResults(),
-      ctx
-    });
-  });
-
-  it('exact generate function goes to "completion" status', ctx => {
-    testBuildGenerate({
-      checkResults: new ExactCheckResults(),
-      asyncCheckRes: new ExactAsyncCheckResults(),
-      ctx
-    });
-  });
-
-  it('exact force generate function goes to "completion" status', ctx => {
-    testBuildGenerate({
-      checkResults: new ExactForceCheckResults(),
-      asyncCheckRes: new ExactForceAsyncCheckResults(),
-      ctx
-    });
-  });
-
   fancy
     .it('static server serves found html content', (_, done) => {
       const server = createServer({
         fileName: path.join(__dirname, '../fixtures/io/test.html')
       });
       request(server)
-        .get('/')
+        .get('/text.html')
         .expect('Content-Type', 'text/html')
         .expect(200)
         .end(function (err: any, _res: any) {
@@ -245,7 +177,7 @@ describe('Build', () => {
         fileName: path.join(__dirname, '../fixtures/io/missing.html')
       });
       request(server)
-        .get('/')
+        .get('/missing.html')
         .expect(404)
         .end(function (err: any, _res: any) {
           if (err) {
@@ -253,6 +185,151 @@ describe('Build', () => {
             return done(err);
           }
           return done();
+        });
+    });
+
+  fancy
+    .it('runs build pdf command with minimum flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'pdf',
+        '--input',
+        path.join(__dirname, '../fixtures/io/input.latex'),
+        '--output',
+        path.join(__dirname, '../temp/no-downloads/output.pdf')
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .pipe(
+          mergeMap(res => {
+            return res.docsGenerated$;
+          })
+        )
+        .subscribe({
+          next: () => {
+            done();
+          }
+        });
+    });
+
+  fancy
+    .it('runs build pdf command with exact flag', (_, done) => {
+      const buildFile$ = from(build.run([
+        'pdf',
+        '--input',
+        path.join(__dirname, '../fixtures/io/input.latex'),
+        '--output',
+        path.join(__dirname, '../temp/no-downloads/exact-output.pdf'),
+        '--exact'
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .pipe(
+          mergeMap(res => {
+            return res.docsGenerated$;
+          })
+        )
+        .subscribe({
+          next: () => {
+            done();
+          }
+        });
+    });
+
+  fancy
+    .it('runs build pdf command with exact and force flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'pdf',
+        '--input',
+        path.join(__dirname, '../fixtures/io/input.latex'),
+        '--output',
+        path.join(__dirname, '../temp/no-downloads/exact-force-output.pdf'),
+        '--exact',
+        '--force'
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .pipe(
+          mergeMap(res => {
+            return res.docsGenerated$;
+          })
+        )
+        .subscribe({
+          next: () => {
+            done();
+          }
+        });
+    });
+
+  fancy
+    .it('runs build pdf command with force flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'pdf',
+        '--input',
+        path.join(__dirname, '../fixtures/io/input.latex'),
+        '--output',
+        path.join(__dirname, '../temp/no-downloads/exact-force-output.pdf'),
+        '--force'
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .pipe(
+          mergeMap(res => {
+            return res.docsGenerated$;
+          })
+        )
+        .subscribe({
+          next: () => {
+            done();
+          }
+        });
+    });
+
+  fancy
+    .it('runs build pdf command with dry-run flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'pdf',
+        '--input',
+        path.join(__dirname, '../fixtures/io/input.latex'),
+        '--output',
+        path.join(__dirname, '../temp/no-downloads/exact-force-output.pdf'),
+        `--dry-run`,
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .pipe(
+          mergeMap(res => {
+            return res.docsGenerated$;
+          })
+        )
+        .subscribe({
+          next: () => {
+            done();
+          }
+        });
+    });
+
+  fancy
+    .it('runs build pdf command with exact and dry-run flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'pdf',
+        '--input',
+        path.join(__dirname, '../fixtures/io/input.latex'),
+        '--output',
+        path.join(__dirname, '../temp/no-downloads/exact-force-output.pdf'),
+        '--exact',
+        `--dry-run`,
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .pipe(
+          mergeMap(res => {
+            return res.docsGenerated$;
+          })
+        )
+        .subscribe({
+          next: () => {
+            done();
+          }
         });
     });
 });

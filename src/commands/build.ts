@@ -163,6 +163,9 @@ export default class Build extends Command {
         // meaning no file generation will occur
         this.log(buildCli.msg.trim());
         this.log(buildAsyncResults.msg.trim());
+        docsGenerated$.next('');
+        docsGenerated$.complete();
+
       },
       exact: (([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
         buildRunMap.default([{ ...buildCli, exactPdf: true }, buildAsyncResults]);
@@ -259,7 +262,8 @@ export default class Build extends Command {
       });
 
     return {
-      docsGenerated$
+      docsGenerated$,
+      dryRunBuild$
     };
   }
 }
