@@ -4,7 +4,7 @@ import 'module-alias/register';
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { unnest, difference } from 'ramda';
-import { zip, merge } from 'rxjs';
+import { ReplaySubject, zip, merge } from 'rxjs';
 import { filter, mergeMap, take, takeLast, mapTo } from 'rxjs/operators';
 const listify = require('listify');
 
@@ -152,8 +152,9 @@ export default class Build extends Command {
         })
       );
 
-    // TODO1: Replay subject pass as immediate return object
-    // and pass this subject into buildRunMap default branch
+    // Returns the status of the generated documents as the
+    // main means of providing information on the build command
+    const docsGenerated$ = new ReplaySubject(undefined);
 
     const buildRunMap: Record<string, Function> = {
       'dry-run': ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
@@ -177,7 +178,7 @@ export default class Build extends Command {
         // Default build with file generation
         this.log(buildCli.msg.trim());
         this.log(buildAsyncResults.msg.trim());
-        this.buildGenerate(buildCli as BuildCheckGoodResults, buildAsyncResults);
+        this.buildGenerate(buildCli as BuildCheckGoodResults, buildAsyncResults, docsGenerated$);
       }
     };
 
@@ -256,5 +257,9 @@ export default class Build extends Command {
       .subscribe(([_, buildAsyncResults]) => {
         this.log(buildAsyncResults.msg.trim());
       });
+
+    return {
+      docsGenerated$
+    };
   }
 }

@@ -9,7 +9,8 @@ import { reject } from 'ramda';
 import { typeCheck, stringTypes } from '@utilities/type-check';
 import Build from '../../commands/build';
 import { BuildCheckGoodResults, CommandFlagKeys } from './build-checks';
-import { AsyncCheckResults, FileOutputExistence } from './build-cli-input-async-checks';
+import { AsyncCheckResults, FileOutputExistence }
+  from './build-cli-input-async-checks';
 import { truncateFilePath } from './build-utilities';
 import { pandocGenerated } from './build-generate-pandoc';
 import { playwrightGenerated } from './build-generate-playwright';
@@ -29,9 +30,15 @@ export interface BuildGenerate {
 
 const pdfAndHtmlFormat = (n: string) => n === 'pdf' || n === 'html';
 
-export function buildGenerate(results: BuildCheckGoodResults, asyncResults: AsyncCheckResults): any
-export function buildGenerate(this: Build,
-  results: BuildCheckGoodResults, asyncResults: AsyncCheckResults) {
+export function buildGenerate(
+  results: BuildCheckGoodResults,
+  asyncResults: AsyncCheckResults,
+  docsGenerated$: ReplaySubject<any>): any
+export function buildGenerate(
+  this: Build,
+  results: BuildCheckGoodResults,
+  asyncResults: AsyncCheckResults,
+  docsGenerated$: ReplaySubject<any>) {
   const { conditions, fromServerCli, exactPdf } = results,
     { input, output: outputPath } = conditions.flags,
     { normalizedFormats, flags } = conditions,
@@ -45,7 +52,6 @@ export function buildGenerate(this: Build,
 
   // Exact pdf creation will require playwright
   const buildDocuments$ = new ReplaySubject(undefined);
-  const docsGenerated$ = new ReplaySubject(undefined);
 
   const hasPdfFormat = normalizedFormats.includes('pdf'),
     hasHtmlFormat = normalizedFormats.includes('html'),

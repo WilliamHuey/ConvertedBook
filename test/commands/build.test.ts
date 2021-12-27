@@ -1,6 +1,7 @@
 // Third party module
 import 'module-alias/register';
 import { expect } from '@oclif/test';
+import { ReplaySubject } from 'rxjs';
 import { takeLast } from 'rxjs/operators';
 import { unnest } from 'ramda';
 import { fancy } from 'fancy-test';
@@ -31,7 +32,8 @@ const testBuildGenerate = ({ checkResults, asyncCheckRes, ctx }: TestBuildGenera
   const generationPathProjectGenerate = `${baseTempFolder}no-downloads/`;
   process.chdir(generationPathProjectGenerate);
 
-  const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults)
+  const docsGenerated$ = new ReplaySubject(undefined);
+  const pd = buildGenerate(checkResults as BuildCheckGoodResults, asyncCheckRes as AsyncCheckResults, docsGenerated$)
     .docsGenerated$
     .pipe(takeLast(1));
 
