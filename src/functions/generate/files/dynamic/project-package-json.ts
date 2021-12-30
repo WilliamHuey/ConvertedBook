@@ -1,7 +1,7 @@
 export class ProjectPackageJson {
   constructor(name: string) {
     Object.assign(this, {
-      name: name || '<from cli input name>',
+      name: name || 'placeholder-name',
       version: '1.0.0',
       description: '',
       main: 'index.js',

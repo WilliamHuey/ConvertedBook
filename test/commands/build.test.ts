@@ -14,6 +14,11 @@ import * as path from 'path';
 // Library modules
 import build from '../../src/commands/build';
 import { createServer } from '../../src/functions/build/build-server';
+import {
+  supposedFileName,
+  getFileNameFromParts,
+  truncateFilePath
+} from '../../src/functions/build/build-utilities';
 import { retryTest, baseTempFolder, dryFlag, testDataDirectory } from './test-utilities';
 
 describe('Build', () => {
@@ -151,6 +156,27 @@ describe('Build', () => {
     .command(['build', "--args=''"])
     .it('with no formats and empty args flag', ctx => {
       expect(ctx.stdout.trim()).to.contain('Build failed: No required flags found (--input, --output)');
+    });
+
+  fancy
+    .it('file name checks with "supposed file name"', () => {
+      const results = supposedFileName('/a/path/stuff.js');
+      expect(results).to.be.an('array').that.includes('stuff');
+      expect(results).to.be.an('array').that.includes('js');
+    });
+
+  fancy
+    .it('file name checks with "get file name from parts"', () => {
+      const results = supposedFileName('/a/path/stuff.js');
+      const firstItem = getFileNameFromParts(results);
+      expect(firstItem).to.contain('stuff');
+    });
+
+  fancy
+    .it('file name checks with "truncate file path"', () => {
+      const results = truncateFilePath('/a/path/stuff.js');
+      expect(results.filePathSplit).to.be.an('array').that.includes('stuff.js');
+      expect(results.filePathFolder).to.contain('/a/path');
     });
 
   fancy

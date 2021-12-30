@@ -22,6 +22,13 @@ describe('Dry Run Generation:', () => {
       expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
     });
 
+  retryTest()
+    .stdout()
+    .command(unnest([['generate'], [`${baseTempNoDownloadFolder}dry-run-generate-no-npm-name`], dryFlag]))
+    .it('dry run with valid project name', ctx => {
+      expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
+    });
+
   mkdir(`${baseTempNoDownloadFolder}dry-duplicate-folder`).pipe(share())
     .subscribe(() => {
       test
