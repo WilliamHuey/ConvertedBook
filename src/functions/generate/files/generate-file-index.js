@@ -1,2 +1,2 @@
 import "latex.css";
-import styles from "./styles/index.module.scss";
+import "./styles/index.module.scss";

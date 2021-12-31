@@ -21,7 +21,7 @@ export default class Serve extends Command {
     pandoc: flags.string({ char: 'p', description: 'Pandoc options' })
   }
 
-  static aliases = ['s']
+  static aliases = ['s', 'server']
 
   static serverFilenamePath = 'server.js';
 
