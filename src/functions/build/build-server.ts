@@ -9,11 +9,6 @@ interface CreateServer {
   fileName: string;
 }
 
-process.on('uncaughtException',
-  err => console.error('uncaughtException', err));
-process.on('unhandledRejection',
-  err => console.error('unhandledRejection', err));
-
 const mediaTypes: Record<string, string> = {
   zip: 'application/zip',
   jpg: 'image/jpeg',
