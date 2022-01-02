@@ -238,6 +238,57 @@ describe('Build', () => {
     });
 
   fancy
+    .it('runs build pdf, html and epub command with minimum flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'pdf',
+        'html',
+        'epub',
+        '--input',
+        path.join(__dirname, '../fixtures/io/input.latex'),
+        '--output',
+        path.join(__dirname, '../temp/no-downloads/output.pdf'),
+        '--exact'
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .pipe(
+          mergeMap(res => {
+            return res.docsGenerated$;
+          })
+        )
+        .subscribe({
+          next: () => {
+            done();
+          }
+        });
+    });
+
+  fancy
+    .it('runs build pdf and html command with minimum flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'pdf',
+        'html',
+        '--input',
+        path.join(__dirname, '../fixtures/io/input.latex'),
+        '--output',
+        path.join(__dirname, '../temp/no-downloads/output.pdf'),
+        '--exact'
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .pipe(
+          mergeMap(res => {
+            return res.docsGenerated$;
+          })
+        )
+        .subscribe({
+          next: () => {
+            done();
+          }
+        });
+    });
+
+  fancy
     .it('runs build pdf command with exact flag', (_, done) => {
       const buildFile$ = from(build.run([
         'pdf',
