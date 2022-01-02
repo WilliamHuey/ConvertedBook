@@ -17,7 +17,7 @@
     <meta name="description" content="$description-meta$" />
   $endif$
     <title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
-    <script type="module" src="main.js"></script>
+    <script type="module" src="./javascript/main.js"></script>
   $for(header-includes)$
     $header-includes$
   $endfor$

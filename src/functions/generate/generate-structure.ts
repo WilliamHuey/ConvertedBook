@@ -11,8 +11,9 @@ export class GenerateStructureOutline {
               default.html5
           /styles
             index.scss
+          /javascript
+            main.js
           index.tex
-          main.js
         index.html
         package.json
         server.js
@@ -54,6 +55,17 @@ export class GenerateStructureOutline {
                 },
               },
               {
+                name: 'javascript',
+                content: {
+                  files: [
+                    {
+                      name: 'main.js',
+                      fileContent: 'indexJs'
+                    }
+                  ]
+                }
+              },
+              {
                 name: 'styles',
                 content: {
                   files: [
@@ -73,10 +85,6 @@ export class GenerateStructureOutline {
               {
                 name: 'index.html',
                 fileContent: 'indexHtml'
-              },
-              {
-                name: 'main.js',
-                fileContent: 'indexJs'
               }
             ],
           },
