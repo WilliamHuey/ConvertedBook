@@ -179,6 +179,8 @@ describe('Build', () => {
       expect(results.filePathFolder).to.contain('/a/path');
     });
 
+  // Server - Content-type check
+
   fancy
     .it('static server serves found html content', (_, done) => {
       const server = createServer({
@@ -213,6 +215,8 @@ describe('Build', () => {
           return done();
         });
     });
+
+  // Command inputs build
 
   fancy
     .it('runs build pdf command with minimum flags', (_, done) => {
