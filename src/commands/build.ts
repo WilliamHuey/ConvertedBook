@@ -3,7 +3,7 @@ import 'module-alias/register';
 
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { unnest, difference } from 'ramda';
+import { unnest, difference, reject } from 'ramda';
 import { ReplaySubject, zip, merge } from 'rxjs';
 import { filter, mergeMap, take, takeLast, mapTo } from 'rxjs/operators';
 const listify = require('listify');
@@ -91,7 +91,7 @@ export default class Build extends Command {
     // Can not continue further, and display the dependencies error message
     showDepsUnsatisfied$
       .subscribe(res => {
-        this.log(`Build failed: These dependencies were not found in your path: ${res.join(', ')}`);
+        this.log(`Build failed: These dependencies were not found in your path: ${reject((n) => n === '', res).join(', ')}`);
       });
 
     // All dependencies found, and can perform further checks
