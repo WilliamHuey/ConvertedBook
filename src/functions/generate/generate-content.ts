@@ -111,7 +111,7 @@ class GenerateContent implements GenerateStructure {
     content?.folders?.forEach((element: InnerContentProperties) => {
       const newFolderName = path.join(parentFolderPath, element.name),
         createFolder$ = mkdir(newFolderName)
-          .pipe(takeLast(1), takeUntil(this.fullProjectFolderExists$))
+          .pipe(takeUntil(this.fullProjectFolderExists$), takeLast(1))
           .pipe(share());
 
       const countStructureNonExistFolders$ = concat(parentFolder$, createFolder$)
