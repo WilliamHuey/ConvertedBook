@@ -3,7 +3,7 @@ import * as path from 'path';
 
 // Third party modules
 import { ReplaySubject } from 'rxjs';
-import { reject } from 'ramda';
+import { reject, intersection } from 'ramda';
 
 // Library modules
 import { typeCheck, stringTypes } from '@utilities/type-check';
@@ -68,11 +68,12 @@ export function buildGenerate(
     // Use pandoc to create the html document because playwright
     // will depend on it for the exact pdf generation.
 
+
     // Manipulate the settings to only generate the html with pandoc
     pandocGenerated({
       input,
       normalizedFormats: !normalizedFormats.includes('html') ?
-        [...normalizedFormats, 'html'] : normalizedFormats,
+        ['pdf', 'html'] : intersection(['pdf', 'html'], normalizedFormats),
       htmlCliGenerate: normalizedFormats.includes('html'),
       flags: Object.assign(flags, { output: path.parse(flags.input).name }),
       fileOutputExistence,

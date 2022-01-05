@@ -21,8 +21,8 @@
     "playwright": "^1.17.1",
     "port-scout": "^1.1.2",
     "ramda": "^0.27.1",
-    "rxjs": "^7.4.0",
-    "ts-pattern": "^3.3.3",
+    "rxjs": "^7.5.1",
+    "ts-pattern": "^3.3.4",
     "ts-xor": "^1.0.8",
     "tslib": "^2.3.1"
   },
@@ -34,7 +34,7 @@
     "@types/node": "^16.11.7",
     "@types/ramda": "^0.27.49",
     "chai": "^4.3.4",
-    "concurrently": "^6.4.0",
+    "concurrently": "^7.0.0",
     "del": "^6.0.0",
     "eslint": "^5.16.0",
     "eslint-config-oclif": "^3.1.0",
@@ -45,7 +45,7 @@
     "nyc": "^15.1.0",
     "supertest": "^6.1.6",
     "ts-node": "^10.3.0",
-    "typescript": "^4.5.3"
+    "typescript": "^4.5.4"
   },
   "engines": {
     "node": ">=8.0.0"
