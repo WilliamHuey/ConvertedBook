@@ -1,5 +1,6 @@
 // Native modules
 import * as path from 'path';
+import { unlinkSync } from 'fs';
 
 // Third party modules
 import { ReplaySubject } from 'rxjs';
@@ -106,6 +107,18 @@ export function buildGenerate(
   // be limited by the exactpdf options for other file formats.
   docsGenerated$
     .subscribe(() => {
+
+      // Delete the intermediary html file when after
+      // completion of an exact pdf generation, but
+      // only when no html output is specified with the exact pdf
+      // generation
+      if (exactPdf && !normalizedFormats.includes('html')) {
+        try {
+          unlinkSync(`${normalizedOutputPath}.html`);
+        } catch (_) {
+          // avoid logging out error when html does not exist
+        }
+      }
       console.log('Complete file format generation');
     });
 
