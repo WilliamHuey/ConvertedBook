@@ -18,6 +18,7 @@
     "listify": "^1.0.3",
     "lookpath": "^1.2.2",
     "module-alias": "^2.2.2",
+    "pandoc-filter": "^2.0.2",
     "playwright": "^1.17.1",
     "port-scout": "^1.1.2",
     "ramda": "^0.27.1",
