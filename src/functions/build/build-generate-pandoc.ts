@@ -77,7 +77,7 @@ export function pandocGenerateFormat(input: string,
   // Configure pandoc options and arguments
   const pandocAdditionalOptions = flags.pandoc ?
     JSON.parse(flags.pandoc).pandoc : null;
-  const basePandocOptions = [input, '-o', `${normalizedOutputPath}.${format}`, '-s'];
+  const basePandocOptions = [input, '-o', `${normalizedOutputPath}.${format}`, '-s', '--toc'];
   const pandocDefaultOptions = fromServerCli ? [`--data-dir=${baseContentDir}/config`, '--template=default.html5', ...basePandocOptions] : basePandocOptions;
 
   // Add in more options for Pandoc when specified
