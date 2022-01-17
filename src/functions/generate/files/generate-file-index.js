@@ -1,6 +1,3 @@
-import "latex.css";
-import "../styles/index.module.scss";
-
 import '@kor-ui/kor'
 import { LitElement, html } from 'lit';
 
@@ -11,7 +8,7 @@ let registerWebComponents = () => {
       return html`${document
         .createRange()
         .createContextualFragment(`
-            <kor-app-bar slot="top" label="Table of Contents"></kor-app-bar>
+           <kor-app-bar slot="top" label="Table of Contents"></kor-app-bar>
           `)
         }`;
     }

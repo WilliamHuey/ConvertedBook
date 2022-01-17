@@ -10,7 +10,7 @@ export class GenerateStructureOutline {
             /templates
               default.html5
           /styles
-            index.scss
+            index.css
           /javascript
             main.js
           index.tex
@@ -18,6 +18,7 @@ export class GenerateStructureOutline {
         package.json
         server.js
         snowpack.config.js
+        postcss.config.js
     */
     Object.assign(this, {
       folders: [
@@ -70,7 +71,7 @@ export class GenerateStructureOutline {
                 content: {
                   files: [
                     {
-                      name: 'index.module.scss',
+                      name: 'index.module.css',
                       fileContent: 'configStylesIndex'
                     }
                   ]
@@ -107,6 +108,10 @@ export class GenerateStructureOutline {
         {
           name: 'snowpack.config.js',
           fileContent: 'snowpack'
+        },
+        {
+          name: 'postcss.config.js',
+          fileContent: 'postcss'
         },
       ],
     });

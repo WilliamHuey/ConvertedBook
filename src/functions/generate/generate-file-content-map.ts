@@ -27,7 +27,7 @@ const fileContent: FileContentType = {
   indexHtml: { name: 'generate-file-index.html' },
   indexTex: { name: 'generate-file-index.tex' },
   indexJs: { name: 'generate-file-index.js' },
-  configStylesIndex: { name: 'generate-file-index-module.scss' },
+  configStylesIndex: { name: 'generate-file-index-module.css' },
   texHtml5Template: { name: 'generate-file-latex-default.html5' },
   packageJson: {
     content: ({ projectName }) => {
@@ -40,7 +40,8 @@ const fileContent: FileContentType = {
   },
   latexSnowpackPlugin: { name: 'generate-file-latex-plugin.js' },
   server: { name: 'generate-file-server.js' },
-  snowpack: { name: 'generate-file-snowpack.js' }
+  snowpack: { name: 'generate-file-snowpack.js' },
+  postcss: { name: 'generate-file-postcss-config.js' }
 };
 
 // Data could vary and pattern is not predictable
