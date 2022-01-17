@@ -8,10 +8,12 @@ export class ProjectPackageJson {
       author: '',
       license: 'ISC',
       dependencies: {
-        snowpack: '^3.8.8',
+        "@kor-ui/kor": "^1.9.1",
+        "@snowpack/plugin-sass": "^1.4.0",
         "latex.css": "^1.5.0",
-        '@snowpack/plugin-sass': '^1.4.0',
+        "lit": "^2.1.1",
         "lookpath": "^1.2.2",
+        "snowpack": "^3.8.8"
       },
       scripts: {
         start: 'snowpack dev',
