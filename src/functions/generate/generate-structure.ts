@@ -10,9 +10,10 @@ export class GenerateStructureOutline {
             /templates
               default.html5
           /styles
-            index.css
+            project.js
+            vendor.module.css
           /javascript
-            main.js
+            helper.js
           index.tex
         index.html
         package.json
@@ -60,8 +61,8 @@ export class GenerateStructureOutline {
                 content: {
                   files: [
                     {
-                      name: 'main.js',
-                      fileContent: 'indexJs'
+                      name: 'helper.js',
+                      fileContent: 'helperJs'
                     }
                   ]
                 }
@@ -71,8 +72,12 @@ export class GenerateStructureOutline {
                 content: {
                   files: [
                     {
-                      name: 'index.module.css',
+                      name: 'vendor.module.css',
                       fileContent: 'configStylesIndex'
+                    },
+                    {
+                      name: 'project.js',
+                      fileContent: 'projectJs'
                     }
                   ]
                 }

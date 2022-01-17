@@ -1,9 +1,0 @@
-@import "latex.css";
-
-body {
-  max-width: 185ch;
-}
-
-p {
-  font-size: 1.3rem;
-}
