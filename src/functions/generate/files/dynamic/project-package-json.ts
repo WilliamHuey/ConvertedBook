@@ -8,7 +8,6 @@ export class ProjectPackageJson {
       author: '',
       license: 'ISC',
       dependencies: {
-        "@kor-ui/kor": "^1.9.1",
         "@linaria/cli": "^3.0.0-beta.15",
         "@linaria/shaker": "^3.0.0-beta.15",
         "@snowpack/plugin-run-script": "^2.3.0",

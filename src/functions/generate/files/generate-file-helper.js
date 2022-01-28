@@ -1,24 +1,28 @@
-import '@kor-ui/kor'
-import { LitElement, html } from 'lit';
+import { LitElement, css, html } from 'lit';
 
 let registerWebComponents = () => {
   class ConvertedBookAppBar extends LitElement {
+    static styles = css`nav { text-transform: uppercase; }`;
 
     render() {
       return html`${document
         .createRange()
         .createContextualFragment(`
-           <kor-app-bar slot="top" label="Table of Contents"></kor-app-bar>
+           <nav>
+            <button>
+              Table of Contents
+            </button>
+           </nav>
           `)
         }`;
     }
   }
 
   // Register the app bar
-  customElements.define('converted-book-app-bar', ConvertedBookAppBar);
+  customElements.define('convertedbook-app-bar', ConvertedBookAppBar);
 
   // Create the app bar
-  let convertedBookAppBar = document.createElement('converted-book-app-bar');
+  let convertedBookAppBar = document.createElement('convertedbook-app-bar');
 
   // Insert the app bar into body
   document.body.insertBefore(convertedBookAppBar, document.body.firstChild);
