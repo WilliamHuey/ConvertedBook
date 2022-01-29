@@ -1,5 +1,10 @@
 import { LitElement, css, html } from 'lit';
 
+// Please refresh the page manually if changes are made to the
+// convertedbook web componentsince there aren't methods in the
+// CustomElementRegistry for redefining or removing a registered web component
+
+// https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry
 let registerWebComponents = () => {
   class ConvertedBookAppBar extends LitElement {
     static styles = css`nav { text-transform: uppercase; }`;
@@ -42,7 +47,7 @@ if (import.meta.hot) {
   })
 }
 
-// Creat the web components
+// Create the web components
 document.addEventListener('DOMContentLoaded', () => {
   registerWebComponents();
 });
