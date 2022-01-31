@@ -28,6 +28,7 @@ const fileContent: FileContentType = {
   indexTex: { name: 'generate-file-index.tex' },
   helperJs: { name: 'generate-file-helper.js' },
   projectJs: { name: 'generate-file-project.js' },
+  globalJs: { name: 'generate-file-global.js' },
   configStylesIndex: { name: 'generate-file-vendor.css' },
   texHtml5Template: { name: 'generate-file-latex-default.html5' },
   packageJson: {

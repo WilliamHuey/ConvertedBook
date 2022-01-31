@@ -11,6 +11,7 @@ export class GenerateStructureOutline {
               default.html5
           /styles
             project.js
+            global.js
             vendor.module.css
           /javascript
             helper.js
@@ -78,6 +79,10 @@ export class GenerateStructureOutline {
                     {
                       name: 'project.js',
                       fileContent: 'projectJs'
+                    },
+                    {
+                      name: 'global.js',
+                      fileContent: 'globalJs'
                     }
                   ]
                 }

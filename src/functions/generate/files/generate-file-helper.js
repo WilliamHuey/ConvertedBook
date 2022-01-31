@@ -1,5 +1,12 @@
 import { LitElement, css, html } from 'lit';
 
+import { injectGlobal } from '@emotion/css'
+import { default as globalStyles } from "../styles/global.js";
+
+// Global styles
+const myStyle = injectGlobal`${globalStyles}`;
+document.body.classList.add(myStyle);
+
 // Please refresh the page manually if changes are made to the
 // convertedbook web component since there aren't methods in the
 // CustomElementRegistry for redefining or removing a registered web component
