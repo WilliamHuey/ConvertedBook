@@ -1,7 +1,7 @@
 import { LitElement, css, html } from 'lit';
 
 // Please refresh the page manually if changes are made to the
-// convertedbook web componentsince there aren't methods in the
+// convertedbook web component since there aren't methods in the
 // CustomElementRegistry for redefining or removing a registered web component
 
 // https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry
