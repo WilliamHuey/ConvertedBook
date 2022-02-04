@@ -14,19 +14,39 @@ document.body.classList.add(myStyle);
 // https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry
 let registerWebComponents = () => {
   class ConvertedBookAppBar extends LitElement {
-    static styles = css`nav { text-transform: uppercase; }`;
+    static styles = css`
+      nav {
+        text-transform: uppercase;
+        top: 0;
+        position: sticky;
+        margin-bottom: 1rem;
+      }
+    `;
 
     render() {
       return html`${document
         .createRange()
         .createContextualFragment(`
-           <nav>
-            <button>
+          <nav id="nav">
+            <button id="button">
               Table of Contents
             </button>
-           </nav>
-          `)
+          </nav>
+        `)
         }`;
+    }
+
+    connectedCallback() {
+      super.connectedCallback()
+    }
+
+    firstUpdated() {
+      this.shadowRoot.querySelector("#button")
+        .addEventListener('click', this._toggleMenu);
+    }
+
+    _toggleMenu() {
+      this.open = !this.open;
     }
   }
 
