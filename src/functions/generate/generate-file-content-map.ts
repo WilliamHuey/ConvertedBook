@@ -26,7 +26,7 @@ const fileContent: FileContentType = {
   gitignore: { name: 'generate-file-git-ignore.txt' },
   indexHtml: { name: 'generate-file-index.html' },
   indexTex: { name: 'generate-file-index.tex' },
-  helperJs: { name: 'generate-file-helper.js' },
+  helperJs: { name: 'generate-file-helper.ts' },
   projectJs: { name: 'generate-file-project.js' },
   globalJs: { name: 'generate-file-global.js' },
   configStylesIndex: { name: 'generate-file-vendor.css' },
