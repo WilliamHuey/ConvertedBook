@@ -23,11 +23,18 @@ let registerWebComponents = () => {
       }
     `;
 
+    @property({ type: Boolean })
+    open: boolean = false;
+
+    constructor() {
+      super();
+    }
+
     render() {
       return html`${document
         .createRange()
         .createContextualFragment(`
-          <nav id="nav">
+          <nav id="nav" class=${this.open}>
             <button id="button">
               Table of Contents
             </button>
@@ -41,8 +48,10 @@ let registerWebComponents = () => {
     }
 
     firstUpdated() {
-      this.shadowRoot.querySelector("#button")
-        .addEventListener('click', this._toggleMenu);
+      this.shadowRoot
+        .addEventListener('click', () => {
+          this._toggleMenu();
+        });
     }
 
     _toggleMenu() {
