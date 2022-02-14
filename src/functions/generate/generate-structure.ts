@@ -14,7 +14,7 @@ export class GenerateStructureOutline {
             global.js
             vendor.module.css
           /javascript
-            helper.js
+            helper.ts
           index.tex
         index.html
         package.json
@@ -62,8 +62,8 @@ export class GenerateStructureOutline {
                 content: {
                   files: [
                     {
-                      name: 'helper.js',
-                      fileContent: 'helperJs'
+                      name: 'helper.ts',
+                      fileContent: 'helperTs'
                     }
                   ]
                 }
@@ -118,6 +118,10 @@ export class GenerateStructureOutline {
         {
           name: 'snowpack.config.js',
           fileContent: 'snowpack'
+        },
+        {
+          name: 'tsconfig.json',
+          fileContent: 'tsconfig'
         },
         {
           name: 'postcss.config.js',

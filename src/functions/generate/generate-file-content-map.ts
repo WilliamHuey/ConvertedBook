@@ -26,7 +26,7 @@ const fileContent: FileContentType = {
   gitignore: { name: 'generate-file-git-ignore.txt' },
   indexHtml: { name: 'generate-file-index.html' },
   indexTex: { name: 'generate-file-index.tex' },
-  helperJs: { name: 'generate-file-helper.ts' },
+  helperTs: { name: 'generate-file-helper.ts' },
   projectJs: { name: 'generate-file-project.js' },
   globalJs: { name: 'generate-file-global.js' },
   configStylesIndex: { name: 'generate-file-vendor.css' },
@@ -43,6 +43,7 @@ const fileContent: FileContentType = {
   latexSnowpackPlugin: { name: 'generate-file-latex-plugin.js' },
   server: { name: 'generate-file-server.js' },
   snowpack: { name: 'generate-file-snowpack.js' },
+  tsconfig: { name: 'generate-file-tsconfig.json' },
   postcss: { name: 'generate-file-postcss-config.js' }
 };
 
