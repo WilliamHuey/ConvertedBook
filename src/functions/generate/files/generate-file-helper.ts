@@ -1,4 +1,4 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, unsafeCSS, html } from 'lit';
 
 import { injectGlobal } from '@emotion/css'
 import { default as globalStyles } from "../styles/global.js";
@@ -14,8 +14,10 @@ document.body.classList.add(myStyle);
 // https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry
 let registerWebComponents = () => {
   class ConvertedBookAppBar extends LitElement {
+    static stylesPrefix: string = 'convertedbook';
+
     static styles = css`
-      nav {
+      #${unsafeCSS(ConvertedBookAppBar.stylesPrefix)}-interactions {
         text-transform: uppercase;
         top: 0;
         position: sticky;
