@@ -34,11 +34,16 @@ let registerWebComponents = () => {
       return html`${document
         .createRange()
         .createContextualFragment(`
-          <nav id="nav" class=${this.open}>
-            <button id="button">
-              Table of Contents
-            </button>
-          </nav>
+          <div id="convertedbook-interactions">
+            <nav id="convertedbook-nav">
+              <button id="convertedbook-button">
+                Table of Contents
+              </button>
+            </nav>
+            <div id="convertedbook-table-of-contents-container"
+              class=${this.open}>
+            </div>
+          </div>
         `)
         }`;
     }
