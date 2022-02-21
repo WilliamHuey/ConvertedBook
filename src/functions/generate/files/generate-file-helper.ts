@@ -55,7 +55,7 @@ let registerWebComponents = () => {
     }
 
     firstUpdated() {
-      this.shadowRoot
+      this.shadowRoot.getElementById('convertedbook-button')
         .addEventListener('click', () => {
           this._toggleMenu();
         });
