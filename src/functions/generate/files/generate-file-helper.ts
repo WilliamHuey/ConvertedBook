@@ -55,14 +55,31 @@ let registerWebComponents = () => {
     }
 
     firstUpdated() {
-      this.shadowRoot.getElementById('convertedbook-button')
-        .addEventListener('click', () => {
-          this._toggleMenu();
+      this.shadowRoot
+        .addEventListener('click', (evt) => {
+          const eventEl = (evt.target as HTMLButtonElement),
+            elementType = eventEl.nodeName;
+          if (elementType === 'BUTTON' &&
+            eventEl.id === "convertedbook-button") {
+            this._toggleMenu();
+          }
         });
     }
 
-    _toggleMenu() {
+    async _toggleMenu() {
       this.open = !this.open;
+      await this.updateComplete;
+      this._setUpTableOfContents();
+    }
+
+    _setUpTableOfContents() {
+      if (this.open) {
+        const originalToc = document.querySelectorAll('#TOC')[0];
+
+        this.shadowRoot
+          .getElementById('convertedbook-table-of-contents-container')
+          .appendChild(originalToc.cloneNode(true))
+      }
     }
   }
 
