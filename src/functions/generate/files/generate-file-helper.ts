@@ -1,4 +1,5 @@
 import { LitElement, css, unsafeCSS, html } from 'lit';
+import { property } from 'lit/decorators.js';
 
 import { injectGlobal } from '@emotion/css'
 import { default as globalStyles } from "../styles/global.js";
