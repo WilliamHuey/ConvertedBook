@@ -1,7 +1,8 @@
 import { LitElement, css, unsafeCSS, html } from 'lit';
 import { property } from 'lit/decorators.js';
-
 import { injectGlobal } from '@emotion/css'
+import walk from "dom-walk";
+
 import { default as globalStyles } from "../styles/global.js";
 
 // Global styles
@@ -76,10 +77,19 @@ let registerWebComponents = () => {
     _setUpTableOfContents() {
       if (this.open) {
         const originalToc = document.querySelectorAll('#TOC')[0];
+        let clonedToc = originalToc.cloneNode(true);
+
+        // Remove the id attributes from dom nodes from any of the
+        // nodes from the 'table of contents' element to avoid
+        // conflicts
+        walk(clonedToc, function (node) {
+          if (node.id)
+            node.removeAttribute('id')
+        });
 
         this.shadowRoot
           .getElementById('convertedbook-table-of-contents-container')
-          .appendChild(originalToc.cloneNode(true))
+          .appendChild(clonedToc)
       }
     }
   }
