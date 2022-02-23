@@ -35,17 +35,18 @@ let registerWebComponents = () => {
     }
 
     render() {
+      const toggleMenuState = this.open ? 'opened' : 'collapsed';
       return html`${document
         .createRange()
         .createContextualFragment(`
           <div id="convertedbook-interactions">
-            <nav id="convertedbook-nav">
-              <button id="convertedbook-button">
+            <div id="convertedbook-nav">
+              <button id="convertedbook-button" class=${toggleMenuState}>
                 Table of Contents
               </button>
-            </nav>
-            <div id="convertedbook-table-of-contents-container"
-              class=${this.open}>
+            </div>
+            <div id="convertedbook-table-of-contents-container" class=${toggleMenuState}
+             >
             </div>
           </div>
         `)
