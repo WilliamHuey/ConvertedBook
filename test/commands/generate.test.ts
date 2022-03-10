@@ -41,7 +41,7 @@ describe('Dry Run Generation:', () => {
 
   // dry-run and force flag with existing folder
   mkdir(`${baseTempNoDownloadFolder}dry-forced-duplicate-folder`).pipe(share())
-    .subscribe(() => {
+    .subscribe((res) => {
       test
         .stdout()
         .command(unnest([['generate'], [`${baseTempNoDownloadFolder}dry-forced-duplicate-folder`, npmProjectFlagAndName], dryFlag, '--force']))

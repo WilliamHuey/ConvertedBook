@@ -204,7 +204,7 @@ export default class Generate extends Command {
           return remove(path.join(parentFolderPath), { recursive: true, force: true })
             .pipe(takeLast(1), share());
         }))
-      .pipe(takeLast(1));
+      .pipe(takeLast(1), share());
 
     deleteFolderOnForce$.subscribe(() => { });
 
@@ -285,7 +285,8 @@ export default class Generate extends Command {
       .subscribe(this.logCreationDone);
 
     // Dry run project generation
-    const projectFolderDry$ = creationVerified$
+    // should still log out to console when force flag is present
+    const projectFolderDry$ = merge(creationVerified$, forcedOutputFolderExists$)
       .pipe(filter(() => {
         return isDryRun;
       }));
@@ -296,10 +297,8 @@ export default class Generate extends Command {
       .subscribe(this.logCreationDone);
 
     return {
-      projectFolderWithContents$:
-        projectFolderWithContents$,
-      projectFolderDry$:
-        projectFolderDry$
+      projectFolderWithContents$,
+      projectFolderDry$
     };
   }
 }
