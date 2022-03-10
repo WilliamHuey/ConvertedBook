@@ -13,6 +13,7 @@ import { tap, mergeMap, share, takeUntil, catchError, filter, takeLast, take } f
 import { match } from 'ts-pattern';
 const IsThere = require('is-there');
 
+// RxJs wrapped fs remove
 const remove = bindNodeCallback(fs.rm);
 
 // Libraries modules

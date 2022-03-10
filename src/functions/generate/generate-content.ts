@@ -1,16 +1,12 @@
 // Native modules
 import * as path from 'path';
-import * as fs from 'fs';
 import { typeCheck, stringTypes } from '@utilities/type-check';
 
 // Third party modules
-import { concat, Observable, BehaviorSubject, of, bindNodeCallback } from 'rxjs';
-import { share, scan, takeLast, skipWhile, mergeMap, map, filter, takeUntil } from 'rxjs/operators';
+import { concat, Observable, BehaviorSubject, of } from 'rxjs';
+import { share, scan, takeLast, skipWhile, mergeMap, map, filter } from 'rxjs/operators';
 import { writeFile, mkdir } from '@rxnode/fs';
 import { match, __ } from 'ts-pattern';
-
-// RxJs wrapped fs remove
-const remove = bindNodeCallback(fs.rm);
 
 // Library modules
 import { GenerateStructureOutline } from './generate-structure';
