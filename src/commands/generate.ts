@@ -4,13 +4,16 @@ import 'module-alias/register';
 // Native modules
 import { spawn } from 'child_process';
 import * as path from 'path';
+import * as fs from 'fs';
 
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { bindCallback, of, from, merge } from 'rxjs';
+import { bindCallback, of, from, merge, bindNodeCallback } from 'rxjs';
 import { tap, mergeMap, share, takeUntil, catchError, filter, takeLast, take } from 'rxjs/operators';
 import { match } from 'ts-pattern';
 const IsThere = require('is-there');
+
+const remove = bindNodeCallback(fs.rm);
 
 // Libraries modules
 import { typeCheck, stringTypes } from '@utilities/type-check';
@@ -190,7 +193,22 @@ export default class Generate extends Command {
         })
       );
 
-    const creationVerified$ = merge(fullProjectFolderNonExists$, forcedOutputFolderExists$)
+    // Delete the existing folder if it exists when the forced flag is found
+    const deleteFolderOnForce$ = forcedOutputFolderExists$
+      .pipe(
+        filter(() => {
+          // console.log("Generate ~ filter ~ isDryRun", isDryRun)
+          return !isDryRun;
+        }),
+        mergeMap(() => {
+          return remove(path.join(parentFolderPath), { recursive: true, force: true })
+            .pipe(takeLast(1), share());
+        }))
+      .pipe(takeLast(1));
+
+    deleteFolderOnForce$.subscribe(() => { });
+
+    const creationVerified$ = merge(fullProjectFolderNonExists$, deleteFolderOnForce$)
       .pipe(
         mergeMap(() => {
           return outputFolderExists$;

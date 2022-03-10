@@ -111,39 +111,16 @@ class GenerateContent implements GenerateStructure {
     content?.folders?.forEach((element: InnerContentProperties) => {
       const newFolderName = path.join(parentFolderPath, element.name),
         createFolder$ = mkdir(newFolderName)
-          .pipe(takeUntil(this.fullProjectFolderExists$), takeLast(1))
-          .pipe(share());
+          .pipe(takeLast(1), share());
 
-      const countStructureNonExistFolders$ = concat(parentFolder$, createFolder$)
-        .pipe(share());
-
-      const countStructureExistingFolder$ = this.fullProjectFolderExists$
-        .pipe(
-          mergeMap(() => {
-            return remove(newFolderName, { recursive: true, force: true })
-              .pipe(takeLast(1), share());
-          }),
-          mergeMap(() => {
-            return mkdir(newFolderName).pipe(takeLast(1), share());
-          }))
-        .pipe(takeLast(1));
-
-      countStructureExistingFolder$
-        .subscribe({
-          next: () => {
-            folderStructure.structureCreationCountSubject.next(1);
-          },
-          error: () => {
-            // Ignore the error, timing issues with the remove an write
-          }
-        });
+      const countStructureNonExistFolders$ = concat(parentFolder$, createFolder$);
 
       countStructureNonExistFolders$
         .subscribe({
           next: () => {
             folderStructure.structureCreationCountSubject.next(1);
           },
-          error: () => {
+          error: (_err) => {
             // Ignore the error
           }
         });
