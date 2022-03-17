@@ -124,25 +124,6 @@ describe('Actual project generation:', () => {
         });
       });
 
-    fancy
-      .it('will download NPM modules with "--force" flag to overwrite project', (_, done) => {
-        forceGenerationDone$.subscribe(() => {
-          const forceGenerateProjectFolder$ = from(generate.run([forcedGenerationPathProjectGenerate, '--npm-project-name', npmProjectName, '--force']) as Promise<any>).pipe(take(1), share());
-
-          forceGenerateProjectFolder$
-            .pipe(
-              mergeMap(res => {
-                return res.projectFolderWithContents$;
-              })
-            )
-            .subscribe({
-              next: () => {
-                done();
-              }
-            });
-        });
-      });
-
     mkdir(`${baseTempDownloadFolder}serve-empty-folder`).pipe(share())
       .subscribe(() => {
         process.chdir(`${baseTempDownloadFolder}serve-empty-folder`);
