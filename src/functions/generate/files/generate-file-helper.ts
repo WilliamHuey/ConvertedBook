@@ -19,6 +19,7 @@ let registerWebComponents = () => {
     static stylesPrefix: string = 'convertedbook';
 
     static styles = css`
+
       :host {
         display: flex;
         justify-content: end;
@@ -28,6 +29,11 @@ let registerWebComponents = () => {
         margin-bottom: 1rem;
         font-family: "JetBrains Mono",monospace;
         max-width: 100%;
+      }
+
+      #${unsafeCSS(ConvertedBookAppBar.stylesPrefix)}-interactions {
+        padding: 1rem 2rem;
+        border-radius: 0.25rem;
       }
 
       #${unsafeCSS(ConvertedBookAppBar.stylesPrefix)}-button {
@@ -91,6 +97,16 @@ let registerWebComponents = () => {
         font-size: 0.75rem;
       }
 
+      #${unsafeCSS(ConvertedBookAppBar.stylesPrefix)}-table-of-contents-container a {
+        display: inline-block;
+        margin-bottom: 0.25rem;
+        padding: 0.125rem;
+      }
+
+      #${unsafeCSS(ConvertedBookAppBar.stylesPrefix)}-table-of-contents-container nav > ul ul {
+        margin-left: 1rem;
+      }
+
       #${unsafeCSS(ConvertedBookAppBar.stylesPrefix)}-table-of-contents-container nav ul {
         padding-left: 0;
       }
@@ -98,7 +114,6 @@ let registerWebComponents = () => {
       a {
         background-color: white;
         border: 1px solid gray;
-        padding: 0.25rem;
         border-radius: 0.125rem;
       }
 
@@ -135,6 +150,16 @@ let registerWebComponents = () => {
       a.block:hover,
       a:visited.block:hover {
         background: #eee;
+      }
+
+      title {
+        background-color: red;
+      }
+
+      @media (max-width: 280px) {
+        #${unsafeCSS(ConvertedBookAppBar.stylesPrefix)}-interactions {
+          padding: 0;
+        }
       }
     `;
 
