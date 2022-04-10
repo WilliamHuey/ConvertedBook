@@ -4,7 +4,7 @@ import * as path from 'path';
 // Third party modules
 import { of, Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
-import { readFile } from '@rxnode/fs';
+import { readFile } from '@utilities/rxjs-fs';
 
 // Library modules
 import { typeCheck, stringTypes } from '@utilities/type-check';

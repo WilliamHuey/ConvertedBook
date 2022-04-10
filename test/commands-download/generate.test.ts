@@ -5,7 +5,7 @@ import { fancy } from 'fancy-test';
 import { filter, take, share, mergeMap } from 'rxjs/operators';
 const del = require('del');
 const isOnline = require('is-online');
-import { mkdir } from '@rxnode/fs';
+import { mkdir } from '../../src/utilities/rxjs-fs';
 
 // Library modules
 import generate from '../../src/commands/generate';

@@ -1,9 +1,8 @@
 // Third party module
-import 'module-alias/register';
 import { expect, test } from '@oclif/test';
 import { unnest } from 'ramda';
 import { share } from 'rxjs/operators';
-import { mkdir } from '@rxnode/fs';
+import { mkdir } from '../../src/utilities/rxjs-fs';
 
 // Library modules
 import { retryTest, dryFlag, baseTempFolder } from './test-utilities';

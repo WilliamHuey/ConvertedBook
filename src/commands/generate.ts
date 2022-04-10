@@ -19,7 +19,7 @@ const remove = bindNodeCallback(fs.rm);
 // Libraries modules
 import { typeCheck, stringTypes } from '@utilities/type-check';
 import { GenerateContent } from '../functions/generate/generate-content';
-import { mkdir } from '@rxnode/fs';
+import { mkdir } from '@utilities/rxjs-fs';
 import { truncateFilePath, supposedFileName } from '../functions/build/build-utilities';
 
 type FileFolderPathError = string

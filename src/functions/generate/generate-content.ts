@@ -5,7 +5,7 @@ import { typeCheck, stringTypes } from '@utilities/type-check';
 // Third party modules
 import { concat, Observable, BehaviorSubject, of } from 'rxjs';
 import { share, scan, takeLast, skipWhile, mergeMap, map, filter } from 'rxjs/operators';
-import { writeFile, mkdir } from '@rxnode/fs';
+import { mkdir, writeFile } from '@utilities/rxjs-fs';
 import { match, __ } from 'ts-pattern';
 
 // Library modules
@@ -144,10 +144,10 @@ class GenerateContent implements GenerateStructure {
             return typeCheck(fileContent, stringTypes.String);
           }),
           map(fileContent => {
-            return fileContent;
+            return (fileContent as string);
           }),
-          mergeMap(fileContent => {
-            return writeFile(newFileName, fileContent).pipe(share());
+          mergeMap((fileContent) => {
+            return writeFile(newFileName, fileContent);
           }));
 
       concat(parentFolder$, createFile$)
