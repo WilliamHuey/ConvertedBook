@@ -105,11 +105,18 @@ class GenerateContent implements GenerateStructure {
 
     // Generate the folders
     content?.folders?.forEach((element: InnerContentProperties) => {
-      const newFolderName = path.join(parentFolderPath, element.name),
-        createFolder$ = mkdir(newFolderName)
-          .pipe(takeLast(1), share());
+      const newFolderName = path.join(parentFolderPath, element.name);
+      const createFolder$ = mkdir(newFolderName)
+        .pipe(takeLast(1), share());
 
       const countStructureNonExistFolders$ = concat(parentFolder$, createFolder$);
+
+      createFolder$
+        .subscribe({
+          error: (e) => {
+            console.log("Error", e)
+          }
+        });
 
       countStructureNonExistFolders$
         .subscribe({
@@ -140,11 +147,8 @@ class GenerateContent implements GenerateStructure {
 
       const createFile$ = fileContent$
         .pipe(
-          filter(fileContent => {
-            return typeCheck(fileContent, stringTypes.String);
-          }),
           map(fileContent => {
-            return (fileContent as string);
+            return fileContent;
           }),
           mergeMap((fileContent) => {
             return writeFile(newFileName, fileContent);

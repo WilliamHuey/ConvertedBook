@@ -48,7 +48,7 @@ const fileContent: FileContentType = {
 };
 
 // Data could vary and pattern is not predictable
-export function fileContentObservable(key: string, data: Record<string, any>): Observable<string | {}> {
+export function fileContentObservable(key: string, data: Record<string, any>): Observable<string | NodeJS.ArrayBufferView> {
   const asFn = fileContent[key] as FileContentFnValueType,
     asStr = fileContent[key] as FileContentNameValueType;
 
@@ -57,7 +57,7 @@ export function fileContentObservable(key: string, data: Record<string, any>): O
     return of('');
 
   if (typeCheck(fileContent[key], stringTypes.Undefined))
-    return of({});
+    return of('');
 
   if (typeCheck(asFn.content, stringTypes.Function))
     return of(asFn.content(data));
@@ -66,5 +66,5 @@ export function fileContentObservable(key: string, data: Record<string, any>): O
     return readFile(path.join(__dirname, `/files/${asStr.name}`), 'utf8')
       .pipe(share());
 
-  return of({});
+  return of('');
 }
