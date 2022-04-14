@@ -114,7 +114,7 @@ class GenerateContent implements GenerateStructure {
       createFolder$
         .subscribe({
           error: (e) => {
-            console.log("Error", e)
+            console.log("Error", e);
           }
         });
 
@@ -122,20 +122,21 @@ class GenerateContent implements GenerateStructure {
         .subscribe({
           next: () => {
             folderStructure.structureCreationCountSubject.next(1);
+            if (element.content)
+              this.createStructureObservable({
+                parentFolder$: createFolder$,
+                parentFolderPath: newFolderName,
+                content: element.content,
+                structureCreationCountSubject:
+                  folderStructure.structureCreationCountSubject,
+              });
           },
           error: (_err) => {
             // Ignore the error
           }
         });
 
-      if (element.content)
-        this.createStructureObservable({
-          parentFolder$: createFolder$,
-          parentFolderPath: newFolderName,
-          content: element.content,
-          structureCreationCountSubject:
-            folderStructure.structureCreationCountSubject,
-        });
+
     });
 
     // Generate the files

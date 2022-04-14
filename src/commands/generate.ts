@@ -124,7 +124,8 @@ export default class Generate extends Command {
     } = truncateFilePath(folderName);
 
     const parentFolderNamePresent = parentFolderName.length > 0;
-    const normalizedParentFolderName = parentFolderNamePresent ? parentFolderName : normalizedFolder;
+    const normalizedParentFolderName = parentFolderNamePresent ?
+      parentFolderName : normalizedFolder;
     const actualProjectFolderName = supposedFileName(normalizedFolder)
       ?.join('');
 
@@ -202,14 +203,17 @@ export default class Generate extends Command {
           return !isDryRun;
         }),
         mergeMap(() => {
-          return remove(path.join(parentFolderPath), { recursive: true, force: true })
+          return remove(path.join(parentFolderPath), {
+            recursive: true, force: true
+          })
             .pipe(takeLast(1), share());
         }))
       .pipe(takeLast(1), share());
 
     deleteFolderOnForce$.subscribe(() => { });
 
-    const creationVerified$ = merge(fullProjectFolderNonExists$, deleteFolderOnForce$)
+    const creationVerified$ = merge(fullProjectFolderNonExists$,
+      deleteFolderOnForce$)
       .pipe(
         mergeMap(() => {
           return outputFolderExists$;
@@ -223,22 +227,27 @@ export default class Generate extends Command {
           return !isDryRun;
         }),
         mergeMap(() => {
+
+          const filePathJoin$ = mkdir(
+            filePathSplit.join('/')
+          ).pipe(share());
+
+          const fileNormalizedFolder$ = mkdir(
+            normalizedFolder
+          ).pipe(share());
+
           return parentFolderNamePresent ?
 
-            // Output folder exists one level above the specified project folder name
-            // then create the project folder as is
-            mkdir(
-              filePathSplit.join('/')
-            ).pipe(share()) : mkdir(
-              normalizedFolder
-            ).pipe(share());
+            // Output folder exists one level above the specified
+            // project folder name then create the project folder as is
+            filePathJoin$ : fileNormalizedFolder$;
         }),
         takeLast(1),
-        share(),
-        catchError(error => of(error))
+        share()
       );
 
-    const normalizedFolderPath = parentFolderNamePresent ? normalizedFolder : parentFolderPath;
+    const normalizedFolderPath = parentFolderNamePresent ?
+      normalizedFolder : parentFolderPath;
 
     // Read the project folder for generating the observable creating chain.
     // Normalize the path for project folder generation
@@ -252,21 +261,23 @@ export default class Generate extends Command {
     const projectFolderWithContents$ = projectFolder$
       .pipe(
         mergeMap(() => {
-          return folderStructure.generateStructure(fullProjectFolderExists$).structureCreationCount$;
+          return folderStructure
+            .generateStructure(fullProjectFolderExists$)
+            .structureCreationCount$;
         }),
         take(1),
         tap(this.logCreationBegin),
-        mergeMap(() => {
-          // Install the NPM modules
-          const npmService = spawn('npm', ['install'], {
-            cwd: normalizedFolderPath,
-          });
+        // mergeMap(() => {
+        //   // Install the NPM modules
+        //   const npmService = spawn('npm', ['install'], {
+        //     cwd: normalizedFolderPath,
+        //   });
 
-          const npmOnComplete$ = bindCallback(npmService.stdout.on),
-            npmClose$ = npmOnComplete$.call(npmService, 'close');
+        //   const npmOnComplete$ = bindCallback(npmService.stdout.on),
+        //     npmClose$ = npmOnComplete$.call(npmService, 'close');
 
-          return npmClose$;
-        })
+        //   return npmClose$;
+        // })
       )
       .pipe(share());
 
@@ -287,7 +298,8 @@ export default class Generate extends Command {
 
     // Dry run project generation
     // should still log out to console when force flag is present
-    const projectFolderDry$ = merge(creationVerified$, forcedOutputFolderExists$)
+    const projectFolderDry$ = merge(creationVerified$,
+      forcedOutputFolderExists$)
       .pipe(filter(() => {
         return isDryRun;
       }));
