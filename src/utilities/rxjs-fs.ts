@@ -17,7 +17,7 @@ function toPath(file: RxFsPath): string {
   return is(String, file) ? file : file.fullPath;
 }
 
-export function readFile(file: RxFsPath, data: string | Buffer, options: fs.WriteFileOptions | null = null): Observable<string> {
+export function readFile(file: RxFsPath, options: fs.WriteFileOptions | null = null): Observable<string> {
   const filePath = toPath(file);
   return new Observable(
     (observer: Subscriber<string>) => {

@@ -38,7 +38,7 @@ describe('Actual project generation:', () => {
 
   isOffLine$
     .subscribe(() => {
-      console.log('Warning: Tests will fail if NPM module can not be downloaded due to no internet connectivity');
+      console.log('Warning: Tests will fail if NPM modules can not be downloaded due to no internet connectivity');
     });
 
   // Online observable wrapped function

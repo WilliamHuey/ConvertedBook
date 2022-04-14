@@ -8,8 +8,8 @@ import * as fs from 'fs';
 
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { bindCallback, of, from, merge, bindNodeCallback } from 'rxjs';
-import { tap, mergeMap, share, takeUntil, catchError, filter, takeLast, take } from 'rxjs/operators';
+import { bindCallback, from, merge, bindNodeCallback, race } from 'rxjs';
+import { tap, mergeMap, share, takeUntil, filter, takeLast, take } from 'rxjs/operators';
 import { match } from 'ts-pattern';
 const IsThere = require('is-there');
 
@@ -199,21 +199,21 @@ export default class Generate extends Command {
     const deleteFolderOnForce$ = forcedOutputFolderExists$
       .pipe(
         filter(() => {
-          // console.log("Generate ~ filter ~ isDryRun", isDryRun)
           return !isDryRun;
         }),
         mergeMap(() => {
           return remove(path.join(parentFolderPath), {
             recursive: true, force: true
           })
-            .pipe(takeLast(1), share());
+            .pipe(share());
         }))
-      .pipe(takeLast(1), share());
+      .pipe(share());
 
     deleteFolderOnForce$.subscribe(() => { });
 
-    const creationVerified$ = merge(fullProjectFolderNonExists$,
-      deleteFolderOnForce$)
+    const creationVerified$ = race(
+      deleteFolderOnForce$,
+      fullProjectFolderNonExists$)
       .pipe(
         mergeMap(() => {
           return outputFolderExists$;
@@ -227,20 +227,15 @@ export default class Generate extends Command {
           return !isDryRun;
         }),
         mergeMap(() => {
-
-          const filePathJoin$ = mkdir(
-            filePathSplit.join('/')
-          ).pipe(share());
-
-          const fileNormalizedFolder$ = mkdir(
-            normalizedFolder
-          ).pipe(share());
-
           return parentFolderNamePresent ?
 
             // Output folder exists one level above the specified
             // project folder name then create the project folder as is
-            filePathJoin$ : fileNormalizedFolder$;
+            mkdir(
+              filePathSplit.join('/')
+            ).pipe(share()) : mkdir(
+              normalizedFolder
+            ).pipe(share());
         }),
         takeLast(1),
         share()
@@ -267,17 +262,17 @@ export default class Generate extends Command {
         }),
         take(1),
         tap(this.logCreationBegin),
-        // mergeMap(() => {
-        //   // Install the NPM modules
-        //   const npmService = spawn('npm', ['install'], {
-        //     cwd: normalizedFolderPath,
-        //   });
+        mergeMap(() => {
+          // Install the NPM modules
+          const npmService = spawn('npm', ['install'], {
+            cwd: normalizedFolderPath,
+          });
 
-        //   const npmOnComplete$ = bindCallback(npmService.stdout.on),
-        //     npmClose$ = npmOnComplete$.call(npmService, 'close');
+          const npmOnComplete$ = bindCallback(npmService.stdout.on),
+            npmClose$ = npmOnComplete$.call(npmService, 'close');
 
-        //   return npmClose$;
-        // })
+          return npmClose$;
+        })
       )
       .pipe(share());
 
