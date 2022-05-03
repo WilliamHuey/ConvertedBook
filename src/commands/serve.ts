@@ -48,8 +48,11 @@ export default class Serve extends Command {
     hasServerFile$
       .subscribe({
         next: () => {
+
+          // Force the pandoc generation mode by passing the option
+          // explicitly
           const server = spawn('node', [Serve.serverFilenamePath,
-          JSON.stringify(flags)]);
+            '--pandoc=true', JSON.stringify(flags)]);
 
           server.stdout.on('data', (data: any) => {
             console.error(`Info: ${data}`);
