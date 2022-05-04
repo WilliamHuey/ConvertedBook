@@ -12,7 +12,7 @@ import { BuildGenerate } from './build-generate';
 
 // Directory for pandoc process
 const baseDir = process.cwd(),
-  baseContentDir = `${baseDir}/content`;
+  baseContentDir = `${baseDir}/src/config/templates`;
 
 export function pandocGenerated({ input,
   normalizedFormats,
@@ -78,7 +78,7 @@ export function pandocGenerateFormat(input: string,
   const pandocAdditionalOptions = flags.pandoc || fromServerCli ?
     JSON.parse(flags.pandoc).pandoc : null;
   const basePandocOptions = [input, '-o', `${normalizedOutputPath}.${format}`, '-s', '--toc'];
-  const pandocDefaultOptions = fromServerCli ? [`--data-dir=${baseContentDir}/config`, '--template=default.html5', ...basePandocOptions] : basePandocOptions;
+  const pandocDefaultOptions = fromServerCli ? [`--data-dir=${baseContentDir}`, '--template=default.html5', ...basePandocOptions] : basePandocOptions;
 
   // Add in more options for Pandoc when specified
   const allPandocOptions = pandocAdditionalOptions ?
