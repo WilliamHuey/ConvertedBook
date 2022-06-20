@@ -35,7 +35,6 @@ export default class Serve extends Command {
 
     // Basic check for 'server.js' file as a measure
     // of a folder being a 'convertedbook' project.
-
     const hasServerFile$ = checkServerFilepath$
       .pipe(
         filter(hasServerFile => {

@@ -85,7 +85,7 @@ _See code: [src/commands/generate.ts](https://github.com/WilliamHuey/ConvertedBo
 
 ## `convertedbook help [COMMAND]`
 
-display help for convertedbook
+Display help for convertedbook
 
 ```
 USAGE
