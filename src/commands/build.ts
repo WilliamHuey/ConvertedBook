@@ -4,7 +4,7 @@ import 'module-alias/register';
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { unnest, difference, without } from 'ramda';
-import { ReplaySubject, zip, merge, from } from 'rxjs';
+import { ReplaySubject, zip, merge, from, race } from 'rxjs';
 import { filter, mergeMap, take, takeLast, mapTo } from 'rxjs/operators';
 const IsThere = require('is-there');
 const listify = require('listify');
@@ -97,6 +97,8 @@ export default class Build extends Command {
     const checkServerFilepath$ = from(IsThere
       .promises.file('server.js') as Promise<boolean>);
 
+    // Synonymous with server reload since reloads from
+    // latex files trigger this path
     const hasServerFile$ = checkServerFilepath$
       .pipe(
         filter(hasServerFile => {
@@ -112,7 +114,12 @@ export default class Build extends Command {
         })
       );
 
-    buildFilesFromCli$
+    // Server reloads and cli conversion take the
+    // usual build branch conditions
+    race(
+      hasServerFile$,
+      buildFilesFromCli$
+    )
       .subscribe(() => {
         const {
           showDepsUnsatisfied$,
