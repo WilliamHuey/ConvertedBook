@@ -114,13 +114,18 @@ export default class Build extends Command {
         })
       );
 
+    console.log('..,.afasfs')
+
     // Server reloads and cli conversion take the
     // usual build branch conditions
     race(
-      hasServerFile$,
-      buildFilesFromCli$
+      buildFilesFromCli$,
+      hasServerFile$
     )
       .subscribe(() => {
+
+        console.log('.............');
+
         const {
           showDepsUnsatisfied$,
           allDepsSatisfied$

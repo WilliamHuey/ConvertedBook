@@ -85,6 +85,8 @@ export function buildGenerate(
       exactPdf: true
     });
 
+    console.log('|||||||||||| build gen')
+
     // Pass in additional argument to distinguish the branch type generation
     playwrightGenerated({
       input,
