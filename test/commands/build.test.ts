@@ -13,7 +13,8 @@ import * as path from 'path';
 
 // Library modules
 import build from '../../src/commands/build';
-import { createServer } from '../../src/functions/build/build-server';
+// import { createServer } from '../../src/functions/build/build-server';
+import serve from '../../src/commands/serve';
 import {
   supposedFileName,
   getFileNameFromParts,
@@ -182,37 +183,16 @@ describe('Build', () => {
   // Server - Content-type check
 
   fancy
-    .it('static server serves found html content', (_, done) => {
-      const server = createServer({
-        fileName: path.join(__dirname, '../fixtures/io/test.html')
-      });
-      request(server)
-        .get('/text.html')
-        .expect('Content-Type', 'text/html')
-        .expect(200)
-        .end(function (err: any, _res: any) {
-          if (err) {
-            console.log('Error in the serving of the static html file.');
-            return done(err);
-          }
-          return done();
-        });
-    });
-
-  fancy
-    .it('static server serves error on html content not found', (_, done) => {
-      const server = createServer({
-        fileName: path.join(__dirname, '../fixtures/io/missing.html')
-      });
-      request(server)
-        .get('/missing.html')
-        .expect(404)
-        .end(function (err: any, _res: any) {
-          if (err) {
-            console.log('Error in the serving of the static html file.');
-            return done(err);
-          }
-          return done();
+    .it('static server serves found html content', async (_, done) => {
+      const serveRun$ = await serve.run([]);
+      serveRun$
+        .subscribe((serveProcess: any) => {
+          serveProcess.stdout.on('data', async function (data: any) {
+            if (data.toString().includes('Command completed.')) {
+              done();
+              serveProcess.kill();
+            }
+          });
         });
     });
 

@@ -69,7 +69,6 @@ export function buildGenerate(
     // Use pandoc to create the html document because playwright
     // will depend on it for the exact pdf generation.
 
-
     // Manipulate the settings to only generate the html with pandoc
     pandocGenerated({
       input,
@@ -84,8 +83,6 @@ export function buildGenerate(
       docsGenerated$,
       exactPdf: true
     });
-
-    console.log('|||||||||||| build gen')
 
     // Pass in additional argument to distinguish the branch type generation
     playwrightGenerated({

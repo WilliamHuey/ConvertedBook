@@ -1,6 +1,5 @@
 // Native modules
 import * as path from 'path';
-import { typeCheck, stringTypes } from '@utilities/type-check';
 
 // Third party modules
 import { concat, Observable, BehaviorSubject, of } from 'rxjs';
@@ -135,8 +134,6 @@ class GenerateContent implements GenerateStructure {
             // Ignore the error
           }
         });
-
-
     });
 
     // Generate the files

@@ -5,11 +5,9 @@ import * as path from 'path';
 import { chromium } from 'playwright';
 import { take } from 'rxjs/operators';
 import { ReplaySubject } from 'rxjs';
-const scouter = require('port-scout');
 
 // Library modules
 import { BuildGenerate } from './build-generate';
-import { createServer } from './build-server';
 
 import serve from "../../commands/serve";
 
@@ -27,28 +25,12 @@ const createExactPdf = ({
   port, fileName, outPutFileName,
   docsGenerated$
 }: CreateExactPdf) => {
-  // const server = createServer({ fileName: `${fileName}.html` });
-
-  console.log('++++++++-------');
-
   (async () => {
     const serveRun$ = await serve.run([]);
-
-    console.log('fasdgafsaisdf');
-
-    // Pick a random port which is available
-    // const availablePort = await scouter.web();
-    // server.listen(availablePort, () => { });
-
     serveRun$
       .subscribe((serveProcess: any) => {
-        console.log('serveProcess', serveProcess);
-
         serveProcess.stdout.on('data', async function (data: any) {
-          console.log('data', data)
           if (data.toString().includes('Command completed.')) {
-            console.log('done')
-
             const browser = await chromium.launch();
             const page = await browser.newPage();
             await page.goto(`localhost:${8080}`);
@@ -57,6 +39,7 @@ const createExactPdf = ({
               printBackground: true,
               path: `${outPutFileName}.pdf`
             });
+
             console.log('Generated exact pdf');
             docsGenerated$.next('Generated exact pdf document');
 
@@ -69,8 +52,6 @@ const createExactPdf = ({
           }
         });
       });
-
-    // server.close();
   })();
 }
 
@@ -83,7 +64,6 @@ export function playwrightGenerated({
   buildDocuments$
     .pipe(take(1))
     .subscribe(() => {
-      console.log('++||||')
       createExactPdf({
         fileName: path.parse(flags.input).name,
         outPutFileName: normalizedOutputPath,
