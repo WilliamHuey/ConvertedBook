@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <link href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII=" rel="icon" type="image/x-icon" />
   $for(author-meta)$
     <meta name="author" content="$author-meta$" />
   $endfor$
@@ -17,9 +18,9 @@
     <meta name="description" content="$description-meta$" />
   $endif$
     <title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
-    <link rel="stylesheet" type="text/css" href="./build/styles/vendor.css">
+    <link rel="stylesheet" type="text/css" href="./src/styles/vendor.css">
     <link rel="stylesheet" type="text/css" href="./build/styles/project.css">
-    <script type="module" src="./javascript/helper.js"></script>
+    <script type="module" src="./src/helper.ts"></script>
   $for(header-includes)$
     $header-includes$
   $endfor$

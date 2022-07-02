@@ -1,23 +1,15 @@
-const snowpack = require('snowpack'),
-    path = require('path'),
-    { lookpath } = require('lookpath');
-
-const { loadConfiguration, startServer } = snowpack;
-const convertedbookCliName = 'convertedbook';
+const { createServer } = require('vite');
 
 (async () => {
-    const configPath = path.resolve(process.cwd(), 'snowpack.config.js');
-
-    const config = await loadConfiguration({
-        devOptions: {
-            hmr: true
+    const server = await createServer({
+        configFile: "./vite.config.js",
+        root: __dirname,
+        server: {
+            port: 8080
         }
-    }, configPath);
+    });
 
-    const convertedBookPath = await lookpath(convertedbookCliName);
-    if (convertedBookPath) {
-        startServer({ config });
-    } else {
-        console.log(`ERROR: "${convertedbookCliName}" is not found in the path! Server can not be started.`);
-    }
+    await server.listen();
+
+    server.printUrls();
 })();

@@ -33,3 +33,7 @@ build/Release
 
 # Generated content
 build/
+dist/
+
+# The index.tex outputs index.html
+index.html

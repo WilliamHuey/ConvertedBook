@@ -8,22 +8,19 @@ export class ProjectPackageJson {
       author: '',
       license: 'ISC',
       dependencies: {
-        "@emotion/css": "^11.7.1",
-        "@linaria/cli": "^3.0.0-beta.15",
-        "@linaria/shaker": "^3.0.0-beta.15",
-        "@snowpack/plugin-run-script": "^2.3.0",
+        "@emotion/css": "^11.9.0",
+        "@linaria/cli": "^3.0.0-beta.21",
+        "@linaria/shaker": "^3.0.0-beta.21",
         "dom-walk": "^0.1.2",
-        "latex.css": "^1.5.0",
-        "lit": "^2.1.1",
+        "latex.css": "^1.7.1",
+        "lit": "^2.2.6",
         "lookpath": "^1.2.2",
-        "postcss": "^8.4.5",
-        "postcss-cli": "^9.1.0",
-        "postcss-import": "^14.0.2",
-        "postcss-smart-asset": "^2.0.6",
-        "snowpack": "^3.8.8"
+        "vite": "^2.9.12"
       },
       scripts: {
-        start: 'snowpack dev',
+        "dev": "vite -d",
+        "build": "vite build",
+        "preview": "vite preview"
       },
     });
   }

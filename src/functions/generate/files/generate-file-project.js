@@ -1,8 +1,10 @@
 import { css } from '@linaria/core';
 import { default as globalStyles } from "./global.js";
 
-export const globals = css`
+const globals = css`
   :global() {
     ${globalStyles}
   }
 `;
+
+export default globals;
