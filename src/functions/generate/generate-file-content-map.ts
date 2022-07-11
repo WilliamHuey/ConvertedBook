@@ -40,11 +40,9 @@ const fileContent: FileContentType = {
       );
     }
   },
-  latexSnowpackPlugin: { name: 'generate-file-latex-plugin.js' },
   server: { name: 'generate-file-server.js' },
-  snowpack: { name: 'generate-file-snowpack.js' },
-  tsconfig: { name: 'generate-file-tsconfig.json' },
-  postcss: { name: 'generate-file-postcss-config.js' }
+  viteConfig: { name: 'generate-file-vite.config.js' },
+  tsConfig: { name: 'generate-file-tsconfig.json' }
 };
 
 // Data could vary and pattern is not predictable

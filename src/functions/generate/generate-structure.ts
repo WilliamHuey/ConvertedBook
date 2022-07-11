@@ -2,110 +2,23 @@ export class GenerateStructureOutline {
   constructor(projectName: string) {
     /*
       /project-name
-        .gitignore
-        /plugins
-          latex.js
-        /content
+        /src
           /config
             /templates
               default.html5
           /styles
-            project.js
             global.js
-            vendor.module.css
-          /javascript
-            helper.ts
+            project.js
+          helper.ts
           index.tex
-        index.html
+        .gitignore
         package.json
         server.js
-        snowpack.config.js
-        postcss.config.js
+        tsconfig.json
+        vite.config.js
     */
     Object.assign(this, {
-      folders: [
-        {
-          name: 'plugins',
-          content: {
-            files: [
-              {
-                name: 'latex.js',
-                fileContent: 'latexSnowpackPlugin'
-              }
-            ]
-          }
-        },
-        {
-          name: 'content',
-          content: {
-            folders: [
-              {
-                name: 'config',
-                content: {
-                  folders: [
-                    {
-                      name: 'templates',
-                      content: {
-                        files: [
-                          {
-                            name: 'default.html5',
-                            fileContent: 'texHtml5Template'
-                          }
-                        ],
-                      }
-                    }
-                  ]
-                },
-              },
-              {
-                name: 'javascript',
-                content: {
-                  files: [
-                    {
-                      name: 'helper.ts',
-                      fileContent: 'helperTs'
-                    }
-                  ]
-                }
-              },
-              {
-                name: 'styles',
-                content: {
-                  files: [
-                    {
-                      name: 'vendor.module.css',
-                      fileContent: 'configStylesIndex'
-                    },
-                    {
-                      name: 'project.js',
-                      fileContent: 'projectJs'
-                    },
-                    {
-                      name: 'global.js',
-                      fileContent: 'globalJs'
-                    }
-                  ]
-                }
-              }
-            ],
-            files: [
-              {
-                name: 'index.tex',
-                fileContent: 'indexTex',
-              },
-              {
-                name: 'index.html',
-                fileContent: 'indexHtml'
-              }
-            ],
-          },
-        }
-      ],
       files: [
-        {
-          name: '.gitignore',
-          fileContent: 'gitignore',
-        },
         {
           name: 'package.json',
           fileContent: 'packageJson',
@@ -116,18 +29,68 @@ export class GenerateStructureOutline {
           fileContent: 'server'
         },
         {
-          name: 'snowpack.config.js',
-          fileContent: 'snowpack'
+          name: 'vite.config.js',
+          fileContent: 'viteConfig'
         },
         {
           name: 'tsconfig.json',
-          fileContent: 'tsconfig'
-        },
-        {
-          name: 'postcss.config.js',
-          fileContent: 'postcss'
-        },
+          fileContent: 'tsConfig'
+        }
       ],
+      folders: [
+        {
+          name: 'src',
+          content: {
+            files: [
+              {
+                name: 'helper.ts',
+                fileContent: 'helperTs'
+              },
+              {
+                name: 'index.tex',
+                fileContent: 'indexTex'
+              }
+            ],
+            folders: [
+              {
+                name: 'config',
+                content: {
+                  folders: [
+                    {
+                      name: 'template',
+                      content: {
+                        files: [{
+                          name: 'default.html5',
+                          fileContent: 'texHtml5Template'
+                        }]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                name: 'styles',
+                content: {
+                  files: [
+                    {
+                      name: 'vendor.css',
+                      fileContent: 'configStylesIndex'
+                    },
+                    {
+                      name: 'global.js',
+                      fileContent: 'globalJs'
+                    },
+                    {
+                      name: 'project.js',
+                      fileContent: 'projectJs'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
     });
   }
 }
