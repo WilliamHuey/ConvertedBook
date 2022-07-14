@@ -2,6 +2,7 @@ export class GenerateStructureOutline {
   constructor(projectName: string) {
     /*
       /project-name
+        /build
         /src
           /config
             /templates
@@ -39,6 +40,9 @@ export class GenerateStructureOutline {
       ],
       folders: [
         {
+          name: 'build'
+        },
+        {
           name: 'src',
           content: {
             files: [
@@ -57,7 +61,7 @@ export class GenerateStructureOutline {
                 content: {
                   folders: [
                     {
-                      name: 'template',
+                      name: 'templates',
                       content: {
                         files: [{
                           name: 'default.html5',
