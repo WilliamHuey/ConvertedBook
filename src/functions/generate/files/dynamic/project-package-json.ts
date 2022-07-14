@@ -9,8 +9,8 @@ export class ProjectPackageJson {
       license: 'ISC',
       dependencies: {
         "@emotion/css": "^11.9.0",
-        "@linaria/cli": "^3.0.0-beta.21",
-        "@linaria/shaker": "^3.0.0-beta.21",
+        "@linaria/cli": "^4.0.0-beta.0",
+        "@linaria/shaker": "^4.0.0-beta.0",
         "dom-walk": "^0.1.2",
         "latex.css": "^1.7.1",
         "lit": "^2.2.6",
