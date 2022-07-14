@@ -15,7 +15,7 @@ export class ProjectPackageJson {
         "latex.css": "^1.7.1",
         "lit": "^2.2.6",
         "lookpath": "^1.2.2",
-        "vite": "^2.9.12"
+        "vite": "^3.0.0"
       },
       scripts: {
         "dev": "vite -d",
