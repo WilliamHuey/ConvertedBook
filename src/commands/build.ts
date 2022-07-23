@@ -89,6 +89,9 @@ export default class Build extends Command {
     // after running the build command
     const docsGenerated$ = new ReplaySubject(undefined);
 
+    // Log the checked results
+    const asyncResultsLog$ = new ReplaySubject(undefined);
+
     // Build for a 'convertedbook' project.
 
     // Assume that the presence of the 'server.js'
@@ -160,6 +163,8 @@ export default class Build extends Command {
         const buildCliAsyncCheck$ = buildCliResults$
           .pipe(
             filter((result: BuildCheckResults) => {
+
+
               return result.continue;
             })
           );
@@ -173,18 +178,32 @@ export default class Build extends Command {
             })
           );
 
+        asyncResultsLog$.next(buildCliAsyncResults$);
+
         // Valid input and output means file conversion can happen
         const buildCliContinueGeneration$ = zip(
           buildCliAsyncCheck$,
           buildCliAsyncResults$
             .pipe(
               filter(buildAsyncResults => {
+                // console.log('buildAsyncResults', buildAsyncResults);
                 return buildAsyncResults.continue;
               })
             )
         );
 
-        const dryRunBuild$ = buildCliContinueGeneration$
+        // Dry run should still allow continuation even when facing
+        // a continue value of false
+        const dryRunBuild$ = zip(
+          buildCliAsyncCheck$,
+          buildCliAsyncResults$
+            .pipe(
+              filter(buildAsyncResults => {
+                // console.log('buildAsyncResults', buildAsyncResults);
+                return !buildAsyncResults.continue;
+              })
+            )
+        )
           .pipe(
             filter(([buildCli, _]) => {
               return (buildCli as BuildCheckGoodResults)
@@ -220,6 +239,11 @@ export default class Build extends Command {
             this.buildGenerate(buildCli as BuildCheckGoodResults, buildAsyncResults, docsGenerated$);
           }
         };
+
+        // dryRunBuild$
+        //   .subscribe((drb) => {
+        //     console.log("Build ~ .subscribe ~ drb", drb)
+        //   });
 
         const buildRunScenarios$ = merge(
           dryRunBuild$,
@@ -299,8 +323,8 @@ export default class Build extends Command {
       });
 
     return {
-      docsGenerated$
-      //dryRunBuild$
+      docsGenerated$,
+      asyncResultsLog$
     };
   }
 }

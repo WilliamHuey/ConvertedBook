@@ -9,7 +9,7 @@ import { test } from '@oclif/test';
 // readings
 const retryTest = function () {
   return test
-    .retries(100);
+    .retries(500);
 };
 
 // Remove generated testing files
