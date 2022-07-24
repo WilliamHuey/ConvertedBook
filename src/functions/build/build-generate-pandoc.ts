@@ -50,10 +50,10 @@ export function pandocGenerated({ input,
   groupFormatsGenerated$
     .subscribe(() => {
       buildDocuments$.next('Pandoc generated');
-      if (!exactPdf) {
-        docsGenerated$.next('');
-        docsGenerated$.complete();
-      }
+
+      // TODO: Update this when generating pdf from project folder
+      docsGenerated$.next('');
+      docsGenerated$.complete();
     });
 
   return {

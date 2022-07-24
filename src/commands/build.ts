@@ -86,7 +86,6 @@ export default class Build extends Command {
 
   async run() {
     const { raw } = this.parse(Build);
-    console.log("Build", raw[raw.length - 1])
 
     // Get extra information to know if this build command is
     // being initiated from the cli for building a file or from
@@ -193,7 +192,6 @@ export default class Build extends Command {
           buildCliAsyncResults$
             .pipe(
               filter(buildAsyncResults => {
-                // console.log('buildAsyncResults', buildAsyncResults);
                 return buildAsyncResults.continue;
               })
             )
@@ -206,7 +204,6 @@ export default class Build extends Command {
           buildCliAsyncResults$
             .pipe(
               filter(buildAsyncResults => {
-                // console.log('buildAsyncResults', buildAsyncResults);
                 return !buildAsyncResults.continue;
               })
             )
@@ -240,25 +237,12 @@ export default class Build extends Command {
           },
           default: ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
 
-            this.log('||||||||default')
-
             // Default build with file generation
             this.log(buildCli.msg.trim());
             this.log(buildAsyncResults.msg.trim());
             this.buildGenerate(buildCli as BuildCheckGoodResults, buildAsyncResults, docsGenerated$, additionalInputArgs);
           }
         };
-
-        this.log('docsGenerated$', docsGenerated$)
-
-        // docsGenerated$
-        //   .subscribe({
-        //     // error: (v) => { },
-        //     next: (v) => console.log(`observerA: ${v}`),
-
-        //     complete: () => console.log(`complete: `)
-        //     // complete: (v) => console.log(`complete: ${v}`)
-        //   });
 
         const buildRunScenarios$ = merge(
           dryRunBuild$,

@@ -35,669 +35,596 @@ describe('Build', () => {
     del([`${baseTempFolder}no-downloads/*`, `!${baseTempFolder}no-downloads/.gitkeep`]);
   });
 
-  // fancy
-  //   .it('dry run with valid input and invalid output flag', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       '--input',
-  //       validInputFlag,
-  //       '--output',
-  //       invalidOutputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
+  fancy
+    .it('dry run with valid input and invalid output flag', (_, done) => {
+      const buildFile$ = from(build.run([
+        '--input',
+        validInputFlag,
+        '--output',
+        invalidOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
 
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Build failed: Invalid output folder/file');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('dry run with invalid input and valid output flag', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       '--input',
-  //       invalidInputFlag,
-  //       '--output',
-  //       validOutputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Build failed: Invalid input file');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('dry run with invalid input and invalid output flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       '--input',
-  //       invalidInputFlag,
-  //       '--output',
-  //       invalidOutputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Build failed: Invalid input file and invalid output folder/file');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('dry run with valid input and output flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'html',
-  //       'pdf',
-  //       '--input',
-  //       validInputFlag,
-  //       '--output',
-  //       validOutputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Creating output file');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('dry run with pdf format and valid flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'pdf',
-  //       '--input',
-  //       validInputFlag,
-  //       '--output',
-  //       validOutputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Creating output file');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('dry run with epub format and valid flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'epub',
-  //       '--input',
-  //       validInputFlag,
-  //       '--output',
-  //       validOutputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Creating output file');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('dry run with epub and html format and valid flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'epub',
-  //       'html',
-  //       '--input',
-  //       validInputFlag,
-  //       '--output',
-  //       validOutputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Creating output file');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('dry run with html, pdf, and epub format with valid flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'html',
-  //       'pdf',
-  //       'epub',
-  //       '--input',
-  //       validInputFlag,
-  //       '--output',
-  //       validOutputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Creating output file');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('dry run with html, pdf, and epub format with valid flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'sdaf',
-  //       '--input',
-  //       validInputFlag,
-  //       '--output',
-  //       validOutputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Did not build as there are no valid formats');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('dry run with multiple invalid formats and valid flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'sdaf',
-  //       'mf',
-  //       '--input',
-  //       validInputFlag,
-  //       '--output',
-  //       validOutputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Did not build as there are no valid formats');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('dry run with valid and invalid formats with valid flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'sdaf',
-  //       'pdf',
-  //       '--input',
-  //       validInputFlag,
-  //       '--output',
-  //       validOutputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-
-  //               // Still create the valid document format
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Creating output file');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('dry run with no formats specified, defaults to all formats and with valid flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       '--input',
-  //       validInputFlag,
-  //       '--output',
-  //       validOutputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-
-  //               // Still create the valid document format
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Creating output file');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('dry run with no formats and empty args flag and valid input', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       "--args=''",
-  //       '--input',
-  //       validInputFlag,
-  //       dryFlagStr
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Build failed: Missing a required "--input" or "--output"');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('with no formats and no flags', (_, done) => {
-  //     const buildFile$ = from(build.run([]) as Promise<any>)
-  //       .pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Build failed: No arguments and no flags available');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('with only invalid formats and no flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'nsdfa',
-  //       'ce'
-  //     ]) as Promise<any>)
-  //       .pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Build failed: Arguments provided but no flags present');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('with pdf format and no flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'pdf',
-  //     ]) as Promise<any>)
-  //       .pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Build failed: Arguments provided but no flags present');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('with all invalid formats and no flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'sdaf',
-  //       'mf'
-  //     ]) as Promise<any>)
-  //       .pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Build failed: Arguments provided but no flags present');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('with no formats and empty args flag', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       "--args=''"
-  //     ]) as Promise<any>)
-  //       .pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .pipe(
-  //               mergeMap((res: any) => {
-  //                 return res;
-  //               })
-  //             )
-  //             .subscribe((asyncResultsLog: any) => {
-  //               expect(asyncResultsLog.msg)
-  //                 .to.contain('Build failed: No required flags found (--input, --output)');
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('file name checks with "supposed file name"', () => {
-  //     const results = supposedFileName('/a/path/stuff.js');
-  //     expect(results).to.be.an('array').that.includes('stuff');
-  //     expect(results).to.be.an('array').that.includes('js');
-  //   });
-
-  // fancy
-  //   .it('file name checks with "get file name from parts"', () => {
-  //     const results = supposedFileName('/a/path/stuff.js');
-  //     const firstItem = getFileNameFromParts(results);
-  //     expect(firstItem).to.contain('stuff');
-  //   });
-
-  // fancy
-  //   .it('file name checks with "truncate file path"', () => {
-  //     const results = truncateFilePath('/a/path/stuff.js');
-  //     expect(results.filePathSplit).to.be.an('array').that.includes('stuff.js');
-  //     expect(results.filePathFolder).to.contain('/a/path');
-  //   });
-
-  // // Server - Content-type check
-  // fancy
-  //   .it('static server serves found html content', async (_, done) => {
-  //     const serveRun$ = await serve.run([]);
-  //     serveRun$
-  //       .subscribe((serveProcess: any) => {
-  //         if (serveProcess.includes('Did not find the server.js" file, might not be a "convertedbook" project!')) {
-  //           done();
-  //         }
-  //       });
-  //   });
-
-  // // Command inputs build
-
-  // fancy
-  //   .it('runs build pdf command with minimum flags', (_, done) => {
-
-  //     const buildFile$ = from(build.run([
-  //       'pdf',
-  //       '--input',
-  //       path.join(__dirname, '../fixtures/io/input.latex'),
-  //       '--output',
-  //       path.join(__dirname, '../temp/no-downloads/min-pdf-output.pdf')
-  //     ]) as Promise<any>)
-  //       .pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .subscribe((_asyncResultsLog: any) => {
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('runs build pdf, html and epub command with minimum flags', (_, done) => {
-
-  //     const buildFile$ = from(build.run([
-  //       'pdf',
-  //       'html',
-  //       'epub',
-  //       '--input',
-  //       path.join(__dirname, '../fixtures/io/input.latex'),
-  //       '--output',
-  //       path.join(__dirname, '../temp/no-downloads/build-pdf-html-epub-output.pdf')
-  //     ]) as Promise<any>)
-  //       .pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .subscribe((_asyncResultsLog: any) => {
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('runs build pdf and html command with minimum flags', (_, done) => {
-
-  //     const buildFile$ = from(build.run([
-  //       'pdf',
-  //       'html',
-  //       '--input',
-  //       path.join(__dirname, '../fixtures/io/input.latex'),
-  //       '--output',
-  //       path.join(__dirname, '../temp/no-downloads/pdf-html-min-output.pdf'),
-  //     ]) as Promise<any>)
-  //       .pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .subscribe((_asyncResultsLog: any) => {
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('runs build pdf command with exact flag', (_, done) => {
-
-  //     const buildFile$ = from(build.run([
-  //       'pdf',
-  //       '--input',
-  //       path.join(__dirname, '../fixtures/io/input.latex'),
-  //       '--output',
-  //       path.join(__dirname, '../temp/no-downloads/pdf-exact-output.pdf'),
-  //       '--exact'
-  //     ]) as Promise<any>)
-  //       .pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .subscribe((_asyncResultsLog: any) => {
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('runs build pdf command with exact flag', (_, done) => {
-
-  //     const buildFile$ = from(build.run([
-  //       'pdf',
-  //       '--input',
-  //       path.join(__dirname, '../fixtures/io/input.latex'),
-  //       '--output',
-  //       path.join(__dirname, '../temp/no-downloads/pdf-exact-output.pdf'),
-  //       '--exact'
-  //     ]) as Promise<any>)
-  //       .pipe(take(1), share());
-
-  //     buildFile$
-  //       .subscribe({
-  //         next: ({ asyncResultsLog$ }) => {
-  //           asyncResultsLog$
-  //             .subscribe((_asyncResultsLog: any) => {
-  //               done();
-  //             });
-  //         }
-  //       });
-  //   });
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: Invalid output folder/file');
+                done();
+              });
+          }
+        });
+    });
 
   fancy
-    .it('runs build pdf command with exact and force flags', (_, done) => {
+    .it('dry run with invalid input and valid output flag', (_, done) => {
+      const buildFile$ = from(build.run([
+        '--input',
+        invalidInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: Invalid input file');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with invalid input and invalid output flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        '--input',
+        invalidInputFlag,
+        '--output',
+        invalidOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: Invalid input file and invalid output folder/file');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with valid input and output flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'html',
+        'pdf',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with pdf format and valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'pdf',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with epub format and valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'epub',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with epub and html format and valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'epub',
+        'html',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with html, pdf, and epub format with valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'html',
+        'pdf',
+        'epub',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with html, pdf, and epub format with valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'sdaf',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Did not build as there are no valid formats');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with multiple invalid formats and valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'sdaf',
+        'mf',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Did not build as there are no valid formats');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with valid and invalid formats with valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'sdaf',
+        'pdf',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+
+                // Still create the valid document format
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with no formats specified, defaults to all formats and with valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+
+                // Still create the valid document format
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with no formats and empty args flag and valid input', (_, done) => {
+      const buildFile$ = from(build.run([
+        "--args=''",
+        '--input',
+        validInputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: Missing a required "--input" or "--output"');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('with no formats and no flags', (_, done) => {
+      const buildFile$ = from(build.run([]) as Promise<any>)
+        .pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: No arguments and no flags available');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('with only invalid formats and no flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'nsdfa',
+        'ce'
+      ]) as Promise<any>)
+        .pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: Arguments provided but no flags present');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('with pdf format and no flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'pdf',
+      ]) as Promise<any>)
+        .pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: Arguments provided but no flags present');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('with all invalid formats and no flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'sdaf',
+        'mf'
+      ]) as Promise<any>)
+        .pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: Arguments provided but no flags present');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('with no formats and empty args flag', (_, done) => {
+      const buildFile$ = from(build.run([
+        "--args=''"
+      ]) as Promise<any>)
+        .pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: No required flags found (--input, --output)');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('file name checks with "supposed file name"', () => {
+      const results = supposedFileName('/a/path/stuff.js');
+      expect(results).to.be.an('array').that.includes('stuff');
+      expect(results).to.be.an('array').that.includes('js');
+    });
+
+  fancy
+    .it('file name checks with "get file name from parts"', () => {
+      const results = supposedFileName('/a/path/stuff.js');
+      const firstItem = getFileNameFromParts(results);
+      expect(firstItem).to.contain('stuff');
+    });
+
+  fancy
+    .it('file name checks with "truncate file path"', () => {
+      const results = truncateFilePath('/a/path/stuff.js');
+      expect(results.filePathSplit).to.be.an('array').that.includes('stuff.js');
+      expect(results.filePathFolder).to.contain('/a/path');
+    });
+
+  // Server - Content-type check
+  fancy
+    .it('static server serves found html content', async (_, done) => {
+      const serveRun$ = await serve.run([]);
+      serveRun$
+        .subscribe((serveProcess: any) => {
+          if (serveProcess.includes('Did not find the server.js" file, might not be a "convertedbook" project!')) {
+            done();
+          }
+        });
+    });
+
+  // Command inputs build
+  fancy
+    .it('runs build pdf and html command with minimum flags', (_, done) => {
+
+      const buildFile$ = from(build.run([
+        'pdf',
+        'html',
+        '--input',
+        path.join(__dirname, '../fixtures/io/input.latex'),
+        '--output',
+        path.join(__dirname, '../temp/no-downloads/pdf-html-min-output.pdf'),
+      ]) as Promise<any>)
+        .pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ docsGenerated$ }) => {
+            docsGenerated$
+              .subscribe(() => {
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('runs build pdf command with exact flag. Will ignore the exact flag.', (_, done) => {
+
+      const buildFile$ = from(build.run([
+        'pdf',
+        '--input',
+        path.join(__dirname, '../fixtures/io/input.latex'),
+        '--output',
+        path.join(__dirname, '../temp/no-downloads/pdf-exact-output.pdf'),
+        '--exact'
+      ]) as Promise<any>)
+        .pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ docsGenerated$ }) => {
+            docsGenerated$
+              .subscribe(() => {
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('runs build pdf command with force flags', (_, done) => {
 
       const buildFile$ = from(build.run([
         'pdf',
@@ -705,142 +632,18 @@ describe('Build', () => {
         path.join(__dirname, '../fixtures/io/input.latex'),
         '--output',
         path.join(__dirname, '../temp/no-downloads/exact-force-output.pdf'),
-        '--exact'
       ]) as Promise<any>)
         .pipe(take(1), share());
 
-      // console.log(".it ~ buildFile$", buildFile$)
-
-
       buildFile$
-        // .pipe(
-        //   mergeMap((res) => {
-        //     console.log("mergeMap ~ res", res)
-        //     return res.docsGenerated$;
-        //     //return { docsGenerated$, asyncResultsLog$ };
-        //   })
-        // )
         .subscribe(
           (res: any) => {
-            const { docsGenerated$, asyncResultsLog$ } = res;
-
-            console.log('docsGenerated$', docsGenerated$);
-
+            const { docsGenerated$ } = res;
             docsGenerated$
               .subscribe(() => {
-                console.log('----|||||||||||');
-
                 done();
-
               });
-            // done();
-
-            // asyncResultsLog$
-            //   .subscribe((asyncResultsLog: any) => {
-            //     console.log(".subscribe ~ asyncResultsLog", asyncResultsLog)
-            //     done();
-            //   });
           }
         );
     });
-
-
-
-  // fancy
-  //   .it('runs build pdf command with exact and force flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'pdf',
-  //       '--input',
-  //       path.join(__dirname, '../fixtures/io/input.latex'),
-  //       '--output',
-  //       path.join(__dirname, '../temp/no-downloads/exact-force-output.pdf'),
-  //       '--exact',
-  //       '--force'
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  // .pipe(
-  //   mergeMap(res => {
-  //     return res.docsGenerated$;
-  //   })
-  // )
-  //       .subscribe({
-  //         next: () => {
-  //           done();
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('runs build pdf command with force flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'pdf',
-  //       '--input',
-  //       path.join(__dirname, '../fixtures/io/input.latex'),
-  //       '--output',
-  //       path.join(__dirname, '../temp/no-downloads/exact-force-output.pdf'),
-  //       '--force'
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .pipe(
-  //         mergeMap(res => {
-  //           return res.docsGenerated$;
-  //         })
-  //       )
-  //       .subscribe({
-  //         next: () => {
-  //           done();
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('runs build pdf command with dry-run flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'pdf',
-  //       '--input',
-  //       path.join(__dirname, '../fixtures/io/input.latex'),
-  //       '--output',
-  //       path.join(__dirname, '../temp/no-downloads/exact-force-output.pdf'),
-  //       `--dry-run`,
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .pipe(
-  //         mergeMap(res => {
-  //           return res.docsGenerated$;
-  //         })
-  //       )
-  //       .subscribe({
-  //         next: () => {
-  //           done();
-  //         }
-  //       });
-  //   });
-
-  // fancy
-  //   .it('runs build pdf command with exact and dry-run flags', (_, done) => {
-  //     const buildFile$ = from(build.run([
-  //       'pdf',
-  //       '--input',
-  //       path.join(__dirname, '../fixtures/io/input.latex'),
-  //       '--output',
-  //       path.join(__dirname, '../temp/no-downloads/exact-force-output.pdf'),
-  //       '--exact',
-  //       `--dry-run`,
-  //     ]) as Promise<any>).pipe(take(1), share());
-
-  //     buildFile$
-  //       .pipe(
-  //         mergeMap(res => {
-  //           return res.docsGenerated$;
-  //         })
-  //       )
-  //       .subscribe({
-  //         next: () => {
-  //           done();
-  //         }
-  //       });
-  //   });
 });

@@ -19,8 +19,8 @@ interface CreateExactPdf {
   additionalInputArgs: Record<any, any>;
 }
 
-// TODO: Read the server port from snowpack dynamically
-const snowpackDevServerPort = 8080;
+// TODO: Read the server port from vite dynamically
+const viteDevServerPort = 8080;
 
 // Assumed the exact generation is from a cli or programmatic 
 // pdf generation event that is outside of the project generation.
@@ -33,7 +33,6 @@ const createExactPdf = ({
     const serveRun$ = await serve.run(['--pandoc', 'true']);
     serveRun$
       .subscribe((serveProcess: any) => {
-        console.log(".subscribe ~ serveProcess", serveProcess, additionalInputArgs)
 
         serveProcess.stdout.on('data', async function (data: any) {
           if (data.toString().includes('Command completed.')) {

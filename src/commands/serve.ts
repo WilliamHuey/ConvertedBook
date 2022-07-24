@@ -61,9 +61,6 @@ export default class Serve extends Command {
           server.stderr.on('data', (data: any) => {
             console.error(`Error: ${data}`);
           });
-          server.stdout.on('end', (data: any) => {
-            console.error(`========End: ${data}`);
-          });
 
           server$.next(server);
         },
