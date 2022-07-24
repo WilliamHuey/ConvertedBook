@@ -297,96 +297,270 @@ describe('Build', () => {
         });
     });
 
-  // retryTest()
-  //   .stdout()
-  //   .command(unnest([['build', 'sdaf'], flags, dryFlag]))
-  //   .it('dry run with invalid format and valid flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Did not build as there are no valid formats');
-  //   });
+  fancy
+    .it('dry run with multiple invalid formats and valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'sdaf',
+        'mf',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
 
-  // retryTest()
-  //   .stdout()
-  //   .command(unnest([['build', 'sdaf', 'mf'], flags, dryFlag]))
-  //   .it('dry run with multiple invalid formats and valid flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Did not build as there are no valid formats');
-  //   });
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Did not build as there are no valid formats');
+                done();
+              });
+          }
+        });
+    });
 
-  // retryTest()
-  //   .stdout()
-  //   .command(unnest([['build', 'sdaf', 'pdf'], flags, dryFlag]))
-  //   .it('dry run with valid and invalid formats with valid flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Ignoring unknown formats');
-  //   });
+  fancy
+    .it('dry run with valid and invalid formats with valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'sdaf',
+        'pdf',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
 
-  // retryTest()
-  //   .stdout()
-  //   .command(unnest([['build'], flags, dryFlag]))
-  //   .it('dry run with no formats specified, defaults to all formats and with valid flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Start building: html, pdf, and epub');
-  //   });
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
 
-  // retryTest()
-  //   .stdout()
-  //   .command(unnest([['build', "--args=''"], flags[0], dryFlag]))
-  //   .it('dry run with no formats and empty args flag and valid input', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Build failed: Missing a required "--input" or "--output"');
-  //   });
+                // Still create the valid document format
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
 
-  // retryTest()
-  //   .stdout()
-  //   .command(['build'])
-  //   .it('with no formats and no flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Build failed: No arguments and no flags available');
-  //   });
+  fancy
+    .it('dry run with no formats specified, defaults to all formats and with valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
 
-  // retryTest()
-  //   .stdout()
-  //   .command(['build', 'nsdfa', 'ce'])
-  //   .it('with only invalid formats and no flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present');
-  //   });
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
 
-  // retryTest()
-  //   .stdout()
-  //   .command(['build', 'pdf'])
-  //   .it('with pdf format and no flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present');
-  //   });
+                // Still create the valid document format
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
 
-  // retryTest()
-  //   .stdout()
-  //   .command(['build', 'sdaf', 'mf'])
-  //   .it('with all invalid formats and no flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Build failed: Arguments provided but no flags present');
-  //   });
+  fancy
+    .it('dry run with no formats and empty args flag and valid input', (_, done) => {
+      const buildFile$ = from(build.run([
+        "--args=''",
+        '--input',
+        validInputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
 
-  // retryTest()
-  //   .stdout()
-  //   .command(['build', "--args=''"])
-  //   .it('with no formats and empty args flag', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Build failed: No required flags found (--input, --output)');
-  //   });
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: Missing a required "--input" or "--output"');
+                done();
+              });
+          }
+        });
+    });
 
-  // fancy
-  //   .it('file name checks with "supposed file name"', () => {
-  //     const results = supposedFileName('/a/path/stuff.js');
-  //     expect(results).to.be.an('array').that.includes('stuff');
-  //     expect(results).to.be.an('array').that.includes('js');
-  //   });
+  fancy
+    .it('with no formats and no flags', (_, done) => {
+      const buildFile$ = from(build.run([]) as Promise<any>)
+        .pipe(take(1), share());
 
-  // fancy
-  //   .it('file name checks with "get file name from parts"', () => {
-  //     const results = supposedFileName('/a/path/stuff.js');
-  //     const firstItem = getFileNameFromParts(results);
-  //     expect(firstItem).to.contain('stuff');
-  //   });
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: No arguments and no flags available');
+                done();
+              });
+          }
+        });
+    });
 
-  // fancy
-  //   .it('file name checks with "truncate file path"', () => {
-  //     const results = truncateFilePath('/a/path/stuff.js');
-  //     expect(results.filePathSplit).to.be.an('array').that.includes('stuff.js');
-  //     expect(results.filePathFolder).to.contain('/a/path');
-  //   });
+  fancy
+    .it('with only invalid formats and no flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'nsdfa',
+        'ce'
+      ]) as Promise<any>)
+        .pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: Arguments provided but no flags present');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('with pdf format and no flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'pdf',
+      ]) as Promise<any>)
+        .pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: Arguments provided but no flags present');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('with all invalid formats and no flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'sdaf',
+        'mf'
+      ]) as Promise<any>)
+        .pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: Arguments provided but no flags present');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('with no formats and empty args flag', (_, done) => {
+      const buildFile$ = from(build.run([
+        "--args=''"
+      ]) as Promise<any>)
+        .pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Build failed: No required flags found (--input, --output)');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('file name checks with "supposed file name"', () => {
+      const results = supposedFileName('/a/path/stuff.js');
+      expect(results).to.be.an('array').that.includes('stuff');
+      expect(results).to.be.an('array').that.includes('js');
+    });
+
+  fancy
+    .it('file name checks with "get file name from parts"', () => {
+      const results = supposedFileName('/a/path/stuff.js');
+      const firstItem = getFileNameFromParts(results);
+      expect(firstItem).to.contain('stuff');
+    });
+
+  fancy
+    .it('file name checks with "truncate file path"', () => {
+      const results = truncateFilePath('/a/path/stuff.js');
+      expect(results.filePathSplit).to.be.an('array').that.includes('stuff.js');
+      expect(results.filePathFolder).to.contain('/a/path');
+    });
 
   // // Server - Content-type check
 
