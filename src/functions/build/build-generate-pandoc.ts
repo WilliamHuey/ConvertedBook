@@ -23,7 +23,8 @@ export function pandocGenerated({ input,
   normalizedOutputPath,
   buildDocuments$,
   docsGenerated$,
-  exactPdf = false }: BuildGenerate) {
+  exactPdf = false,
+  additionalInputArgs }: BuildGenerate) {
   const generated = normalizedFormats
     .map(format => {
       return pandocGenerateFormat(input, normalizedOutputPath, format,

@@ -4,7 +4,7 @@ import { unlinkSync } from 'fs';
 
 // Third party modules
 import { ReplaySubject } from 'rxjs';
-import { reject, intersection } from 'ramda';
+import { reject } from 'ramda';
 
 // Library modules
 import { typeCheck, stringTypes } from '@utilities/type-check';
@@ -27,6 +27,7 @@ export interface BuildGenerate {
   buildDocuments$: ReplaySubject<any>;
   docsGenerated$: ReplaySubject<any>;
   exactPdf?: boolean;
+  additionalInputArgs: Record<any, any>;
 }
 
 const pdfAndHtmlFormat = (n: string) => n === 'pdf' || n === 'html';
@@ -34,12 +35,14 @@ const pdfAndHtmlFormat = (n: string) => n === 'pdf' || n === 'html';
 export function buildGenerate(
   results: BuildCheckGoodResults,
   asyncResults: AsyncCheckResults,
-  docsGenerated$: ReplaySubject<any>): any
+  docsGenerated$: ReplaySubject<any>,
+  additionalInputArgs: Record<any, any>): any
 export function buildGenerate(
   this: Build,
   results: BuildCheckGoodResults,
   asyncResults: AsyncCheckResults,
-  docsGenerated$: ReplaySubject<any>) {
+  docsGenerated$: ReplaySubject<any>,
+  additionalInputArgs: Record<any, any>) {
   const { conditions, fromServerCli, exactPdf } = results,
     { input, output: outputPath } = conditions.flags,
     { normalizedFormats, flags } = conditions,
@@ -66,14 +69,17 @@ export function buildGenerate(
 
   if (playWrightPdfGeneration) {
 
-    // Use pandoc to create the html document because playwright
-    // will depend on it for the exact pdf generation.
+    console.log('=======+++++++++===additionalInputArgs', additionalInputArgs);
+
+    const { pandoc: fromProjectFlag } = additionalInputArgs;
+
+    console.log('fromProjectFlag', fromProjectFlag);
+    console.log('normalizedFormats', normalizedFormats);
 
     // Manipulate the settings to only generate the html with pandoc
     pandocGenerated({
       input,
-      normalizedFormats: !normalizedFormats.includes('html') ?
-        ['pdf', 'html'] : intersection(['pdf', 'html'], normalizedFormats),
+      normalizedFormats: normalizedFormats,
       htmlCliGenerate: normalizedFormats.includes('html'),
       flags: Object.assign(flags, { output: path.parse(flags.input).name }),
       fileOutputExistence,
@@ -81,20 +87,26 @@ export function buildGenerate(
       normalizedOutputPath,
       buildDocuments$,
       docsGenerated$,
-      exactPdf: true
+      exactPdf: true,
+      additionalInputArgs
     });
 
-    // Pass in additional argument to distinguish the branch type generation
-    playwrightGenerated({
-      input,
-      normalizedFormats,
-      flags,
-      fileOutputExistence,
-      checkFromServerCli,
-      normalizedOutputPath,
-      docsGenerated$,
-      buildDocuments$
-    });
+    // TODO: Only generate the exact pdf when inside a project folder
+    if (fromProjectFlag) {
+
+      // Pass in additional argument to distinguish the branch type generation
+      playwrightGenerated({
+        input,
+        normalizedFormats,
+        flags,
+        fileOutputExistence,
+        checkFromServerCli,
+        normalizedOutputPath,
+        docsGenerated$,
+        buildDocuments$,
+        additionalInputArgs
+      });
+    }
   }
 
   // Generally run the pandoc generation when converting any file type,
@@ -131,7 +143,8 @@ export function buildGenerate(
       normalizedOutputPath,
       buildDocuments$,
       exactPdf,
-      docsGenerated$
+      docsGenerated$,
+      additionalInputArgs
     });
   } else {
 
@@ -150,7 +163,8 @@ export function buildGenerate(
         normalizedOutputPath,
         buildDocuments$,
         docsGenerated$,
-        exactPdf
+        exactPdf,
+        additionalInputArgs
       });
     } else {
 

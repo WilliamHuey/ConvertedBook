@@ -4,7 +4,7 @@ import 'module-alias/register';
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { unnest, difference, without } from 'ramda';
-import { ReplaySubject, zip, merge, from, race } from 'rxjs';
+import { ReplaySubject, zip, merge, from } from 'rxjs';
 import { filter, mergeMap, take, takeLast, mapTo } from 'rxjs/operators';
 const IsThere = require('is-there');
 const listify = require('listify');
@@ -85,6 +85,13 @@ export default class Build extends Command {
   static requiredExternalDeps = ['pandoc', 'latex']
 
   async run() {
+    const { raw } = this.parse(Build);
+    console.log("Build", raw[raw.length - 1])
+
+    // Get extra information to know if this build command is
+    // being initiated from the cli for building a file or from
+    // the project folder.
+    const additionalInputArgs = raw[raw.length - 1];
 
     // Used to determine status of the generated documents
     // after running the build command
@@ -233,16 +240,24 @@ export default class Build extends Command {
           },
           default: ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
 
+            this.log('||||||||default')
+
             // Default build with file generation
             this.log(buildCli.msg.trim());
             this.log(buildAsyncResults.msg.trim());
-            this.buildGenerate(buildCli as BuildCheckGoodResults, buildAsyncResults, docsGenerated$);
+            this.buildGenerate(buildCli as BuildCheckGoodResults, buildAsyncResults, docsGenerated$, additionalInputArgs);
           }
         };
 
-        // dryRunBuild$
-        //   .subscribe((drb) => {
-        //     console.log("Build ~ .subscribe ~ drb", drb)
+        this.log('docsGenerated$', docsGenerated$)
+
+        // docsGenerated$
+        //   .subscribe({
+        //     // error: (v) => { },
+        //     next: (v) => console.log(`observerA: ${v}`),
+
+        //     complete: () => console.log(`complete: `)
+        //     // complete: (v) => console.log(`complete: ${v}`)
         //   });
 
         const buildRunScenarios$ = merge(

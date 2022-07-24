@@ -7,8 +7,8 @@ const { spawn } = childProcess;
 
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { from, ReplaySubject } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { from, ReplaySubject, merge } from 'rxjs';
+import { filter, takeLast } from 'rxjs/operators';
 const IsThere = require('is-there');
 
 export default class Serve extends Command {
@@ -45,6 +45,7 @@ export default class Serve extends Command {
     // A found 'server.js' file means it is most
     // likely to be a 'convertedbook' project
     hasServerFile$
+      .pipe(takeLast(1))
       .subscribe({
         next: () => {
 
@@ -59,6 +60,9 @@ export default class Serve extends Command {
 
           server.stderr.on('data', (data: any) => {
             console.error(`Error: ${data}`);
+          });
+          server.stdout.on('end', (data: any) => {
+            console.error(`========End: ${data}`);
           });
 
           server$.next(server);
@@ -80,7 +84,10 @@ export default class Serve extends Command {
     noServerFile$
       .subscribe({
         next: () => {
-          console.log('Did not find the server.js" file, might not be a "convertedbook" project!');
+          const msg = 'Did not find the server.js" file, might not be a "convertedbook" project!';
+          server$.next(msg);
+          server$.complete();
+          console.log(msg);
         }
       });
 

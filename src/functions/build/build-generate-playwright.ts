@@ -16,19 +16,25 @@ interface CreateExactPdf {
   fileName: string;
   outPutFileName: string;
   docsGenerated$: ReplaySubject<any>;
+  additionalInputArgs: Record<any, any>;
 }
 
 // TODO: Read the server port from snowpack dynamically
 const snowpackDevServerPort = 8080;
 
+// Assumed the exact generation is from a cli or programmatic 
+// pdf generation event that is outside of the project generation.
+// Project based generation will only use the inexact pdf generation
 const createExactPdf = ({
   port, fileName, outPutFileName,
-  docsGenerated$
+  docsGenerated$, additionalInputArgs
 }: CreateExactPdf) => {
   (async () => {
-    const serveRun$ = await serve.run([]);
+    const serveRun$ = await serve.run(['--pandoc', 'true']);
     serveRun$
       .subscribe((serveProcess: any) => {
+        console.log(".subscribe ~ serveProcess", serveProcess, additionalInputArgs)
+
         serveProcess.stdout.on('data', async function (data: any) {
           if (data.toString().includes('Command completed.')) {
             const browser = await chromium.launch();
@@ -59,7 +65,8 @@ export function playwrightGenerated({
   flags,
   normalizedOutputPath,
   buildDocuments$,
-  docsGenerated$
+  docsGenerated$,
+  additionalInputArgs
 }: BuildGenerate) {
   buildDocuments$
     .pipe(take(1))
@@ -67,7 +74,8 @@ export function playwrightGenerated({
       createExactPdf({
         fileName: path.parse(flags.input).name,
         outPutFileName: normalizedOutputPath,
-        docsGenerated$
+        docsGenerated$,
+        additionalInputArgs
       });
     });
 }
