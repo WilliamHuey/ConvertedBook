@@ -8,6 +8,7 @@ import { ReplaySubject, zip, merge, from, race } from 'rxjs';
 import { filter, mergeMap, take, takeLast, mapTo } from 'rxjs/operators';
 const IsThere = require('is-there');
 const listify = require('listify');
+import { of } from 'rxjs';
 
 // Library modules
 import {
@@ -156,6 +157,7 @@ export default class Build extends Command {
 
         errorMessage$
           .subscribe(buildCli => {
+            asyncResultsLog$.next(of(buildCli));
             this.log(buildCli.msg.trim());
           });
 
@@ -163,8 +165,6 @@ export default class Build extends Command {
         const buildCliAsyncCheck$ = buildCliResults$
           .pipe(
             filter((result: BuildCheckResults) => {
-
-
               return result.continue;
             })
           );

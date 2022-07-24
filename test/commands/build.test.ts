@@ -119,40 +119,183 @@ describe('Build', () => {
         });
     });
 
-  // retryTest()
-  //   .stdout()
-  //   .command(unnest([['build', 'html', 'pdf'], flags, dryFlag]))
-  //   .it('dry run with valid input and output flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Creating output file');
-  //   });
+  fancy
+    .it('dry run with valid input and output flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'html',
+        'pdf',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
 
-  // retryTest()
-  //   .stdout()
-  //   .command(unnest([['build', 'pdf'], flags, dryFlag]))
-  //   .it('dry run with pdf format and valid flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Start building: pdf');
-  //   });
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
 
-  // retryTest()
-  //   .stdout()
-  //   .command(unnest([['build', 'epub'], flags, dryFlag]))
-  //   .it('dry run with epub format and valid flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Start building: epub');
-  //   });
+  fancy
+    .it('dry run with pdf format and valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'pdf',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
 
-  // retryTest()
-  //   .stdout()
-  //   .command(unnest([['build', 'epub', 'html'], flags, dryFlag]))
-  //   .it('dry run with epub and html format and valid flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Start building: epub and html');
-  //   });
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
 
-  // retryTest()
-  //   .stdout()
-  //   .command(unnest([['build', 'html', 'pdf', 'epub'], flags, dryFlag]))
-  //   .it('dry run with html, pdf, and epub format with valid flags', ctx => {
-  //     expect(ctx.stdout.trim()).to.contain('Start building: html, pdf, and epub');
-  //   });
+  fancy
+    .it('dry run with epub format and valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'epub',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with epub and html format and valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'epub',
+        'html',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with html, pdf, and epub format with valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'html',
+        'pdf',
+        'epub',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Creating output file');
+                done();
+              });
+          }
+        });
+    });
+
+  fancy
+    .it('dry run with html, pdf, and epub format with valid flags', (_, done) => {
+      const buildFile$ = from(build.run([
+        'sdaf',
+        '--input',
+        validInputFlag,
+        '--output',
+        validOutputFlag,
+        dryFlagStr
+      ]) as Promise<any>).pipe(take(1), share());
+
+      buildFile$
+        .subscribe({
+          next: ({ asyncResultsLog$ }) => {
+            asyncResultsLog$
+              .pipe(
+                mergeMap((res: any) => {
+                  return res;
+                })
+              )
+              .subscribe((asyncResultsLog: any) => {
+                expect(asyncResultsLog.msg)
+                  .to.contain('Did not build as there are no valid formats');
+                done();
+              });
+          }
+        });
+    });
 
   // retryTest()
   //   .stdout()

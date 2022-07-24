@@ -3,6 +3,7 @@ import { expect, test } from '@oclif/test';
 import { unnest } from 'ramda';
 import { share } from 'rxjs/operators';
 import { mkdir } from '../../src/utilities/rxjs-fs';
+const del = require('del');
 
 // Library modules
 import { retryTest, dryFlag, baseTempFolder } from './test-utilities';
@@ -14,6 +15,10 @@ const npmProjectName = 'my_project_name',
   npmProjectFlagAndName = `--npm-project-name=${npmProjectName}`;
 
 describe('Dry Run Generation:', () => {
+  after(() => {
+    del([`${baseTempFolder}no-downloads/*`, `!${baseTempFolder}no-downloads/.gitkeep`]);
+  });
+
   retryTest()
     .stdout()
     .command(unnest([['generate'], [`${baseTempNoDownloadFolder}dry-run-generate`, npmProjectFlagAndName], dryFlag]))
