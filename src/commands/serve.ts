@@ -7,7 +7,7 @@ const { spawn } = childProcess;
 
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { from, ReplaySubject, merge } from 'rxjs';
+import { from, ReplaySubject } from 'rxjs';
 import { filter, takeLast } from 'rxjs/operators';
 const IsThere = require('is-there');
 

@@ -1,14 +1,26 @@
 // Third party modules
 import { match, when } from 'ts-pattern';
+const IsThere = require('is-there');
+import { Observable, from } from 'rxjs';
 
 // Library modules
 import Build from '../../commands/build';
 import { action, messagesKeys } from './build-log';
 import { BuildCheckResults, BuildCheckBadResults } from './build-checks';
 
-export function buildCliInputsChecks(this: Build): BuildCheckResults {
+const serverFileName = 'server.js';
+
+export type BuildCliChecks = {
+  isServerJsFound$: Observable<Boolean>;
+}
+
+export function buildCliInputsChecks(this: Build): (BuildCheckResults & BuildCliChecks) {
   // Check for cli input validity
   const buildCmd = this.parse(Build);
+
+  const isServerJsFound$ = from(IsThere
+    .promises.file(serverFileName) as Promise<boolean>);
+
   const output = match(buildCmd)
     .with(({
       // No build arguments and no flags
@@ -66,6 +78,7 @@ export function buildCliInputsChecks(this: Build): BuildCheckResults {
       return (this.buildChecks(buildCmd) as BuildCheckResults);
     })
     .run();
-  return output;
+
+  return { ...output, isServerJsFound$ };
 }
 
