@@ -5,7 +5,7 @@ import 'module-alias/register';
 import { Command, flags } from '@oclif/command';
 import { unnest, difference, without } from 'ramda';
 import { ReplaySubject, zip, merge, from } from 'rxjs';
-import { filter, mergeMap, take, takeLast, map } from 'rxjs/operators';
+import { filter, mergeMap, take, takeLast, map, takeUntil } from 'rxjs/operators';
 const IsThere = require('is-there');
 const listify = require('listify');
 import { of } from 'rxjs';
@@ -14,7 +14,7 @@ import { of } from 'rxjs';
 import {
   buildReport, buildLog, buildCliInputsChecks,
   buildCliInputsAsyncChecks, BuildCheckResults,
-  BuildCheckGoodResults, BuildCliChecks, buildChecks, buildDependencies,
+  BuildCheckGoodResults, buildChecks, buildDependencies,
   buildGenerate, AsyncCheckResults
 } from '../functions/build/build-import';
 
@@ -155,12 +155,15 @@ export default class Build extends Command {
 
         // Allow build command inside a project folder without displaying
         // the error messages.
+
+        // Use the simple assumption that when the 'server.js' file is found,
+        // that it is a valid project folder
         const foundServerjs$ = buildCliResults$
           .pipe(
             mergeMap((result) => {
               return result.isServerJsFound$
             }),
-            filter((isServerJsFound) => {
+            map((isServerJsFound) => {
               return isServerJsFound ? true : false;
             })
           );
@@ -168,13 +171,18 @@ export default class Build extends Command {
         foundServerjs$
           .subscribe((foundServerjs) => {
             console.log("foundServerjs", foundServerjs)
-
-          })
+          });
 
         // End the checks early as critical problems are found
         // or required flags not satisfied
-        const errorMessage$ = buildCliResults$
+        const errorMessage$ = foundServerjs$
           .pipe(
+            filter((result) => {
+              return !result ? true : false;
+            }),
+            mergeMap(() => {
+              return buildCliResults$;
+            }),
             filter((result: BuildCheckResults) => {
               return !result.continue;
             }),
