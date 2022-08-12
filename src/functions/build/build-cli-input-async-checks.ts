@@ -1,5 +1,5 @@
 // Third party modules
-import { from, forkJoin, merge, race } from 'rxjs';
+import { from, forkJoin, merge, race, Observable } from 'rxjs';
 import { filter, map, takeLast, withLatestFrom, mapTo } from 'rxjs/operators';
 import { last } from 'ramda';
 const IsThere = require('is-there');
@@ -23,7 +23,15 @@ export interface AsyncCheckResults {
   fileOutputExistence: FileOutputExistence;
 }
 
-export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults) {
+interface ServerjsBuild {
+  msg: string;
+  continue: boolean;
+  isServerJsFound$: Observable<any>;
+}
+
+export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults, serverjsBuild$: ServerjsBuild) {
+
+  // TODO: Use serverjsBuild$ and adapt to run the logic below
   const { flags, normalizedFormats } = buildCli.conditions;
   const { input, output } = flags;
   const {

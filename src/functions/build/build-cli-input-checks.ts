@@ -11,7 +11,7 @@ import { BuildCheckResults, BuildCheckBadResults } from './build-checks';
 const serverFileName = 'server.js';
 
 export type BuildCliChecks = {
-  isServerJsFound$: Observable<Boolean>;
+  isServerJsFound$: Observable<Boolean>
 }
 
 export function buildCliInputsChecks(this: Build): (BuildCheckResults & BuildCliChecks) {

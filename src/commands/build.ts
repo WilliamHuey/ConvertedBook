@@ -161,6 +161,9 @@ export default class Build extends Command {
         const foundServerjs$ = buildCliResults$
           .pipe(
             mergeMap((result) => {
+
+              console.log('result', result);
+
               return result.isServerJsFound$
             }),
             map((isServerJsFound) => {
@@ -172,6 +175,37 @@ export default class Build extends Command {
           .subscribe((foundServerjs) => {
             console.log("foundServerjs", foundServerjs)
           });
+
+        buildCliResults$
+          .subscribe((buildCliResults) => {
+            console.log("buildCliResults", buildCliResults)
+          });
+
+        // Get the filter value of the serverjs find observable
+        // for continued generation
+        const serverjsBuild$ = foundServerjs$
+          .pipe(
+            filter((result) => {
+              return result ? true : false;
+            }),
+            mergeMap(() => {
+              return buildCliResults$;
+            }),
+            map((result) => {
+              return Object.assign({ ...result }, {
+                msg: 'Build from project folder',
+                continue: true
+              });
+            })
+          );
+
+        serverjsBuild$
+          .subscribe((res) => {
+            console.log("Build ~ .subscribe ~ res", res)
+
+          })
+
+
 
         // End the checks early as critical problems are found
         // or required flags not satisfied
@@ -196,6 +230,8 @@ export default class Build extends Command {
           });
 
         // Continue with the async checks as required flags are found
+
+        //merge(buildCliResults$, serverjsBuild$)
         const buildCliAsyncCheck$ = buildCliResults$
           .pipe(
             filter((result: BuildCheckResults) => {
@@ -203,11 +239,12 @@ export default class Build extends Command {
             })
           );
 
+
         const buildCliAsyncResults$ = buildCliAsyncCheck$
           .pipe(
             mergeMap(buildCli => {
               const buildAsyncResults = this
-                .buildCliInputsAsyncChecks((buildCli as BuildCheckGoodResults));
+                .buildCliInputsAsyncChecks((buildCli as BuildCheckGoodResults), serverjsBuild$);
               return buildAsyncResults;
             })
           );
@@ -284,13 +321,18 @@ export default class Build extends Command {
             const flagOptions = (buildCli as BuildCheckGoodResults).conditions.flags;
             const options = difference(Object.keys(flagOptions), Build.requiredFlags);
 
+            console.log('options', options);
+            console.log('buildCli', buildCli);
+            console.log('buildAsyncResults', buildAsyncResults);
+
+
             // Apply any flags selectively one at a time,
             // for custom changes for each flag other than 'input' and 'output'
             const optionsLen = options.length;
 
             if (optionsLen > 0) {
 
-              // Apply the option as is the since there is no possibility
+              // Apply the option as is since there is no possibility
               // of interference from multiple options interactions
               if (optionsLen === 1) {
                 buildRunMap[options[0]]([buildCli, buildAsyncResults]);
