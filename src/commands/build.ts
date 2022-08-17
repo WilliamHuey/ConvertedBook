@@ -5,7 +5,7 @@ import 'module-alias/register';
 import { Command, flags } from '@oclif/command';
 import { unnest, difference, without } from 'ramda';
 import { ReplaySubject, zip, merge, from } from 'rxjs';
-import { filter, mergeMap, take, takeLast, map, takeUntil } from 'rxjs/operators';
+import { filter, mergeMap, take, takeLast, map } from 'rxjs/operators';
 const IsThere = require('is-there');
 const listify = require('listify');
 import { of } from 'rxjs';
@@ -15,7 +15,6 @@ import {
   buildReport, buildLog, buildCliInputsChecks,
   buildCliInputsAsyncChecks, BuildCheckResults,
   BuildCheckGoodResults, buildChecks, buildDependencies,
-  ServerjsBuild,
   buildGenerate, AsyncCheckResults
 } from '../functions/build/build-import';
 
@@ -233,8 +232,8 @@ export default class Build extends Command {
 
         // Continue with the async checks as required flags are found
 
-        // const buildCliAsyncCheck$ = merge(buildCliResults$, serverjsBuild$)
-        const buildCliAsyncCheck$ = buildCliResults$
+        const buildCliAsyncCheck$ = merge(buildCliResults$, serverjsBuild$)
+          // const buildCliAsyncCheck$ = buildCliResults$
           .pipe(
             filter((result: BuildCheckResults) => {
               return result.continue;
@@ -253,6 +252,12 @@ export default class Build extends Command {
 
         asyncResultsLog$.next(buildCliAsyncResults$);
 
+        buildCliAsyncResults$
+          .subscribe((buildCliAsyncResults) => {
+            console.log("-----Build ~ .subscribe ~ buildCliAsyncResults", buildCliAsyncResults)
+
+          })
+
         // Valid input and output means file conversion can happen
         const buildCliContinueGeneration$ = zip(
           buildCliAsyncCheck$,
@@ -263,6 +268,13 @@ export default class Build extends Command {
               })
             )
         );
+
+        buildCliContinueGeneration$
+          .subscribe((buildCliContinueGeneration) => {
+            console.log("Build ~ .subscribe ~ buildCliContinueGeneration", buildCliContinueGeneration)
+
+          })
+
 
         // Dry run should still allow continuation even when facing
         // a continue value of false
@@ -315,7 +327,7 @@ export default class Build extends Command {
           dryRunBuild$,
           buildCliContinueGeneration$
         )
-          .pipe(takeLast(1));
+        // .pipe(takeLast(1));
 
         buildRunScenarios$
           .pipe(take(1))

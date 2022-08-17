@@ -18,6 +18,9 @@ export function buildCliInputsChecks(this: Build): (BuildCheckResults & BuildCli
   // Check for cli input validity
   const buildCmd = this.parse(Build);
 
+  console.log('buildCmd', buildCmd);
+
+
   const isServerJsFound$ = from(IsThere
     .promises.file(serverFileName) as Promise<boolean>);
 

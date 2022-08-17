@@ -1,5 +1,5 @@
 // Third party modules
-import { from, forkJoin, merge, race, Observable } from 'rxjs';
+import { from, forkJoin, merge, race, Observable, ReplaySubject } from 'rxjs';
 import { filter, map, takeLast, withLatestFrom, mapTo } from 'rxjs/operators';
 import { last } from 'ramda';
 const IsThere = require('is-there');
@@ -26,25 +26,12 @@ export interface AsyncCheckResults {
 export interface ServerjsBuild {
   msg: string;
   continue: boolean;
-  isServerJsFound$: Observable<any>;
+  isServerJsFound$: Observable<Boolean>;
 }
 
-export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults, serverjsBuild$: Observable<ServerjsBuild>, notFoundServerjs$: Observable<Boolean>) {
-
-  serverjsBuild$
-    .subscribe((res) => {
-      console.log("Build ~ .subscribe ~ res", res)
-
-    })
-
-  notFoundServerjs$
-    .subscribe((res) => {
-      console.log(">>>>>>>>>>>>>>notFoundServerjs", res)
-
-    });
-
-
-  // TODO: Use serverjsBuild$ and adapt to run the logic below
+// Common operations checks when generating in a project folder and
+// a non-project folder
+function processBuildCliAsync(buildCli: BuildCheckGoodResults, inputOutputWithOutputFileName$: ReplaySubject<any>) {
   const { flags, normalizedFormats } = buildCli.conditions;
   const { input, output } = flags;
   const {
@@ -309,7 +296,7 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     validInputOutput$
   ).pipe(takeLast(1));
 
-  const inputOutputWithOutputFileName$ = race(
+  race(
     outputFileName$
       .pipe(
         withLatestFrom(inputOutputChecks$),
@@ -325,7 +312,30 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
           return Object.assign({}, outputPath, inputOutput);
         })
       )
-  );
+  )
+    .subscribe((res) => {
+      console.log('res', res);
+
+      inputOutputWithOutputFileName$.next(res);
+    });
+}
+
+export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults, serverjsBuild$: Observable<ServerjsBuild>, notFoundServerjs$: Observable<Boolean>): ReplaySubject<AsyncCheckResults> {
+  let inputOutputWithOutputFileName$: ReplaySubject<AsyncCheckResults> = new ReplaySubject();
+
+  // TODO: Adapt serverjsBuild$ - pass in the observable to indicate to 'build-checks' that certain checks should be relaxed or nullified.
+  serverjsBuild$
+    .subscribe(() => {
+      console.log("Build ~ .subscribe ~ res", this.buildChecks(this.parse()))
+
+    });
+
+  this.log('buildCli....', buildCli);
+
+  notFoundServerjs$
+    .subscribe(() => {
+      processBuildCliAsync(buildCli, inputOutputWithOutputFileName$);
+    });
 
   return inputOutputWithOutputFileName$;
 }
