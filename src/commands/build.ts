@@ -15,6 +15,7 @@ import {
   buildReport, buildLog, buildCliInputsChecks,
   buildCliInputsAsyncChecks, BuildCheckResults,
   BuildCheckGoodResults, buildChecks, buildDependencies,
+  ServerjsBuild,
   buildGenerate, AsyncCheckResults
 } from '../functions/build/build-import';
 
@@ -158,16 +159,25 @@ export default class Build extends Command {
 
         // Use the simple assumption that when the 'server.js' file is found,
         // that it is a valid project folder
-        const foundServerjs$ = buildCliResults$
+
+        const resultServerJsFound$ = buildCliResults$
           .pipe(
             mergeMap((result) => {
+              return result.isServerJsFound$;
+            })
+          );
 
-              console.log('result', result);
-
-              return result.isServerJsFound$
-            }),
+        const foundServerjs$ = resultServerJsFound$
+          .pipe(
             map((isServerJsFound) => {
               return isServerJsFound ? true : false;
+            })
+          );
+
+        const notFoundServerjs$ = resultServerJsFound$
+          .pipe(
+            map((isServerJsFound) => {
+              return isServerJsFound ? false : true;
             })
           );
 
@@ -199,14 +209,6 @@ export default class Build extends Command {
             })
           );
 
-        serverjsBuild$
-          .subscribe((res) => {
-            console.log("Build ~ .subscribe ~ res", res)
-
-          })
-
-
-
         // End the checks early as critical problems are found
         // or required flags not satisfied
         const errorMessage$ = foundServerjs$
@@ -231,7 +233,7 @@ export default class Build extends Command {
 
         // Continue with the async checks as required flags are found
 
-        //merge(buildCliResults$, serverjsBuild$)
+        // const buildCliAsyncCheck$ = merge(buildCliResults$, serverjsBuild$)
         const buildCliAsyncCheck$ = buildCliResults$
           .pipe(
             filter((result: BuildCheckResults) => {
@@ -239,12 +241,12 @@ export default class Build extends Command {
             })
           );
 
-
         const buildCliAsyncResults$ = buildCliAsyncCheck$
           .pipe(
             mergeMap(buildCli => {
               const buildAsyncResults = this
-                .buildCliInputsAsyncChecks((buildCli as BuildCheckGoodResults), serverjsBuild$);
+                .buildCliInputsAsyncChecks((buildCli as BuildCheckGoodResults),
+                  serverjsBuild$, notFoundServerjs$);
               return buildAsyncResults;
             })
           );

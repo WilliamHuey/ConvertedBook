@@ -39,9 +39,6 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>): BuildCh
     conditions
   } = this.buildReport({ argv, flags });
 
-  console.log('||||| conditions', conditions);
-
-
   const {
     argsCommaList,
     noValidFormats,

@@ -23,13 +23,26 @@ export interface AsyncCheckResults {
   fileOutputExistence: FileOutputExistence;
 }
 
-interface ServerjsBuild {
+export interface ServerjsBuild {
   msg: string;
   continue: boolean;
   isServerJsFound$: Observable<any>;
 }
 
-export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults, serverjsBuild$: ServerjsBuild) {
+export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults, serverjsBuild$: Observable<ServerjsBuild>, notFoundServerjs$: Observable<Boolean>) {
+
+  serverjsBuild$
+    .subscribe((res) => {
+      console.log("Build ~ .subscribe ~ res", res)
+
+    })
+
+  notFoundServerjs$
+    .subscribe((res) => {
+      console.log(">>>>>>>>>>>>>>notFoundServerjs", res)
+
+    });
+
 
   // TODO: Use serverjsBuild$ and adapt to run the logic below
   const { flags, normalizedFormats } = buildCli.conditions;
