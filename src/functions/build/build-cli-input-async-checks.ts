@@ -320,20 +320,21 @@ function processBuildCliAsync(buildCli: BuildCheckGoodResults, inputOutputWithOu
     });
 }
 
-export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults, serverjsBuild$: Observable<ServerjsBuild>, notFoundServerjs$: Observable<Boolean>): ReplaySubject<AsyncCheckResults> {
+export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults, serverjsBuild$: Observable<ServerjsBuild>, notProjectFolder$: Observable<Boolean>): ReplaySubject<AsyncCheckResults> {
   let inputOutputWithOutputFileName$: ReplaySubject<AsyncCheckResults> = new ReplaySubject();
 
   // TODO: Adapt serverjsBuild$ - pass in the observable to indicate to 'build-checks' that certain checks should be relaxed or nullified.
   serverjsBuild$
     .subscribe(() => {
-      console.log("Build ~ .subscribe ~ res", this.buildChecks(this.parse()))
+      console.log("Build ||||| .subscribe ~ res", this.buildChecks(this.parse(), serverjsBuild$))
 
     });
 
   this.log('buildCli....', buildCli);
 
-  notFoundServerjs$
+  notProjectFolder$
     .subscribe(() => {
+      this.log('+++++++++++++++++++++ not found')
       processBuildCliAsync(buildCli, inputOutputWithOutputFileName$);
     });
 

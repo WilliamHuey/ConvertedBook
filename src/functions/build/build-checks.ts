@@ -1,12 +1,15 @@
 // Third party modules
 import { cond, always } from 'ramda';
 import { XOR } from 'ts-xor';
+import { Observable } from 'rxjs';
 const listify = require('listify');
 
 // Library modules
 import Build from '../../commands/build';
 import { action, messagesKeys } from './build-log';
 import { BuildReportConditions } from './build-report';
+
+import { ServerjsBuild } from './build-import';
 
 export type BuildCheckBadResults = {
   msg: string;
@@ -31,7 +34,10 @@ type CondsFlagsArgv = BuildReportConditions & CommandArgsFlags;
 
 // Rigorous checks after more simple args and flags check,
 // used by 'buildCliInputsChecks'
-export function buildChecks(this: Build, buildCmd: Record<string, any>): BuildCheckResults {
+export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjsBuild$?: Observable<ServerjsBuild>): BuildCheckResults {
+
+  console.log("serverjsBuild$>>>>>>>>>>>>>..", serverjsBuild$);
+
   const { argv, flags }: Partial<Record<string, any>> = buildCmd;
   // Get the status of the arguments
   const {
@@ -141,6 +147,9 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>): BuildCh
       ]
     ]
   );
+
+
+
 
   return emptyArgsValidFlagsCond() || buildArgsConds();
 }

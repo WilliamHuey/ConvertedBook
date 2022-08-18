@@ -173,22 +173,12 @@ export default class Build extends Command {
             })
           );
 
-        const notFoundServerjs$ = resultServerJsFound$
+        const notProjectFolder$ = resultServerJsFound$
           .pipe(
-            map((isServerJsFound) => {
-              return isServerJsFound ? false : true;
+            filter((isServerJsFound) => {
+              return !isServerJsFound ? true : false;
             })
           );
-
-        foundServerjs$
-          .subscribe((foundServerjs) => {
-            console.log("foundServerjs", foundServerjs)
-          });
-
-        buildCliResults$
-          .subscribe((buildCliResults) => {
-            console.log("buildCliResults", buildCliResults)
-          });
 
         // Get the filter value of the serverjs find observable
         // for continued generation
@@ -245,7 +235,7 @@ export default class Build extends Command {
             mergeMap(buildCli => {
               const buildAsyncResults = this
                 .buildCliInputsAsyncChecks((buildCli as BuildCheckGoodResults),
-                  serverjsBuild$, notFoundServerjs$);
+                  serverjsBuild$, notProjectFolder$);
               return buildAsyncResults;
             })
           );
@@ -254,9 +244,8 @@ export default class Build extends Command {
 
         buildCliAsyncResults$
           .subscribe((buildCliAsyncResults) => {
-            console.log("-----Build ~ .subscribe ~ buildCliAsyncResults", buildCliAsyncResults)
-
-          })
+            console.log("-----Build ~ .subscribe ~ buildCliAsyncResults", buildCliAsyncResults);
+          });
 
         // Valid input and output means file conversion can happen
         const buildCliContinueGeneration$ = zip(
