@@ -244,7 +244,7 @@ export default class Build extends Command {
 
         buildCliAsyncResults$
           .subscribe((buildCliAsyncResults) => {
-            console.log("-----Build ~ .subscribe ~ buildCliAsyncResults", buildCliAsyncResults);
+            console.log("-----Build ~ .subscribe ~ buildCliAsyncResults", JSON.stringify(buildCliAsyncResults));
           });
 
         // Valid input and output means file conversion can happen

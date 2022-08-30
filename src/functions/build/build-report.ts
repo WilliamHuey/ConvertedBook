@@ -41,7 +41,7 @@ export interface BuildReportResults {
   conditions: BuildReportConditions;
 }
 
-export function buildReport(this: Build, { argv, flags }: CommandArgsFlags): BuildReportResults {
+export function buildReport(this: Build, { argv, flags, serverjsBuild$ }: CommandArgsFlags): BuildReportResults {
   // Discern which is an unknown format or flag
   const recognizedFormats = intersection(Build.acceptedOutputFormats, argv);
   const unrecognizedElements = difference(argv, Build.acceptedOutputFormats);
@@ -77,7 +77,7 @@ export function buildReport(this: Build, { argv, flags }: CommandArgsFlags): Bui
     noValidFormats = argsCommaList.length === 0;
 
   // Argument flags presence check
-  const buildFlagsStatus = buildFlags.bind(this)(flags),
+  const buildFlagsStatus = buildFlags.bind(this)(flags, serverjsBuild$),
     emptyArgsValidFlags = emptyArgs && buildFlagsStatus.allRequiredFlagsRecognized,
     normalizedFormats = emptyArgsValidFlags && recognizedFormats.length === 0 ?
       Build.acceptedOutputFormats : recognizedFormats,

@@ -28,7 +28,7 @@ export type BuildCheckResults = XOR<BuildCheckBadResults, BuildCheckGoodResults>
 
 export type CommandFlagKeys = { input: string; output: string; 'dry-run': string };
 
-export type CommandArgsFlags = { argv: string[]; flags: CommandFlagKeys }
+export type CommandArgsFlags = { argv: string[]; flags: CommandFlagKeys, serverjsBuild$: Observable<ServerjsBuild> | undefined }
 
 type CondsFlagsArgv = BuildReportConditions & CommandArgsFlags;
 
@@ -36,14 +36,14 @@ type CondsFlagsArgv = BuildReportConditions & CommandArgsFlags;
 // used by 'buildCliInputsChecks'
 export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjsBuild$?: Observable<ServerjsBuild>): BuildCheckResults {
 
-  console.log("serverjsBuild$>>>>>>>>>>>>>..", serverjsBuild$);
-
   const { argv, flags }: Partial<Record<string, any>> = buildCmd;
   // Get the status of the arguments
   const {
     conditionsHelpers,
     conditions
-  } = this.buildReport({ argv, flags });
+  } = this.buildReport({ argv, flags, serverjsBuild$ });
+
+  console.log("serverjsBuild$>>>>>>>>>>>>>..", serverjsBuild$, conditions);
 
   const {
     argsCommaList,

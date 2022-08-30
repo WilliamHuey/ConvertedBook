@@ -1,11 +1,13 @@
 // Third party modules
 import { intersection } from 'ramda';
+import { Observable } from 'rxjs';
 
 // Library modules
 import Build from '../../commands/build';
 import { optionalArgsFlagKeysArray } from './build-report';
+import { ServerjsBuild } from './build-cli-input-async-checks';
 
-export function buildFlags(this: Build, flags: Record<string, any>) {
+export function buildFlags(this: Build, flags: Record<string, any>, serverjsBuild$: Observable<ServerjsBuild>) {
   const acceptedRequiredFlagKeys = Build.requiredFlags,
     argsFlagKeys = Object.keys(flags),
     recognizedFlags = intersection(acceptedRequiredFlagKeys, argsFlagKeys),
