@@ -28,7 +28,7 @@ export type BuildCheckResults = XOR<BuildCheckBadResults, BuildCheckGoodResults>
 
 export type CommandFlagKeys = { input: string; output: string; 'dry-run': string };
 
-export type CommandArgsFlags = { argv: string[]; flags: CommandFlagKeys, serverjsBuild$: Observable<ServerjsBuild> | undefined }
+export type CommandArgsFlags = { argv: string[]; flags: CommandFlagKeys, serverjsBuild$?: Observable<ServerjsBuild> | undefined }
 
 type CondsFlagsArgv = BuildReportConditions & CommandArgsFlags;
 
@@ -108,6 +108,14 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
   // Supply the information after making checks on the build command
   const conditionsFlagsArgv: CondsFlagsArgv = { ...conditions, flags, argv };
 
+  // Patch 'conditionsFlagsArgv' with the location of the source tex file and
+  // the 'index.html' files for a project folder generation
+  if (serverjsBuild$) {
+    Object.assign(conditionsFlagsArgv, {
+      flags: { input: '.src/index.tex', output: './index.html', force: true }
+    });
+  }
+
   // Valid scenarios for building
   const buildArgsConds = cond([
     onlyOneBuildFormat,
@@ -148,8 +156,7 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
     ]
   );
 
-
-
+  console.log('.|.|.| ', conditionsFlagsArgv);
 
   return emptyArgsValidFlagsCond() || buildArgsConds();
 }

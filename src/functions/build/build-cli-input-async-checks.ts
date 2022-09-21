@@ -326,7 +326,10 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
   // TODO: Adapt serverjsBuild$ - pass in the observable to indicate to 'build-checks' that certain checks should be relaxed or nullified.
   serverjsBuild$
     .subscribe(() => {
-      console.log("Build ||||| .subscribe ~ res", this.buildChecks(this.parse(), serverjsBuild$))
+      console.log("Build ||||| .subscribe ~ res", this.buildChecks(this.parse(), serverjsBuild$), buildCli)
+
+
+      // processBuildCliAsync(buildCli, inputOutputWithOutputFileName$);
 
     });
 
