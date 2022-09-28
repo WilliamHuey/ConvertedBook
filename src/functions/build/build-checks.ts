@@ -43,7 +43,7 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
     conditions
   } = this.buildReport({ argv, flags, serverjsBuild$ });
 
-  console.log("serverjsBuild$>>>>>>>>>>>>>..", serverjsBuild$, conditions);
+  // console.log("serverjsBuild$>>>>>>>>>>>>>..", serverjsBuild$, conditions);
 
   const {
     argsCommaList,
@@ -112,7 +112,7 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
   // the 'index.html' files for a project folder generation
   if (serverjsBuild$) {
     Object.assign(conditionsFlagsArgv, {
-      flags: { input: '.src/index.tex', output: './index.html', force: true }
+      flags: { input: './src/index.tex', output: './index.html', force: true }
     });
   }
 

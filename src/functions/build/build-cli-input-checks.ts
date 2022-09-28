@@ -18,12 +18,13 @@ export function buildCliInputsChecks(this: Build): (BuildCheckResults & BuildCli
   // Check for cli input validity
   const buildCmd = this.parse(Build);
 
-  console.log('buildCmd', buildCmd);
+  // console.log('buildCmd', buildCmd);
 
 
   const isServerJsFound$ = from(IsThere
     .promises.file(serverFileName) as Promise<boolean>);
 
+  // Only synchronous checks here
   const output = match(buildCmd)
     .with(({
       // No build arguments and no flags
@@ -81,6 +82,8 @@ export function buildCliInputsChecks(this: Build): (BuildCheckResults & BuildCli
       return (this.buildChecks(buildCmd) as BuildCheckResults);
     })
     .run();
+
+  // this.log('output', output)
 
   return { ...output, isServerJsFound$ };
 }

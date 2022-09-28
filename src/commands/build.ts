@@ -260,7 +260,7 @@ export default class Build extends Command {
 
         buildCliContinueGeneration$
           .subscribe((buildCliContinueGeneration) => {
-            console.log("Build ~ .subscribe ~ buildCliContinueGeneration", buildCliContinueGeneration)
+            console.log(">>>>Build ~ .subscribe ~ buildCliContinueGeneration", buildCliContinueGeneration)
 
           })
 

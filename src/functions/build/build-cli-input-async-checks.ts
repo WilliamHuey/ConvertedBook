@@ -329,7 +329,10 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
       console.log("Build ||||| .subscribe ~ res", this.buildChecks(this.parse(), serverjsBuild$), buildCli)
 
 
-      // processBuildCliAsync(buildCli, inputOutputWithOutputFileName$);
+      const buildChecks = (this.buildChecks(this.parse(),
+        serverjsBuild$) as BuildCheckGoodResults);
+      processBuildCliAsync(Object.assign(buildCli,
+        { conditions: buildChecks.conditions }), inputOutputWithOutputFileName$);
 
     });
 
