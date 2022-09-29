@@ -62,51 +62,64 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
     someFlagsRequiredRecognized
   } = conditions;
 
-  // Missing a required flag and can not continue
-  if (someFlagsRequiredRecognized) {
-    return {
-      msg: this.buildLog({
-        action: action.check,
-        log: messagesKeys.someRequiredFlagsFound
-      }),
-      continue: false
-    };
-  }
+  // this.log('1 here')
 
-  // No required flags present and will not continue
-  if (!allRequiredFlagsRecognized) {
-    return {
-      msg: this.buildLog({
-        action: action.check,
-        log: messagesKeys.noRequiredFlagsFound
-      }),
-      continue: false
-    };
-  }
+  if (!serverjsBuild$) {
 
-  // No more processing without any valid output formats
-  if (!emptyArgsValidFlags && noValidFormats) {
-    return {
-      msg: this.buildLog({
+    // Missing a required flag and can not continue
+    if (someFlagsRequiredRecognized) {
+      return {
+        msg: this.buildLog({
+          action: action.check,
+          log: messagesKeys.someRequiredFlagsFound
+        }),
+        continue: false
+      };
+    }
+
+    // No required flags present and will not continue
+    if (!allRequiredFlagsRecognized) {
+      return {
+        msg: this.buildLog({
+          action: action.check,
+          log: messagesKeys.noRequiredFlagsFound
+        }),
+        continue: false
+      };
+    }
+
+    // No more processing without any valid output formats
+    if (!emptyArgsValidFlags && noValidFormats) {
+      return {
+        msg: this.buildLog({
+          action: action.check,
+          log: messagesKeys.noValidFormats,
+          data: unknownFormats
+        }),
+        continue: false
+      };
+    }
+
+    // Unknown format warning
+    if (hasUnknownFormats) {
+      console.log(this.buildLog({
         action: action.check,
-        log: messagesKeys.noValidFormats,
+        log: messagesKeys.ignoreUnknownFormats,
         data: unknownFormats
-      }),
-      continue: false
-    };
+      }));
+    }
+
   }
 
-  // Unknown format warning
-  if (hasUnknownFormats) {
-    console.log(this.buildLog({
-      action: action.check,
-      log: messagesKeys.ignoreUnknownFormats,
-      data: unknownFormats
-    }));
-  }
+  // this.log('2 here')
 
   // Supply the information after making checks on the build command
   const conditionsFlagsArgv: CondsFlagsArgv = { ...conditions, flags, argv };
+
+
+
+
+
 
   // Patch 'conditionsFlagsArgv' with the location of the source tex file and
   // the 'index.html' files for a project folder generation
@@ -156,7 +169,7 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
     ]
   );
 
-  console.log('.|.|.| ', conditionsFlagsArgv);
+  console.log('.|.|.| ', emptyArgsValidFlagsCond(), '\n\n', buildArgsConds(), '\n\n', conditionsFlagsArgv);
 
   return emptyArgsValidFlagsCond() || buildArgsConds();
 }

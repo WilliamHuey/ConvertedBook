@@ -4,7 +4,7 @@ import 'module-alias/register';
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { unnest, difference, without } from 'ramda';
-import { ReplaySubject, zip, merge, from } from 'rxjs';
+import { ReplaySubject, zip, merge, from, switchMap } from 'rxjs';
 import { filter, mergeMap, take, takeLast, map } from 'rxjs/operators';
 const IsThere = require('is-there');
 const listify = require('listify');
@@ -85,7 +85,8 @@ export default class Build extends Command {
   static requiredExternalDeps = ['pandoc', 'latex']
 
   async run() {
-    const { raw } = this.parse(Build);
+    const buildCmd = this.parse(Build);
+    const { raw } = buildCmd;
 
     // Get extra information to know if this build command is
     // being initiated from the cli for building a file or from
@@ -153,6 +154,11 @@ export default class Build extends Command {
             })
           );
 
+        buildCliResults$
+          .subscribe((bcr) => {
+            console.log('bcr', bcr);
+          });
+
         // Allow build command inside a project folder without displaying
         // the error messages.
 
@@ -191,9 +197,13 @@ export default class Build extends Command {
               return buildCliResults$;
             }),
             map((result) => {
+              const stuff = this.buildChecks(buildCmd, serverjsBuild$,);
+              console.log('[[[[[[[[[[[[[[[[[[[[[[[[[', stuff);
+
               return Object.assign({ ...result }, {
                 msg: 'Build from project folder',
-                continue: true
+                continue: true,
+                conditions: stuff.conditions
               });
             })
           );
@@ -233,10 +243,11 @@ export default class Build extends Command {
         const buildCliAsyncResults$ = buildCliAsyncCheck$
           .pipe(
             mergeMap(buildCli => {
-              const buildAsyncResults = this
+              const buildAsyncResults$ = this
                 .buildCliInputsAsyncChecks((buildCli as BuildCheckGoodResults),
                   serverjsBuild$, notProjectFolder$);
-              return buildAsyncResults;
+              this.log('++++++++ build async results ++++++')
+              return buildAsyncResults$;
             })
           );
 
@@ -253,6 +264,8 @@ export default class Build extends Command {
           buildCliAsyncResults$
             .pipe(
               filter(buildAsyncResults => {
+                console.log('buildAsyncResults', buildAsyncResults);
+
                 return buildAsyncResults.continue;
               })
             )
@@ -260,7 +273,7 @@ export default class Build extends Command {
 
         buildCliContinueGeneration$
           .subscribe((buildCliContinueGeneration) => {
-            console.log(">>>>Build ~ .subscribe ~ buildCliContinueGeneration", buildCliContinueGeneration)
+            console.log("buildCliContinueGeneration", buildCliContinueGeneration)
 
           })
 
@@ -272,6 +285,8 @@ export default class Build extends Command {
           buildCliAsyncResults$
             .pipe(
               filter(buildAsyncResults => {
+                console.log('buildAsyncResults', buildAsyncResults);
+
                 return !buildAsyncResults.continue;
               })
             )
@@ -282,6 +297,12 @@ export default class Build extends Command {
                 .conditions.flags['dry-run'] === 'true';
             })
           );
+
+        buildCliAsyncCheck$
+          .subscribe((bac) => {
+            console.log('bac', bac);
+
+          })
 
         const buildRunMap: Record<string, Function> = {
           'dry-run': ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
@@ -321,7 +342,9 @@ export default class Build extends Command {
         buildRunScenarios$
           .pipe(take(1))
           .subscribe(([buildCli, buildAsyncResults]) => {
+            this.log('..........................................', buildCli, buildAsyncResults)
             const flagOptions = (buildCli as BuildCheckGoodResults).conditions.flags;
+            this.log('flagOptions', flagOptions)
             const options = difference(Object.keys(flagOptions), Build.requiredFlags);
 
             console.log('options', options);
