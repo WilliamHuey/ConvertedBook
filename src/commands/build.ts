@@ -4,7 +4,7 @@ import 'module-alias/register';
 // Third party modules
 import { Command, flags } from '@oclif/command';
 import { unnest, difference, without } from 'ramda';
-import { ReplaySubject, zip, merge, from, switchMap } from 'rxjs';
+import { ReplaySubject, zip, merge, from } from 'rxjs';
 import { filter, mergeMap, take, takeLast, map } from 'rxjs/operators';
 const IsThere = require('is-there');
 const listify = require('listify');
@@ -88,6 +88,9 @@ export default class Build extends Command {
     const buildCmd = this.parse(Build);
     const { raw } = buildCmd;
 
+    console.log('buildCmd', buildCmd);
+
+
     // Get extra information to know if this build command is
     // being initiated from the cli for building a file or from
     // the project folder.
@@ -154,6 +157,35 @@ export default class Build extends Command {
             })
           );
 
+        const serverCheck$ = allDepsSatisfied$
+          .pipe(
+            mergeMap(() => {
+              return this.buildCliInputsChecks().isServerJsFound$;
+            }),
+            // mergeMap((serverJsFound) => {
+            //   return this.buildCliInputsChecks(serverJsFound);
+            // }),
+            // map((isServerJsFound) => {
+            //   return isServerJsFound;
+            // }),
+            filter((isServerJsFound) => {
+              return isServerJsFound === true;
+            }),
+            map(() => {
+              return this.buildCliInputsChecks(true);
+            }),
+            // mergeMap(() => {
+
+            // })
+
+          );
+
+        serverCheck$
+          .subscribe((serverCheck) => {
+            console.log('serverCheck', serverCheck);
+
+          })
+
         buildCliResults$
           .subscribe((bcr) => {
             console.log('bcr', bcr);
@@ -197,13 +229,13 @@ export default class Build extends Command {
               return buildCliResults$;
             }),
             map((result) => {
-              const stuff = this.buildChecks(buildCmd, serverjsBuild$,);
-              console.log('[[[[[[[[[[[[[[[[[[[[[[[[[', stuff);
+              const buildChecksResults = this.buildChecks(buildCmd, serverjsBuild$,);
+              console.log('[[[[[[[[[[[[[[[[[[[[[[[[[', buildChecksResults);
 
               return Object.assign({ ...result }, {
                 msg: 'Build from project folder',
                 continue: true,
-                conditions: stuff.conditions
+                conditions: buildChecksResults.conditions
               });
             })
           );
@@ -246,7 +278,6 @@ export default class Build extends Command {
               const buildAsyncResults$ = this
                 .buildCliInputsAsyncChecks((buildCli as BuildCheckGoodResults),
                   serverjsBuild$, notProjectFolder$);
-              this.log('++++++++ build async results ++++++')
               return buildAsyncResults$;
             })
           );
@@ -255,7 +286,8 @@ export default class Build extends Command {
 
         buildCliAsyncResults$
           .subscribe((buildCliAsyncResults) => {
-            console.log("-----Build ~ .subscribe ~ buildCliAsyncResults", JSON.stringify(buildCliAsyncResults));
+            console.log('??????????????????????????')
+            console.table(buildCliAsyncResults);
           });
 
         // Valid input and output means file conversion can happen
@@ -264,45 +296,50 @@ export default class Build extends Command {
           buildCliAsyncResults$
             .pipe(
               filter(buildAsyncResults => {
-                console.log('buildAsyncResults', buildAsyncResults);
-
                 return buildAsyncResults.continue;
               })
             )
         );
 
-        buildCliContinueGeneration$
-          .subscribe((buildCliContinueGeneration) => {
-            console.log("buildCliContinueGeneration", buildCliContinueGeneration)
-
-          })
+        // buildCliContinueGeneration$
+        //   .subscribe((buildCliContinueGeneration) => {
+        //     console.log("buildCliContinueGeneration", buildCliContinueGeneration);
+        //   })
 
 
         // Dry run should still allow continuation even when facing
         // a continue value of false
-        const dryRunBuild$ = zip(
+
+        const continuationOnContFalse$ = zip(
           buildCliAsyncCheck$,
           buildCliAsyncResults$
             .pipe(
               filter(buildAsyncResults => {
-                console.log('buildAsyncResults', buildAsyncResults);
-
                 return !buildAsyncResults.continue;
               })
             )
         )
           .pipe(
             filter(([buildCli, _]) => {
+              console.log('ccc  c c cc ', buildCli);
+
               return (buildCli as BuildCheckGoodResults)
                 .conditions.flags['dry-run'] === 'true';
             })
           );
 
-        buildCliAsyncCheck$
-          .subscribe((bac) => {
-            console.log('bac', bac);
+        const dryRunBuild$ = continuationOnContFalse$;
 
-          })
+        // serverjsBuild$
+        //   .pipe(
+        //     filter((serverjsBuild) => {
+        //       return serverjsBuild.conditions?.flags?.force;
+        //     })
+        //   )
+        //   .subscribe((serverjsBuild) => {
+        //     console.log('serverjsBuild', serverjsBuild);
+
+        //   })
 
         const buildRunMap: Record<string, Function> = {
           'dry-run': ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
@@ -342,15 +379,8 @@ export default class Build extends Command {
         buildRunScenarios$
           .pipe(take(1))
           .subscribe(([buildCli, buildAsyncResults]) => {
-            this.log('..........................................', buildCli, buildAsyncResults)
             const flagOptions = (buildCli as BuildCheckGoodResults).conditions.flags;
-            this.log('flagOptions', flagOptions)
             const options = difference(Object.keys(flagOptions), Build.requiredFlags);
-
-            console.log('options', options);
-            console.log('buildCli', buildCli);
-            console.log('buildAsyncResults', buildAsyncResults);
-
 
             // Apply any flags selectively one at a time,
             // for custom changes for each flag other than 'input' and 'output'

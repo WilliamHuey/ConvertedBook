@@ -14,11 +14,11 @@ export type BuildCliChecks = {
   isServerJsFound$: Observable<Boolean>
 }
 
-export function buildCliInputsChecks(this: Build): (BuildCheckResults & BuildCliChecks) {
+export function buildCliInputsChecks(this: Build, serverJs?: Boolean | undefined): (BuildCheckResults & BuildCliChecks) {
   // Check for cli input validity
   const buildCmd = this.parse(Build);
 
-  // console.log('buildCmd', buildCmd);
+  console.log('1 buildCmd', buildCmd, serverJs);
 
 
   const isServerJsFound$ = from(IsThere
@@ -83,8 +83,8 @@ export function buildCliInputsChecks(this: Build): (BuildCheckResults & BuildCli
     })
     .run();
 
-  // this.log('output', output)
+  // console.log('output', output);
+
 
   return { ...output, isServerJsFound$ };
 }
-

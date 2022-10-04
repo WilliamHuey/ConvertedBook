@@ -43,8 +43,6 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
     conditions
   } = this.buildReport({ argv, flags, serverjsBuild$ });
 
-  // console.log("serverjsBuild$>>>>>>>>>>>>>..", serverjsBuild$, conditions);
-
   const {
     argsCommaList,
     noValidFormats,
@@ -61,8 +59,6 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
     allRequiredFlagsRecognized,
     someFlagsRequiredRecognized
   } = conditions;
-
-  // this.log('1 here')
 
   if (!serverjsBuild$) {
 
@@ -111,15 +107,8 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
 
   }
 
-  // this.log('2 here')
-
   // Supply the information after making checks on the build command
   const conditionsFlagsArgv: CondsFlagsArgv = { ...conditions, flags, argv };
-
-
-
-
-
 
   // Patch 'conditionsFlagsArgv' with the location of the source tex file and
   // the 'index.html' files for a project folder generation
@@ -129,14 +118,20 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
     });
   }
 
-  // Valid scenarios for building
-  const buildArgsConds = cond([
+  let listOfConds = [
     onlyOneBuildFormat,
     additionalArgsOverBuildOrder,
     exactMatchBuildOrder,
     multipleArgsNotDependentBuildOrder
-  ].map(argsCond => {
+  ];
+
+  console.log('listOfConds', listOfConds);
+
+
+  // Valid scenarios for building
+  const buildArgsConds = cond(listOfConds.map(argsCond => {
     return [always(argsCond), () => {
+
       return {
         msg: this.buildLog({
           action: action.ready,
@@ -147,6 +142,7 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
       };
     }];
   }));
+
 
   // Also a valid scenario:
   // Build format matches where all the argument
@@ -169,7 +165,9 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
     ]
   );
 
-  console.log('.|.|.| ', emptyArgsValidFlagsCond(), '\n\n', buildArgsConds(), '\n\n', conditionsFlagsArgv);
+  this.log('+++emptyArgsValidFlagsCond()', emptyArgsValidFlagsCond());
+  this.log('+++buildArgsConds', buildArgsConds());
+
 
   return emptyArgsValidFlagsCond() || buildArgsConds();
 }

@@ -314,8 +314,6 @@ function processBuildCliAsync(buildCli: BuildCheckGoodResults, inputOutputWithOu
       )
   )
     .subscribe((res) => {
-      console.log('res', res);
-
       inputOutputWithOutputFileName$.next(res);
     });
 }
@@ -328,7 +326,6 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
     .subscribe(() => {
       console.log("zzzzzzzzzzzzzBuild ||||| .subscribe ~ res")
 
-
       const buildChecks = (this.buildChecks(this.parse(),
         serverjsBuild$) as BuildCheckGoodResults);
       processBuildCliAsync(Object.assign(buildCli,
@@ -337,11 +334,8 @@ export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodR
 
     });
 
-  // this.log('buildCli....', buildCli);
-
   notProjectFolder$
     .subscribe(() => {
-      this.log('+/+.+>>+>+ non proj')
       processBuildCliAsync(buildCli, inputOutputWithOutputFileName$);
     });
 
