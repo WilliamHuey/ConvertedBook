@@ -110,12 +110,13 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
   // Supply the information after making checks on the build command
   const conditionsFlagsArgv: CondsFlagsArgv = { ...conditions, flags, argv };
 
+  this.log('--- conditionsFlagsArgv', conditionsFlagsArgv);
+
   // Patch 'conditionsFlagsArgv' with the location of the source tex file and
   // the 'index.html' files for a project folder generation
   if (serverjsBuild$) {
-    Object.assign(conditionsFlagsArgv, {
-      flags: { input: './src/index.tex', output: './index.html', force: true }
-    });
+    Object.assign(conditionsFlagsArgv.flags,
+      { input: './src/index.tex', output: './index.html', force: true });
   }
 
   let listOfConds = [

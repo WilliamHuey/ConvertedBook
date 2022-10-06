@@ -7,6 +7,7 @@ import { Observable, from } from 'rxjs';
 import Build from '../../commands/build';
 import { action, messagesKeys } from './build-log';
 import { BuildCheckResults, BuildCheckBadResults } from './build-checks';
+import { ServerjsBuild } from './build-import';
 
 const serverFileName = 'server.js';
 
@@ -67,6 +68,7 @@ export function buildCliInputsChecks(this: Build, serverJs?: Boolean | undefined
         return Object.keys(flags).length > 0;
       })
     }), () => {
+      console.log('1111111');
       // Further checks on the flags
       return (this.buildChecks(buildCmd) as BuildCheckResults);
     })
@@ -79,11 +81,16 @@ export function buildCliInputsChecks(this: Build, serverJs?: Boolean | undefined
         return Object.keys(flags).length > 0;
       })
     }), () => {
+      console.log('22222', serverJs);
+
+
       return (this.buildChecks(buildCmd) as BuildCheckResults);
+
     })
     .run();
 
-  // console.log('output', output);
+  console.log('output', output);
+
 
 
   return { ...output, isServerJsFound$ };

@@ -157,35 +157,6 @@ export default class Build extends Command {
             })
           );
 
-        const serverCheck$ = allDepsSatisfied$
-          .pipe(
-            mergeMap(() => {
-              return this.buildCliInputsChecks().isServerJsFound$;
-            }),
-            // mergeMap((serverJsFound) => {
-            //   return this.buildCliInputsChecks(serverJsFound);
-            // }),
-            // map((isServerJsFound) => {
-            //   return isServerJsFound;
-            // }),
-            filter((isServerJsFound) => {
-              return isServerJsFound === true;
-            }),
-            map(() => {
-              return this.buildCliInputsChecks(true);
-            }),
-            // mergeMap(() => {
-
-            // })
-
-          );
-
-        serverCheck$
-          .subscribe((serverCheck) => {
-            console.log('serverCheck', serverCheck);
-
-          })
-
         buildCliResults$
           .subscribe((bcr) => {
             console.log('bcr', bcr);
@@ -240,6 +211,7 @@ export default class Build extends Command {
             })
           );
 
+
         // End the checks early as critical problems are found
         // or required flags not satisfied
         const errorMessage$ = foundServerjs$
@@ -284,12 +256,6 @@ export default class Build extends Command {
 
         asyncResultsLog$.next(buildCliAsyncResults$);
 
-        buildCliAsyncResults$
-          .subscribe((buildCliAsyncResults) => {
-            console.log('??????????????????????????')
-            console.table(buildCliAsyncResults);
-          });
-
         // Valid input and output means file conversion can happen
         const buildCliContinueGeneration$ = zip(
           buildCliAsyncCheck$,
@@ -300,11 +266,6 @@ export default class Build extends Command {
               })
             )
         );
-
-        // buildCliContinueGeneration$
-        //   .subscribe((buildCliContinueGeneration) => {
-        //     console.log("buildCliContinueGeneration", buildCliContinueGeneration);
-        //   })
 
 
         // Dry run should still allow continuation even when facing
@@ -330,16 +291,6 @@ export default class Build extends Command {
 
         const dryRunBuild$ = continuationOnContFalse$;
 
-        // serverjsBuild$
-        //   .pipe(
-        //     filter((serverjsBuild) => {
-        //       return serverjsBuild.conditions?.flags?.force;
-        //     })
-        //   )
-        //   .subscribe((serverjsBuild) => {
-        //     console.log('serverjsBuild', serverjsBuild);
-
-        //   })
 
         const buildRunMap: Record<string, Function> = {
           'dry-run': ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
