@@ -88,9 +88,6 @@ export default class Build extends Command {
     const buildCmd = this.parse(Build);
     const { raw } = buildCmd;
 
-    console.log('buildCmd', buildCmd);
-
-
     // Get extra information to know if this build command is
     // being initiated from the cli for building a file or from
     // the project folder.
@@ -157,11 +154,6 @@ export default class Build extends Command {
             })
           );
 
-        buildCliResults$
-          .subscribe((bcr) => {
-            console.log('bcr', bcr);
-          });
-
         // Allow build command inside a project folder without displaying
         // the error messages.
 
@@ -201,7 +193,6 @@ export default class Build extends Command {
             }),
             map((result) => {
               const buildChecksResults = this.buildChecks(buildCmd, serverjsBuild$,);
-              console.log('[[[[[[[[[[[[[[[[[[[[[[[[[', buildChecksResults);
 
               return Object.assign({ ...result }, {
                 msg: 'Build from project folder',
@@ -270,7 +261,6 @@ export default class Build extends Command {
 
         // Dry run should still allow continuation even when facing
         // a continue value of false
-
         const continuationOnContFalse$ = zip(
           buildCliAsyncCheck$,
           buildCliAsyncResults$
@@ -282,8 +272,6 @@ export default class Build extends Command {
         )
           .pipe(
             filter(([buildCli, _]) => {
-              console.log('ccc  c c cc ', buildCli);
-
               return (buildCli as BuildCheckGoodResults)
                 .conditions.flags['dry-run'] === 'true';
             })

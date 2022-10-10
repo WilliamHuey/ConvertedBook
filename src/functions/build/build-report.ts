@@ -42,10 +42,8 @@ export interface BuildReportResults {
 }
 
 export function buildReport(this: Build, { argv, flags, serverjsBuild$ }: CommandArgsFlags): BuildReportResults {
+
   // Discern which is an unknown format or flag
-
-  console.log('argv++++++++++++++++', argv);
-
   const recognizedFormats = intersection(Build.acceptedOutputFormats, argv);
   const unrecognizedElements = difference(argv, Build.acceptedOutputFormats);
   const unknownFlags = unrecognizedElements.filter(element => {

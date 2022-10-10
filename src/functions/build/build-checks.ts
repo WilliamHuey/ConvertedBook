@@ -110,8 +110,6 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
   // Supply the information after making checks on the build command
   const conditionsFlagsArgv: CondsFlagsArgv = { ...conditions, flags, argv };
 
-  this.log('--- conditionsFlagsArgv', conditionsFlagsArgv);
-
   // Patch 'conditionsFlagsArgv' with the location of the source tex file and
   // the 'index.html' files for a project folder generation
   if (serverjsBuild$) {
@@ -125,9 +123,6 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
     exactMatchBuildOrder,
     multipleArgsNotDependentBuildOrder
   ];
-
-  console.log('listOfConds', listOfConds);
-
 
   // Valid scenarios for building
   const buildArgsConds = cond(listOfConds.map(argsCond => {
@@ -165,10 +160,6 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
       ]
     ]
   );
-
-  this.log('+++emptyArgsValidFlagsCond()', emptyArgsValidFlagsCond());
-  this.log('+++buildArgsConds', buildArgsConds());
-
 
   return emptyArgsValidFlagsCond() || buildArgsConds();
 }
