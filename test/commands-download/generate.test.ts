@@ -91,7 +91,7 @@ describe('Actual project generation:', () => {
               serveProcess$
                 .subscribe((serveProcess: any) => {
                   serveProcess.stdout.on('data', function (data: any) {
-                    if (data.toString().includes('Command completed.')) {
+                    if (data.toString().includes('Complete file format generation')) {
                       serveProcess.kill();
                       process.chdir(originalFolderPath);
                       done();
