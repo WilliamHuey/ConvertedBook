@@ -8,7 +8,7 @@ import * as fs from 'fs';
 
 // Third party modules
 import { Command, flags } from '@oclif/command';
-import { bindCallback, from, merge, bindNodeCallback, race } from 'rxjs';
+import { bindCallback, from, merge, bindNodeCallback } from 'rxjs';
 import { tap, mergeMap, share, takeUntil, filter, takeLast, take } from 'rxjs/operators';
 import { match } from 'ts-pattern';
 const IsThere = require('is-there');
@@ -133,18 +133,33 @@ export default class Generate extends Command {
       .promises.directory(normalizedFolder) as Promise<boolean>);
 
     // Verify the full project's folder existence or non-existence
-    const fullProjectFolderExists$ = checkFullOutputPathProjectFolder$
-      .pipe(
-        filter((outputFolder: boolean) => {
-          return outputFolder;
-        })
-      );
+
+    this.log('normalizedFolder', normalizedFolder)
+
+    checkFullOutputPathProjectFolder$
+      .subscribe((res) => {
+        this.log('checkFullOutputPathProjectFolder', res, normalizedFolder);
+      })
+
     const fullProjectFolderNonExists$ = checkFullOutputPathProjectFolder$
       .pipe(
         filter((outputFolder: boolean) => {
           return !outputFolder;
         })
       );
+
+    const fullProjectFolderExists$ = checkFullOutputPathProjectFolder$
+      .pipe(
+        filter((outputFolder: boolean) => {
+          return outputFolder;
+        }),
+        takeUntil(fullProjectFolderNonExists$)
+      );
+
+    fullProjectFolderExists$
+      .subscribe(() => {
+        this.log('eeeeeeeeeexists')
+      })
 
     const checkOutputFolder$ = from(IsThere
       .promises.directory(normalizedParentFolderName) as Promise<boolean>);
@@ -157,7 +172,9 @@ export default class Generate extends Command {
           // Also accept the situation where only the project name exists
           // by itself, meaning that the output folder should exist
           return outputFolder || !parentFolderNamePresent;
-        })
+        }),
+        takeLast(1),
+        share()
       );
 
     const outputFolderNonExists$ = checkOutputFolder$
@@ -192,8 +209,15 @@ export default class Generate extends Command {
       .pipe(
         filter(() => {
           return forcedGenerate;
-        })
+        }),
+        // takeUntil(fullProjectFolderNonExists$)
       );
+
+    forcedOutputFolderExists$
+      .subscribe((res) => {
+        this.log('...forcedOutputFolderExists', res)
+      })
+
 
     // Delete the existing folder if it exists when the forced flag is found
     const deleteFolderOnForce$ = forcedOutputFolderExists$
@@ -202,6 +226,7 @@ export default class Generate extends Command {
           return !isDryRun;
         }),
         mergeMap(() => {
+          this.log('parentFolderPath', parentFolderPath)
           return remove(path.join(parentFolderPath), {
             recursive: true, force: true
           })
@@ -209,17 +234,28 @@ export default class Generate extends Command {
         }))
       .pipe(share());
 
-    deleteFolderOnForce$.subscribe(() => { });
+    deleteFolderOnForce$
+      .subscribe(() => {
+        this.log('delete folder-------.')
+      })
 
-    const creationVerified$ = race(
-      deleteFolderOnForce$,
-      fullProjectFolderNonExists$)
+    fullProjectFolderNonExists$
+      .subscribe(() => {
+        this.log('||||| fullProjectFolderNonExists.')
+      })
+
+    const creationVerified$ = merge(
+      fullProjectFolderNonExists$,
+      deleteFolderOnForce$
+    )
       .pipe(
-        mergeMap(() => {
-          return outputFolderExists$;
-        }),
-        takeUntil(nonExistentUpperLevelFolder$)
+        takeLast(1)
       );
+
+    creationVerified$
+      .subscribe(() => {
+        this.log('creationVerified')
+      })
 
     const projectFolder$ = creationVerified$
       .pipe(
@@ -227,6 +263,9 @@ export default class Generate extends Command {
           return !isDryRun;
         }),
         mergeMap(() => {
+          this.log('projec....', parentFolderNamePresent)
+
+
           return parentFolderNamePresent ?
 
             // Output folder exists one level above the specified
@@ -235,7 +274,8 @@ export default class Generate extends Command {
               filePathSplit.join('/')
             ).pipe(share()) : mkdir(
               normalizedFolder
-            ).pipe(share());
+            )
+              .pipe(share());
         }),
         takeLast(1),
         share()
@@ -256,6 +296,7 @@ export default class Generate extends Command {
     const projectFolderWithContents$ = projectFolder$
       .pipe(
         mergeMap(() => {
+          this.log('++++ mergemap')
           return folderStructure
             .generateStructure(fullProjectFolderExists$)
             .structureCreationCount$;
@@ -263,6 +304,9 @@ export default class Generate extends Command {
         take(1),
         tap(this.logCreationBegin),
         mergeMap(() => {
+
+          this.log('dddownload the npm modules')
+
           // Install the NPM modules
           const npmService = spawn('npm', ['install'], {
             cwd: normalizedFolderPath,

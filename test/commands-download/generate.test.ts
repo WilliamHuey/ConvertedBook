@@ -105,9 +105,9 @@ describe('Actual project generation:', () => {
     const forceGenerationDone$ = new ReplaySubject();
 
     fancy
-      .it('will download NPM modules with "--force" flag to generate project to "completion" status', (_, done) => {
+      .it('will create project with --force flag on a new project', (_, done) => {
         isOnLine(() => {
-          const forceGenerateProjectFolder$ = from(generate.run([forcedGenerationPathProjectGenerate, '--npm-project-name', npmProjectName, '--force']) as Promise<any>).pipe(take(1), share());
+          const forceGenerateProjectFolder$ = from(generate.run([forcedGenerationPathProjectGenerate, '--npm-project-name', npmProjectName]) as Promise<any>).pipe(take(1), share());
 
           forceGenerateProjectFolder$
             .pipe(
@@ -119,10 +119,37 @@ describe('Actual project generation:', () => {
               next: () => {
                 done();
                 forceGenerationDone$.next('generated');
+                console.log('ffffffffffffirst');
+
               }
             });
         });
       });
+
+
+    fancy
+      .it('will download NPM modules with "--force" flag to overwrite project', (_, done) => {
+
+
+        forceGenerationDone$.subscribe(() => {
+          const forceGenerateProjectFolder$ = from(generate.run([forcedGenerationPathProjectGenerate, '--npm-project-name', npmProjectName, '--force']) as Promise<any>).pipe(take(1), share());
+
+          console.log('secccond');
+
+
+          forceGenerateProjectFolder$
+            .subscribe({
+              next: () => {
+                console.log('third');
+                done();
+              }
+            });
+        });
+
+
+
+      });
+
 
     mkdir(`${baseTempDownloadFolder}serve-empty-folder`).pipe(share())
       .subscribe(() => {

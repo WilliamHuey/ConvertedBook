@@ -105,6 +105,7 @@ class GenerateContent implements GenerateStructure {
     // Generate the folders
     content?.folders?.forEach((element: InnerContentProperties) => {
       const newFolderName = path.join(parentFolderPath, element.name);
+
       const createFolder$ = mkdir(newFolderName)
         .pipe(takeLast(1), share());
 

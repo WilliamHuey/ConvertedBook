@@ -258,7 +258,6 @@ export default class Build extends Command {
             )
         );
 
-
         // Dry run should still allow continuation even when facing
         // a continue value of false
         const continuationOnContFalse$ = zip(
@@ -278,7 +277,6 @@ export default class Build extends Command {
           );
 
         const dryRunBuild$ = continuationOnContFalse$;
-
 
         const buildRunMap: Record<string, Function> = {
           'dry-run': ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
