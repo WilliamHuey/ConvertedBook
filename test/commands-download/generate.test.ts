@@ -105,7 +105,7 @@ describe('Actual project generation:', () => {
     const forceGenerationDone$ = new ReplaySubject();
 
     fancy
-      .it('will create project with --force flag on a new project', (_, done) => {
+      .it('will create project', (_, done) => {
         isOnLine(() => {
           const forceGenerateProjectFolder$ = from(generate.run([forcedGenerationPathProjectGenerate, '--npm-project-name', npmProjectName]) as Promise<any>).pipe(take(1), share());
 
@@ -119,8 +119,6 @@ describe('Actual project generation:', () => {
               next: () => {
                 done();
                 forceGenerationDone$.next('generated');
-                console.log('ffffffffffffirst');
-
               }
             });
         });
@@ -129,25 +127,21 @@ describe('Actual project generation:', () => {
 
     fancy
       .it('will download NPM modules with "--force" flag to overwrite project', (_, done) => {
-
-
         forceGenerationDone$.subscribe(() => {
           const forceGenerateProjectFolder$ = from(generate.run([forcedGenerationPathProjectGenerate, '--npm-project-name', npmProjectName, '--force']) as Promise<any>).pipe(take(1), share());
 
-          console.log('secccond');
-
-
           forceGenerateProjectFolder$
+            .pipe(
+              mergeMap(res => {
+                return res.projectFolderWithContents$;
+              })
+            )
             .subscribe({
               next: () => {
-                console.log('third');
                 done();
               }
             });
         });
-
-
-
       });
 
 
