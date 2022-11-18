@@ -30,12 +30,12 @@ const createExactPdf = ({
   docsGenerated$, additionalInputArgs
 }: CreateExactPdf) => {
   (async () => {
+
     const serveRun$ = await serve.run(['--pandoc', 'true']);
     serveRun$
       .subscribe((serveProcess: any) => {
-
         serveProcess.stdout.on('data', async function (data: any) {
-          if (data.toString().includes('Command completed.')) {
+          if (data.toString().includes('Complete file format generation')) {
             const browser = await chromium.launch();
             const page = await browser.newPage();
             await page.goto(`localhost:${8080}`);
@@ -53,7 +53,6 @@ const createExactPdf = ({
             docsGenerated$.complete();
             await browser.close();
             serveProcess.kill();
-
           }
         });
       });
