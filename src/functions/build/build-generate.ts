@@ -69,10 +69,6 @@ export function buildGenerate(
 
   if (playWrightPdfGeneration) {
 
-    console.log('-----------------playwright gen', checkFromServerCli, additionalInputArgs);
-
-    const { pandoc: fromProjectFlag } = additionalInputArgs;
-
     // Manipulate the settings to only generate the html with pandoc
     pandocGenerated({
       input,
@@ -88,22 +84,21 @@ export function buildGenerate(
       additionalInputArgs
     });
 
-    // TODO: Only generate the exact pdf when inside a project folder
-    // if (fromProjectFlag) {
-
-    // Pass in additional argument to distinguish the branch type generation
-    playwrightGenerated({
-      input,
-      normalizedFormats,
-      flags,
-      fileOutputExistence,
-      checkFromServerCli,
-      normalizedOutputPath,
-      docsGenerated$,
-      buildDocuments$,
-      additionalInputArgs
-    });
-    // }
+    if (results.isServerJsFound$) {
+      results.isServerJsFound$.subscribe(() => {
+        playwrightGenerated({
+          input,
+          normalizedFormats,
+          flags,
+          fileOutputExistence,
+          checkFromServerCli,
+          normalizedOutputPath,
+          docsGenerated$,
+          buildDocuments$,
+          additionalInputArgs
+        });
+      });
+    }
   }
 
   // Generally run the pandoc generation when converting any file type,

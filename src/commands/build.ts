@@ -300,8 +300,6 @@ export default class Build extends Command {
           },
           default: ([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
 
-            this.log('----------------default')
-
             // Default build with file generation
             this.log(buildCli.msg.trim());
             this.log(buildAsyncResults.msg.trim());

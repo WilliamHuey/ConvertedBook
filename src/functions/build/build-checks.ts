@@ -22,6 +22,7 @@ export type BuildCheckGoodResults = {
   conditions: CondsFlagsArgv;
   fromServerCli?: boolean;
   exactPdf?: boolean;
+  isServerJsFound$?: Observable<Boolean>;
 }
 
 export type BuildCheckResults = XOR<BuildCheckBadResults, BuildCheckGoodResults>
