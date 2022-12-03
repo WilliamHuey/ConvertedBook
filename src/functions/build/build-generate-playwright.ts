@@ -39,6 +39,16 @@ const createExactPdf = ({
             const browser = await chromium.launch();
             const page = await browser.newPage();
             await page.goto(`localhost:${8080}`);
+
+            // Remove the helper JavaScript helper elements:
+            // table of contents dropdown menu
+            const elementHandle = await page.$('#convertedbook-interactions');
+            if (elementHandle) {
+              await elementHandle.evaluate(node => {
+                node.remove();
+              });
+            }
+
             await page.pdf({
               format: 'A4',
               printBackground: true,
