@@ -30,6 +30,10 @@ export class GenerateStructureOutline {
           fileContent: 'server'
         },
         {
+          name: 'server-config.json',
+          fileContent: 'serverConfig'
+        },
+        {
           name: 'vite.config.js',
           fileContent: 'viteConfig'
         },

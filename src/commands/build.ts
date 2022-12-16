@@ -287,7 +287,6 @@ export default class Build extends Command {
             this.log(buildAsyncResults.msg.trim());
             docsGenerated$.next('');
             docsGenerated$.complete();
-
           },
           exact: (([buildCli, buildAsyncResults]: [BuildCheckGoodResults, AsyncCheckResults]) => {
             buildRunMap.default([{ ...buildCli, exactPdf: true }, buildAsyncResults]);

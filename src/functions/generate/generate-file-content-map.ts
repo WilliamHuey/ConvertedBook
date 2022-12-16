@@ -41,6 +41,7 @@ const fileContent: FileContentType = {
     }
   },
   server: { name: 'generate-file-server.js' },
+  serverConfig: { name: 'generate-file-server-config.json' },
   viteConfig: { name: 'generate-file-vite.config.js' },
   tsConfig: { name: 'generate-file-tsconfig.json' }
 };

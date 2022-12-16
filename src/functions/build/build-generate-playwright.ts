@@ -19,9 +19,6 @@ interface CreateExactPdf {
   additionalInputArgs: Record<any, any>;
 }
 
-// TODO: Read the server port from vite dynamically
-const viteDevServerPort = 8080;
-
 // Assumed the exact generation is from a cli or programmatic 
 // pdf generation event that is outside of the project generation.
 // Project based generation will only use the inexact pdf generation
@@ -34,11 +31,21 @@ const createExactPdf = ({
     const serveRun$ = await serve.run(['--pandoc', 'true']);
     serveRun$
       .subscribe((serveProcess: any) => {
+        let serverPortStr = "8080";
         serveProcess.stdout.on('data', async function (data: any) {
+
+          // Read the server port from 'server-config.json' through the console
+          const isServerPortStr = data.toString().includes("http://localhost:");
+          if (isServerPortStr) {
+            const [_str, serverPort] = data
+              .toString().split("http://localhost:");
+            serverPortStr = serverPort.replace(/\//g, "").trim();
+          }
+
           if (data.toString().includes('Complete file format generation')) {
             const browser = await chromium.launch();
             const page = await browser.newPage();
-            await page.goto(`localhost:${8080}`);
+            await page.goto(`localhost:${serverPortStr}`);
 
             // Remove the helper JavaScript helper elements:
             // table of contents dropdown menu

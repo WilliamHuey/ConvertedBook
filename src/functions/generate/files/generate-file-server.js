@@ -1,12 +1,11 @@
 const { createServer } = require('vite');
+const serverConfig = require('./server-config.json');
 
 (async () => {
     const server = await createServer({
         configFile: "./vite.config.js",
         root: __dirname,
-        server: {
-            port: 8080
-        }
+        server: serverConfig
     });
 
     await server.listen();
