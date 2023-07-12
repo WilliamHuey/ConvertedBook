@@ -321,7 +321,6 @@ function processBuildCliAsync(buildCli: BuildCheckGoodResults, inputOutputWithOu
 export function buildCliInputsAsyncChecks(this: Build, buildCli: BuildCheckGoodResults, serverjsBuild$: Observable<ServerjsBuild>, notProjectFolder$: Observable<Boolean>): ReplaySubject<AsyncCheckResults> {
   let inputOutputWithOutputFileName$: ReplaySubject<AsyncCheckResults> = new ReplaySubject();
 
-  // TODO: Adapt serverjsBuild$ - pass in the observable to indicate to 'build-checks' that certain checks should be relaxed or nullified.
   serverjsBuild$
     .subscribe(() => {
       const buildChecks = (this.buildChecks(this.parse(),

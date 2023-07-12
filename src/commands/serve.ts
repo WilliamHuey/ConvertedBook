@@ -16,9 +16,9 @@ export default class Serve extends Command {
 
   static flags = {
     help: flags.help({ char: 'h' }),
-    // flag with a value (-n, --name=VALUE)
     name: flags.string({ char: 'n', description: 'Serve' }),
-    pandoc: flags.string({ char: 'p', description: 'Pandoc options' })
+    pandoc: flags.string({ char: 'p', description: 'Pandoc options' }),
+    options: flags.string({ char: 'o', description: 'General options' })
   }
 
   static aliases = ['s', 'server']
@@ -27,7 +27,6 @@ export default class Serve extends Command {
 
   async run() {
     const { flags } = this.parse(Serve);
-
     const server$ = new ReplaySubject();
 
     const checkServerFilepath$ = from(IsThere
@@ -79,6 +78,13 @@ export default class Serve extends Command {
       );
 
     noServerFile$
+      .pipe(
+        filter(()=> {
+
+          // Skip the error output when generating a one-off document
+          return JSON.parse(flags?.options || "{}")?.flag === "pandoc"
+        })
+      )
       .subscribe({
         next: () => {
           const msg = 'Did not find the server.js" file, might not be a "convertedbook" project!';

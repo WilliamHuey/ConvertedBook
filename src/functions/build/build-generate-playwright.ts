@@ -28,10 +28,11 @@ const createExactPdf = ({
 }: CreateExactPdf) => {
   (async () => {
 
-    const serveRun$ = await serve.run(['--pandoc', 'true']);
+    const serveRun$ = await serve.run(['--pandoc', 'true', '--options', JSON.stringify(additionalInputArgs)]);
     serveRun$
       .subscribe((serveProcess: any) => {
         let serverPortStr = "8080";
+
         serveProcess.stdout.on('data', async function (data: any) {
 
           // Read the server port from 'server-config.json' through the console

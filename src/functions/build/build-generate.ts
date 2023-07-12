@@ -67,7 +67,7 @@ export function buildGenerate(
 
   const playWrightPdfGeneration = exactPdf && hasPdfFormat;
 
-  if (playWrightPdfGeneration) {
+  if (playWrightPdfGeneration && additionalInputArgs.flag !== 'pandoc') {
 
     // Manipulate the settings to only generate the html with pandoc
     pandocGenerated({
