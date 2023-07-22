@@ -5,6 +5,8 @@ import * as path from 'path';
 import { chromium } from 'playwright';
 import { take } from 'rxjs/operators';
 import { ReplaySubject } from 'rxjs';
+const isPortAvailable = require('is-port-available');
+const portfinder = require('portfinder');
 
 // Library modules
 import { BuildGenerate } from './build-generate';
@@ -31,16 +33,31 @@ const createExactPdf = ({
     const serveRun$ = await serve.run(['--pandoc', 'true', '--options', JSON.stringify(additionalInputArgs)]);
     serveRun$
       .subscribe((serveProcess: any) => {
+
+        // Default port for generation
         let serverPortStr = "8080";
 
         serveProcess.stdout.on('data', async function (data: any) {
 
           // Read the server port from 'server-config.json' through the console
           const isServerPortStr = data.toString().includes("http://localhost:");
+
           if (isServerPortStr) {
-            const [_str, serverPort] = data
-              .toString().split("http://localhost:");
-            serverPortStr = serverPort.replace(/\//g, "").trim();
+
+            // Check if provided port is in use
+            const portUse = await isPortAvailable(isServerPortStr);
+
+            // Pick a random port if the chosen port is in use
+            if (portUse) {
+              const randomPort = await portfinder.getPortPromise();
+              serverPortStr = randomPort
+            } else {
+
+              // Can use the port defined in the console output
+              const [_str, serverPort] = data
+                .toString().split("http://localhost:");
+              serverPortStr = serverPort.replace(/\//g, "").trim();
+            }
           }
 
           if (data.toString().includes('Complete file format generation')) {
