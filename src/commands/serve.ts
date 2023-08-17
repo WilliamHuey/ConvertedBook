@@ -36,7 +36,7 @@ export default class Serve extends Command {
     // of a folder being a 'convertedbook' project.
     const hasServerFile$ = checkServerFilepath$
       .pipe(
-        filter(hasServerFile => {
+        filter((hasServerFile: boolean) => {
           return hasServerFile;
         })
       );
@@ -72,7 +72,7 @@ export default class Serve extends Command {
     // is most likely not a 'convertedbook' project
     const noServerFile$ = checkServerFilepath$
       .pipe(
-        filter(hasServerFile => {
+        filter((hasServerFile: boolean) => {
           return !hasServerFile;
         })
       );

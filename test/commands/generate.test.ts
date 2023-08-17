@@ -23,14 +23,14 @@ describe('Dry Run Generation:', () => {
     .stdout()
     .command(unnest([['generate'], [`${baseTempNoDownloadFolder}dry-run-generate`, npmProjectFlagAndName], dryFlag]))
     .it('dry run with valid project name and npm project name', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
+      expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nCompleted project generation');
     });
 
   retryTest()
     .stdout()
     .command(unnest([['generate'], [`${baseTempNoDownloadFolder}dry-run-generate-no-npm-name`], dryFlag]))
     .it('dry run with valid project name', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
+      expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nCompleted project generation');
     });
 
   mkdir(`${baseTempNoDownloadFolder}dry-duplicate-folder`).pipe(share())
@@ -50,7 +50,7 @@ describe('Dry Run Generation:', () => {
         .stdout()
         .command(unnest([['generate'], [`${baseTempNoDownloadFolder}dry-forced-duplicate-folder`, npmProjectFlagAndName], dryFlag, '--force']))
         .it('dry run forced with existing project folder name', ctx => {
-          expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
+          expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nCompleted project generation');
         });
     });
 
@@ -59,7 +59,7 @@ describe('Dry Run Generation:', () => {
     .stdout()
     .command(unnest([['generate'], [`${baseTempNoDownloadFolder}dry-forced-folder`, npmProjectFlagAndName], dryFlag]))
     .it('dry run forced with valid project name and npm project name', ctx => {
-      expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nComplete project generation');
+      expect(ctx.stdout.trim()).to.contain('Created project folders and files\nNow downloading node modules...\nCompleted project generation');
     });
 });
 

@@ -96,7 +96,7 @@ export default class Generate extends Command {
         .otherwise(() => console.log('Error: Can not create folder'));
     },
     next: () => {
-      console.log('Complete project generation');
+      console.log('Completed project generation');
     },
   }
 
