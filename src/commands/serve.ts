@@ -18,7 +18,8 @@ export default class Serve extends Command {
     help: flags.help({ char: 'h' }),
     name: flags.string({ char: 'n', description: 'Serve' }),
     pandoc: flags.string({ char: 'p', description: 'Pandoc options' }),
-    options: flags.string({ char: 'o', description: 'General options' })
+    options: flags.string({ char: 'o', description: 'General options' }),
+    port: flags.string({ char: 'r', description: 'Port selection' })
   }
 
   static aliases = ['s', 'server']
