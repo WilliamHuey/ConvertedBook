@@ -49,6 +49,8 @@ export default class Serve extends Command {
       .subscribe({
         next: () => {
 
+          // TODO: Check port availability from the one supplied in the flags object
+
           // Force the pandoc generation mode by passing the option
           // explicitly
           const server = spawn('node', [Serve.serverFilenamePath,
