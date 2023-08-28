@@ -14,6 +14,7 @@ import { ServerjsBuild } from './build-import';
 export type BuildCheckBadResults = {
   msg: string;
   continue: boolean;
+  isServerJsFound$?: Observable<Boolean>;
 }
 
 export type BuildCheckGoodResults = {
