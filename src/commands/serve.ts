@@ -18,8 +18,7 @@ export default class Serve extends Command {
     help: flags.help({ char: 'h' }),
     name: flags.string({ char: 'n', description: 'Serve' }),
     pandoc: flags.string({ char: 'p', description: 'Pandoc options' }),
-    options: flags.string({ char: 'o', description: 'General options' }),
-    port: flags.string({ char: 'r', description: 'Port selection' })
+    options: flags.string({ char: 'o', description: 'General options' })
   }
 
   static aliases = ['s', 'server']
@@ -48,8 +47,6 @@ export default class Serve extends Command {
       .pipe(takeLast(1))
       .subscribe({
         next: () => {
-
-          // TODO: Check port availability from the one supplied in the flags object
 
           // Force the pandoc generation mode by passing the option
           // explicitly
