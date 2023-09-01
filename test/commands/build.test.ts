@@ -20,14 +20,13 @@ import {
   getFileNameFromParts,
   truncateFilePath
 } from '../../src/functions/build/build-utilities';
-import { retryTest, baseTempFolder, dryFlag, testDataDirectory } from './test-utilities';
+import { baseTempFolder, dryFlag, testDataDirectory } from './test-utilities';
 
 describe('Build', () => {
   const invalidInputFlag = `${testDataDirectory}zz`;
   const invalidOutputFlag = `${testDataDirectory}jkl/hlkj/`;
   const validInputFlag = `${testDataDirectory}input.latex`;
   const validOutputFlag = `${testDataDirectory}`;
-  const flags = [validInputFlag, validOutputFlag];
 
   const dryFlagStr = dryFlag.join("");
 
@@ -382,7 +381,7 @@ describe('Build', () => {
 
                 // Still create the valid document format
                 expect(asyncResultsLog.msg)
-                  .to.contain('Creating output file');
+                  .to.contain('Creating output files');
                 done();
               });
           }

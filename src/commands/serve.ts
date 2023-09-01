@@ -27,7 +27,9 @@ export default class Serve extends Command {
 
   async run() {
     const { flags } = this.parse(Serve);
+
     const server$ = new ReplaySubject();
+
 
     const checkServerFilepath$ = from(IsThere
       .promises.file(Serve.serverFilenamePath) as Promise<boolean>);
@@ -80,9 +82,7 @@ export default class Serve extends Command {
     noServerFile$
       .pipe(
         filter(()=> {
-
-          // Skip the error output when generating a one-off document
-          return JSON.parse(flags?.options || "{}")?.flag === "pandoc"
+          return Object.keys(flags).length === 0;
         })
       )
       .subscribe({
