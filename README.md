@@ -1,7 +1,7 @@
 Convertedbook
 =================
 
-![Logo](https://raw.githubusercontent.com/williamhuey/convertedbook/main/assets/convertedbook-banner.png)
+![Logo](https://github.com/WilliamHuey/ConvertedBook/blob/e9ec3da28a57aee9afe1823b973c1b6ee61e8e4b/assets/convertedbook-banner.png)
 
 [![GitHub license](https://img.shields.io/github/license/oclif/hello-world)](https://github.com/oclif/hello-world/blob/main/LICENSE)
 
