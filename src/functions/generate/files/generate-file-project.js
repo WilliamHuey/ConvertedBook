@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { css } from '@linaria/core';
 import { default as globalStyles } from "./global.js";
 

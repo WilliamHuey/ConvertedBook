@@ -1,25 +1,25 @@
-// Third party module
-import 'module-alias/register';
-
 // Native modules
 import { spawn } from 'child_process';
 import * as fs from 'fs';
 
 // Third party modules
-import { Command, flags } from '@oclif/command';
-import { bindCallback, from, merge, bindNodeCallback } from 'rxjs';
-import { tap, mergeMap, share, takeUntil, filter, takeLast, take } from 'rxjs/operators';
+import { bindCallback, from, merge, bindNodeCallback, Observable, ReplaySubject, of } from 'rxjs';
+import { tap, mergeMap, share, takeUntil, filter, takeLast, take, map } from 'rxjs/operators';
 import { match } from 'ts-pattern';
-const IsThere = require('is-there');
+import { pathExists } from 'path-exists';
+import { Args, Command, Flags } from '@oclif/core';
 
 // RxJs wrapped fs remove
 const remove = bindNodeCallback(fs.rm);
 
 // Libraries modules
-import { typeCheck, stringTypes } from '@utilities/type-check';
-import { GenerateContent } from '../functions/generate/generate-content';
-import { mkdir } from '@utilities/rxjs-fs';
-import { truncateFilePath, supposedFileName } from '../functions/build/build-utilities';
+import { typeCheck, stringTypes } from '../utilities/type-check.js';
+import { GenerateContent } from '../functions/generate/generate-content.js';
+import { mkdir } from '../utilities/rxjs-fs.js';
+import { truncateFilePath, supposedFileName } from '../functions/build/build-utilities.js';
+import ConsoleLog from '../functions/shared/console-log.js'
+
+import { messages, messagesKeys } from '../functions/generate/generate-log.js';
 
 type FileFolderPathError = string
 
@@ -29,61 +29,86 @@ interface FileFolderError {
 }
 
 export default class Generate extends Command {
-  static description = 'Create a "convertedbook" project folder.';
+ constructor(args: string[], config: any) {
+    super(args, config);
+
+    // Use a logger for general message logging
+    const consoleLog = new ConsoleLog();
+    const { consoleLog$, consoleErrorLog$, consoleLogSubject$ } = consoleLog.create();
+
+    Generate.consoleLog$ = consoleLog$;
+    Generate.consoleErrorLog$ = consoleErrorLog$;
+    Generate.consoleLogSubject$ = consoleLogSubject$;
+  }
+
+  static consoleLog$: Observable<any>;
+  static consoleErrorLog$: Observable<any>;
+  static consoleLogSubject$: ReplaySubject<{}>;
+
+  static description = 'Create a new "convertedbook" project folder with files.'
+
+  static examples = [
+    {
+      command: '<%= config.bin %> <%= command.id %> my-folder --npm-project-name="a-projectname"',
+      description: "Generate a project with the name of 'my-folder' and the package.json project key of 'a-projectname'"
+    },
+    {
+      command: '<%= config.bin %> <%= command.id %> my-folder --npm-project-name="a-projectname" --dry-run',
+      description: "Dry run of the command above for testing"
+    }
+  ]
 
   static flags = {
-    help: flags.help({ char: 'h' }),
+    help: Flags.help({ char: 'h' }),
 
     // flag with a value (-n, --name=VALUE)
-    name: flags.string({ char: 'n', description: 'Generate' }),
+    name: Flags.string({ char: 'n', description: 'Generate' }),
 
     // flag with no value (-f, --force)
-    force: flags.boolean({
+    force: Flags.boolean({
       char: 'f',
       default: false,
-      description: 'overwrite an existing folder'
+      description: 'Overwrite an existing folder'
     }),
-    'npm-project-name': flags.string({
+    'npm-project-name': Flags.string({
       char: 'p',
-      description: 'add the package.json\'s project name field'
+      description: 'Add the package.json\'s project name field'
     }),
-    'dry-run': flags.boolean({
+    'dry-run': Flags.boolean({
       char: 'd',
       default: false,
-      description: 'test out the generate command to see cli output without generating the actual project folder and files'
+      description: 'Test out the generate command to see cli output without generating the actual project folder and files'
     }),
-    toc: flags.boolean({
+    toc: Flags.boolean({
       char: 't',
       default: false,
-      description: 'when present, display the table of contents link on the top of the document'
+      description: 'When present, display the table of contents link on the top of the document'
     })
-  };
+  }
 
   static aliases = ['g'];
 
-  static args = [{ name: 'folderName' }];
-
-  private logCreationBegin = () => {
-    console.log('Created project folders and files');
-    console.log('Now downloading node modules...');
-  }
+  static args = {
+    name: Args.string({ required: true, folderName: 'folderName' })
+  };
 
   private logErrorMsg = (error: FileFolderError) => {
     if (error.path === '.') {
+
       // Current directory path
-      console.log(
-        'Error: Folder already exists in current directory and project was not generated'
-      );
+      Generate.consoleLogSubject$
+        .next({error: `${messages[messagesKeys.folderAlreadyExists]}` });
     } else {
-      console.log(
-        `Error: Folder already exists: ${error.path}. Project was not generated`
-      );
+
+      Generate.consoleLogSubject$
+        .next({error: `${(messages[messagesKeys
+        .folderExistsNotGenerated] as Function)(error)}`});
     }
   }
 
   private logCreationDone = {
     error: (error: FileFolderError) => {
-      console.log(error);
+      this.log(`${error}`);
       match(error)
         .with(
           {
@@ -93,16 +118,33 @@ export default class Generate extends Command {
             this.logErrorMsg(error);
           }
         )
-        .otherwise(() => console.log('Error: Can not create folder'));
+        .otherwise(() => {
+          Generate.consoleLogSubject$
+            .next({error: `${messages[messagesKeys.canNotCreateFolder]}` });
+        });
     },
     next: () => {
-      console.log('Completed project generation');
+      Generate.consoleLogSubject$
+        .next({info: `${messages[messagesKeys.completeProjectGeneration]}` });
     },
   }
 
-  async run() {
-    const { args, flags } = this.parse(Generate),
-      { folderName } = args;
+  private logCreationBegin = () => {
+    Generate.consoleLogSubject$
+      .next({info: `${messages[messagesKeys.createdProjectFoldersAndFiles]}` });
+
+    Generate.consoleLogSubject$
+      .next({info: `${messages[messagesKeys.nowDownloadingFiles]}` });
+  }
+
+  public async run(): Promise<{
+    projectFolderWithContents$: Observable<Object>,
+    dryRunGenerate$: Observable<any>,
+    consoleErrorLog$: Observable<any>,
+    consoleLog$: Observable<any>,
+  }> {
+    const { args, flags } = await this.parse(Generate),
+      { name: folderName } = args;
     let { 'npm-project-name': npmProjectName } = flags;
     npmProjectName = npmProjectName || 'project';
 
@@ -115,7 +157,7 @@ export default class Generate extends Command {
       folderName?.length === 0 ?
       'New Folder' :
       folderName;
-
+    
     // Determine the project folder name
     const {
       filePathFolder: parentFolderName,
@@ -128,27 +170,27 @@ export default class Generate extends Command {
     const actualProjectFolderName = supposedFileName(normalizedFolder)
       ?.join('');
 
-    const checkFullOutputPathProjectFolder$ = from(IsThere
-      .promises.directory(normalizedFolder) as Promise<boolean>);
+    const checkFullOutputPathProjectFolder$ = from(pathExists
+      (normalizedFolder) as Promise<boolean>);
 
     // Verify the full project's folder existence or non-existence
     const fullProjectFolderNonExists$ = checkFullOutputPathProjectFolder$
       .pipe(
         filter((outputFolder: boolean) => {
-          return !outputFolder;
+          return outputFolder === false;
         })
       );
 
     const fullProjectFolderExists$ = checkFullOutputPathProjectFolder$
       .pipe(
         filter((outputFolder: boolean) => {
-          return outputFolder;
+          return outputFolder === true;
         }),
         takeUntil(fullProjectFolderNonExists$)
       );
 
-    const checkOutputFolder$ = from(IsThere
-      .promises.directory(normalizedParentFolderName) as Promise<boolean>);
+    const checkOutputFolder$ = from(pathExists
+      (normalizedParentFolderName) as Promise<boolean>);
 
     // Checking one level up the project to verify the proper placement
     // of the project folder
@@ -181,7 +223,7 @@ export default class Generate extends Command {
     nonExistentUpperLevelFolder$
       .subscribe({
         next: () => {
-          console.log(`Error: Non-existent parent folder for "${actualProjectFolderName}"`);
+          this.log(`${messages[messagesKeys.nonExistingParentFolder]} "${actualProjectFolderName}"`);
         },
         error: () => {
           // Ignore error
@@ -208,6 +250,8 @@ export default class Generate extends Command {
             .pipe(share());
         }))
       .pipe(share());
+
+
 
     const creationVerified$ = merge(
       fullProjectFolderNonExists$,
@@ -257,7 +301,7 @@ export default class Generate extends Command {
             .generateStructure(fullProjectFolderExists$)
             .structureCreationCount$;
         }),
-        take(1),
+        // take(1),
         tap(this.logCreationBegin),
         mergeMap(() => {
 
@@ -272,6 +316,9 @@ export default class Generate extends Command {
           return npmClose$;
         })
       )
+      .pipe(map(() => {
+        return 'Created project folder';
+      }))
       .pipe(share());
 
     // Existing folder prevents generation of the project folder
@@ -285,26 +332,50 @@ export default class Generate extends Command {
         this.logErrorMsg({ code: 'EEXIST', path: normalizedParentFolderName });
       });
 
+    const dryRunGenerate$ = merge(creationVerified$, forcedOutputFolderExists$)
+      .pipe(
+        take(1),
+        filter(() => {
+          return isDryRun;
+        }),
+        map(() => {
+          return isDryRun;
+        })
+      );
+
     // Actual project generation
     projectFolderWithContents$
       .subscribe(this.logCreationDone);
 
-    // Dry run project generation
-    // should still log out to console when force flag is present
-    const projectFolderDry$ = merge(creationVerified$,
-      forcedOutputFolderExists$)
-      .pipe(filter(() => {
-        return isDryRun;
-      }));
+    // Log both the information and warning messages
+    Generate.consoleErrorLog$
+      .subscribe((msgs) => {
+        const lastestMsg = msgs[msgs.length - 1];
+        this.log(lastestMsg.error);
+      });
 
-    projectFolderDry$
-      .pipe(takeLast(1), share())
-      .pipe(tap(this.logCreationBegin))
+    Generate.consoleLog$
+      .pipe(
+
+        // Prevent double logging of the messages with actual project
+        // folder generation
+        takeUntil(projectFolderWithContents$)
+      )
+      .subscribe((msgs) => {
+        const lastestMsg = msgs[msgs.length - 1];
+        this.log(lastestMsg.info);
+      });
+
+    // Dry run branch should still log out console messages
+    dryRunGenerate$
       .subscribe(this.logCreationDone);
 
     return {
       projectFolderWithContents$,
-      projectFolderDry$
+      dryRunGenerate$,
+      consoleErrorLog$: Generate.consoleErrorLog$,
+      consoleLog$: Generate.consoleLog$
     };
+
   }
 }

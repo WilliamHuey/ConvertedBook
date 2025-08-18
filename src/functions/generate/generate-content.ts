@@ -3,13 +3,13 @@ import * as path from 'path';
 
 // Third party modules
 import { concat, Observable, BehaviorSubject, of } from 'rxjs';
-import { share, scan, takeLast, skipWhile, mergeMap, map, filter } from 'rxjs/operators';
-import { mkdir, writeFile } from '@utilities/rxjs-fs';
-import { match, __ } from 'ts-pattern';
+import { share, scan, takeLast, skipWhile, mergeMap, map, last } from 'rxjs/operators';
+import { mkdir, writeFile } from '../../utilities/rxjs-fs.js';
+import { match, P } from 'ts-pattern';
 
 // Library modules
-import { GenerateStructureOutline } from './generate-structure';
-import { fileContentObservable } from './generate-file-content-map';
+import { GenerateStructureOutline } from './generate-structure.js';
+import { fileContentObservable } from './generate-file-content-map.js';
 
 interface GenerateStructure extends ReadStructure {
   projectName: string;
@@ -93,7 +93,7 @@ class GenerateContent implements GenerateStructure {
       .with(undefined, () => {
         return '';
       })
-      .with(__.string, () => {
+      .with(P.string, () => {
         return fileContent as string;
       })
       .run();
@@ -107,22 +107,15 @@ class GenerateContent implements GenerateStructure {
       const newFolderName = path.join(parentFolderPath, element.name);
 
       const createFolder$ = mkdir(newFolderName)
-        .pipe(takeLast(1), share());
+        .pipe(last(), share());
 
       const countStructureNonExistFolders$ = concat(parentFolder$, createFolder$);
-
-      createFolder$
-        .subscribe({
-          error: (e) => {
-            console.log("Error", e);
-          }
-        });
 
       countStructureNonExistFolders$
         .subscribe({
           next: () => {
             folderStructure.structureCreationCountSubject.next(1);
-            if (element.content)
+            if (element.content) {
               this.createStructureObservable({
                 parentFolder$: createFolder$,
                 parentFolderPath: newFolderName,
@@ -130,8 +123,10 @@ class GenerateContent implements GenerateStructure {
                 structureCreationCountSubject:
                   folderStructure.structureCreationCountSubject,
               });
+            }
           },
-          error: (_err) => {
+          error: (err) => {
+            console.log('err: ', err);
             // Ignore the error
           }
         });
@@ -139,9 +134,10 @@ class GenerateContent implements GenerateStructure {
 
     // Generate the files
     content?.files?.forEach((element: FileContentProperties) => {
-      const fileContent = element.fileContent ? element.fileContent : '',
+
+      const fileContentRef = element.fileContent ? element.fileContent : '',
         newFileName = path.join(parentFolderPath, element.name),
-        fileNameKey = this.fileContentType(fileContent),
+        fileNameKey = this.fileContentType(fileContentRef),
         fileContent$ = fileContentObservable(fileNameKey, element.data);
 
       const createFile$ = fileContent$
@@ -154,8 +150,7 @@ class GenerateContent implements GenerateStructure {
           }));
 
       concat(parentFolder$, createFile$)
-        .pipe(takeLast(1))
-        .subscribe(() => {
+        .subscribe((createFile) => {
           folderStructure.structureCreationCountSubject.next(1);
         });
     });
@@ -180,7 +175,7 @@ class GenerateContent implements GenerateStructure {
       .asObservable()
       .pipe(
         scan((acc, curr: number) => acc + curr, 0),
-        skipWhile(structureCreationCount => {
+        skipWhile((structureCreationCount) => {
           return structureCreationCount !== structureCount;
         })
       );

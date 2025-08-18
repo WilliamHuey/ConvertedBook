@@ -1,23 +1,22 @@
 // Third party modules
-import { init, head, last } from 'ramda';
+import { init, last } from 'ramda';
 
 // Libraries modules
-import { typeCheck, stringTypes } from '@utilities/type-check';
+import { typeCheck, stringTypes } from '../../utilities/type-check.js';
 
-export function supposedFileName(fullPath: string) {
+export function supposedFileName(fullPath: string): Array<string> {
   const fullPathSplit = fullPath.split('/');
-  return last(fullPathSplit)?.split('.');
+  const lastFullPathSplit = last(fullPathSplit)?.split('.');
+  return lastFullPathSplit ? lastFullPathSplit : [""];
 }
 
-export function getFileNameFromParts(supposeFileParts: string[] | undefined): string |
-  undefined {
+export function getFileNameFromParts(supposeFileParts: Array<string>): Array<string> {
 
   // Using the default typeof undefined check since TypeScript is not able to
   // infer the valid meaning of passing the running of typeCheck
   // against undefined.
-  const validStringArray: string[] = typeCheck(supposeFileParts, stringTypes.Array) && typeof supposeFileParts != 'undefined' ? supposeFileParts : [];
-
-  return validStringArray ? head(validStringArray) : '';
+  const validStringArray = typeCheck(supposeFileParts, stringTypes.Array) && typeof supposeFileParts != 'undefined' ? supposeFileParts : [""];
+  return validStringArray ? [validStringArray[0]] : [""];
 }
 
 export function truncateFilePath(filePath: string) {

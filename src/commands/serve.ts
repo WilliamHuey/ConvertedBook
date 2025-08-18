@@ -1,38 +1,43 @@
-// Third party module
-import 'module-alias/register';
-
 // Native modules
-import * as childProcess from 'child_process';
-const { spawn } = childProcess;
+import { ChildProcess, spawn } from 'child_process';
 
 // Third party modules
-import { Command, flags } from '@oclif/command';
+import { Command, Flags } from '@oclif/core';
 import { from, ReplaySubject } from 'rxjs';
 import { filter, takeLast } from 'rxjs/operators';
-const IsThere = require('is-there');
+import { pathExists } from 'path-exists';
+
+// Library modules
+import { messages, messagesKeys } from '../functions/serve/serve-log.js';
+
+type ServerReplaySubject = ReplaySubject<ChildProcess | String>
 
 export default class Serve extends Command {
-  static description = 'Run live server for real-time updates on document changes'
+  static description = `Run live server to view real-time updates on document changes in the browser. You must change into the directory of your convertedbook project before you are able to run this command. To change the server port, edit the port value in server-config.js.
+  `
+
+  static examples = [
+    '<%= config.bin %> <%= command.id %>',
+  ]
 
   static flags = {
-    help: flags.help({ char: 'h' }),
-    name: flags.string({ char: 'n', description: 'Serve' }),
-    pandoc: flags.string({ char: 'p', description: 'Pandoc options' }),
-    options: flags.string({ char: 'o', description: 'General options' })
+    help: Flags.help({ char: 'h' }),
+    name: Flags.string({ char: 'n', description: 'Serve' }),
+    pandoc: Flags.string({ char: 'p', description: 'Pandoc options' }),
+    options: Flags.string({ char: 'o', description: 'General options' })
   }
 
   static aliases = ['s', 'server']
 
   static serverFilenamePath = 'server.js';
 
-  async run() {
-    const { flags } = this.parse(Serve);
+  public async run(): Promise<ServerReplaySubject> {
+    const { flags } = await this.parse(Serve);
 
-    const server$ = new ReplaySubject();
+    const server$: ServerReplaySubject = new ReplaySubject();
 
-
-    const checkServerFilepath$ = from(IsThere
-      .promises.file(Serve.serverFilenamePath) as Promise<boolean>);
+    const checkServerFilepath$ = from(pathExists
+      (Serve.serverFilenamePath) as Promise<boolean>);
 
     // Basic check for 'server.js' file as a measure
     // of a folder being a 'convertedbook' project.
@@ -52,21 +57,25 @@ export default class Serve extends Command {
 
           // Force the pandoc generation mode by passing the option
           // explicitly
-          const server = spawn('node', [Serve.serverFilenamePath,
+          const server: ChildProcess = spawn('node', [Serve.serverFilenamePath,
             '--pandoc=true', JSON.stringify(flags)]);
 
-          server.stdout.on('data', (data: any) => {
-            console.error(`Info: ${data}`);
-          });
+          if (server?.stdout) {
+            server.stdout.on('data', (data: any) => {
+              console.error(`Info: ${data}`);
+            });
+          }
 
-          server.stderr.on('data', (data: any) => {
-            console.error(`Error: ${data}`);
-          });
+          if (server.stderr) {
+            server.stderr.on('data', (data: any) => {
+              console.error(`Error: ${data}`);
+            });
+          }
 
           server$.next(server);
         },
         error: () => {
-          console.log('Error when attempting to start server!');
+          this.log(`${messages[messagesKeys.errorWhenStartingServer]}`);
         }
       });
 
@@ -80,18 +89,10 @@ export default class Serve extends Command {
       );
 
     noServerFile$
-      .pipe(
-        filter(()=> {
-          return Object.keys(flags).length === 0;
-        })
-      )
-      .subscribe({
-        next: () => {
-          const msg = 'Did not find the server.js" file, might not be a "convertedbook" project!';
-          server$.next(msg);
-          server$.complete();
-          console.log(msg);
-        }
+      .subscribe(() => {
+        server$.next(`${messages[messagesKeys.serverJsNotFound]}`);
+        server$.complete();
+        this.log(`${messages[messagesKeys.serverJsNotFound]}`);
       });
 
     return server$;

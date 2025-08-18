@@ -3,18 +3,17 @@ import { intersection } from 'ramda';
 import { Observable } from 'rxjs';
 
 // Library modules
-import Build from '../../commands/build';
-import { optionalArgsFlagKeysArray } from './build-report';
-import { ServerjsBuild } from './build-cli-input-async-checks';
+import Build from '../../commands/build.js';
+import { ServerjsBuild } from './build-cli-input-async-checks.js';
 
 export function buildFlags(this: Build, flags: Record<string, any>, serverjsBuild$: Observable<ServerjsBuild> | undefined) {
+  const acceptedRequiredFlagKeys = Build.requiredFlags;
+  const argsFlagKeys = Object.keys(flags);
+  const recognizedFlags = intersection(acceptedRequiredFlagKeys, argsFlagKeys);
+  
+  const recognizedFlagsLen = recognizedFlags.length;
 
-  const acceptedRequiredFlagKeys = Build.requiredFlags,
-    argsFlagKeys = Object.keys(flags),
-    recognizedFlags = intersection(acceptedRequiredFlagKeys, argsFlagKeys),
-    optionalArgsFlagKeys = intersection(Build.optionalFlags, argsFlagKeys) as optionalArgsFlagKeysArray,
-    recognizedFlagsLen = recognizedFlags.length,
-    someFlagsRequiredRecognized = recognizedFlagsLen > 0 && recognizedFlagsLen < acceptedRequiredFlagKeys.length;
+  const someFlagsRequiredRecognized = recognizedFlagsLen > 0 && recognizedFlagsLen < acceptedRequiredFlagKeys.length;
 
   let allRequiredFlagsRecognized = recognizedFlags.length === acceptedRequiredFlagKeys.length;
 
@@ -27,7 +26,6 @@ export function buildFlags(this: Build, flags: Record<string, any>, serverjsBuil
   return {
     allRequiredFlagsRecognized,
     someFlagsRequiredRecognized,
-    optionalArgsFlagKeys,
     argsFlagKeys
   };
 }

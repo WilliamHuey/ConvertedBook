@@ -1,3 +1,5 @@
+import "./vendor.css"
+
 export default `
   body {
     width: 100%;

@@ -5,31 +5,31 @@ import { unlinkSync } from 'fs';
 // Third party modules
 import { forkJoin, bindCallback } from 'rxjs';
 import { first } from 'rxjs/operators';
+import listify from 'listify';
 
 // Library modules
-import { FileOutputExistence } from './build-cli-input-async-checks';
-import { BuildGenerate } from './build-generate';
+import { FileOutputExistence } from './build-cli-input-async-checks.js';
+import { BuildGenerate } from './build-generate.js';
+import { messages, messagesKeys } from './build-log.js';
 
 // Directory for pandoc process
 const baseDir = process.cwd(),
   baseContentDir = `${baseDir}/src/config/templates`;
 
-export function pandocGenerated({ input,
+export function pandocGenerated({
+  input,
   normalizedFormats,
   flags,
   fileOutputExistence,
-  htmlCliGenerate = false,
   checkFromServerCli,
   normalizedOutputPath,
   buildDocuments$,
-  docsGenerated$,
-  exactPdf = false,
-  additionalInputArgs }: BuildGenerate) {
+  docsGenerated$ }: BuildGenerate) {
   const generated = normalizedFormats
     .map(format => {
       return pandocGenerateFormat(input, normalizedOutputPath, format,
-        fileOutputExistence, htmlCliGenerate, flags, checkFromServerCli,
-        exactPdf);
+        fileOutputExistence, flags, checkFromServerCli
+        );
     });
 
   const pandocGen = generated.reduce((acc, el): any => {
@@ -48,11 +48,11 @@ export function pandocGenerated({ input,
     .pipe(first());
 
   groupFormatsGenerated$
-    .subscribe(() => {
+    .subscribe((res) => {
       buildDocuments$.next('Pandoc generated');
 
       // TODO: Update this when generating pdf from project folder
-      docsGenerated$.next('');
+      docsGenerated$.next(`Created following: ${listify(normalizedFormats)}`);
       docsGenerated$.complete();
     });
 
@@ -65,10 +65,8 @@ export function pandocGenerateFormat(input: string,
   normalizedOutputPath: string,
   format: string,
   fileOutputExistence: FileOutputExistence,
-  htmlCliGenerate: boolean,
   flags: Record<string, any>,
-  fromServerCli: boolean,
-  exactPdf: boolean) {
+  fromServerCli: boolean) {
 
   // Need to match the directory in which
   // pandoc is referring to for proper
@@ -111,26 +109,14 @@ export function pandocGenerateFormat(input: string,
   pandocClose$
     .subscribe({
       next: () => {
-
-        // Exact pdf generation logging should be done
-        // by the exact pdf generator and not pandoc.
-        // Also avoid logging the html byproduct generation
-        // that is required by the exact pdf generation.
-        const noHtmlFormatLog = format === 'html' && exactPdf && !htmlCliGenerate;
-        const noPdfFormatLog = format === 'pdf' && exactPdf;
-
-        if (noPdfFormatLog) return
-        if (noHtmlFormatLog) return
-
-        console.log(`Generated ${format}`);
+        console.log(`${(messages[messagesKeys.generatedFormat] as Function)(format)}`);
 
         // Warn on existing file format with the name of the output path
         if (fileOutputExistence[format] && !fromServerCli && !flags.force)
-          console.log(`Warning: ${format} file type exists`);
-
+          console.log(`${(messages[messagesKeys.warning] as Function)(format)}`);
       },
       error: (e: any) => {
-        console.log('Error', e);
+        console.log(`${(messages[messagesKeys.error] as Function)(e)}`);
       }
     });
 

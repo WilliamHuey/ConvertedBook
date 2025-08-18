@@ -1,8 +1,10 @@
 // Library modules
-export { buildReport } from './build-report';
-export { buildLog } from './build-log';
-export { buildCliInputsChecks, BuildCliChecks } from './build-cli-input-checks';
-export { AsyncCheckResults, buildCliInputsAsyncChecks, ServerjsBuild } from './build-cli-input-async-checks';
-export { BuildCheckResults, BuildCheckGoodResults, buildChecks } from './build-checks';
-export { buildDependencies } from './build-dependencies';
-export { buildGenerate } from './build-generate';
+export { buildReport, serverFileCheck } from './build-report.js';
+export { buildLog, messages, messagesKeys } from './build-log.js';
+export type { BuildCliChecks, buildCliInputChecksOutput } from './build-cli-input-checks.js';
+export type { AsyncCheckResults, ServerjsBuild } from './build-cli-input-async-checks.js';
+export { buildCliInputsAsyncChecks } from './build-cli-input-async-checks.js';
+export type { BuildCheckResults, BuildCheckGoodResults } from './build-checks.js';
+export { buildChecks } from './build-checks.js';
+export { buildDependencies } from './build-dependencies.js';
+export { buildGenerate } from './build-generate.js';

@@ -1,118 +1,399 @@
-ConvertedBook
-=============
+Convertedbook
+=================
 
-Convert latex to different ebook formats
+![Logo](https://raw.githubusercontent.com/williamhuey/convertedbook/main/assets/convertedbook-banner.png)
 
-[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/ConvertedBook.svg)](https://npmjs.org/package/ConvertedBook)
-[![Downloads/week](https://img.shields.io/npm/dw/ConvertedBook.svg)](https://npmjs.org/package/ConvertedBook)
-[![License](https://img.shields.io/npm/l/ConvertedBook.svg)](https://github.com/WilliamHuey/ConvertedBook/blob/master/package.json)
+[![GitHub license](https://img.shields.io/github/license/oclif/hello-world)](https://github.com/oclif/hello-world/blob/main/LICENSE)
+
+A live reload server previewer for working with LaTeX documents. Syncs document changes to a web page in the browser to visualize rendered changes.
+
+You have the option to convert your LaTeX files to these output formats:
+
+* HTML
+* PDF
+* EPUB
+
+<!-- tocheader -->
+<strong><h1>Table of Contents</h1></strong>
+
+<!-- tocheaderstop -->
 
 <!-- toc -->
-* [Usage](#usage)
+* [Purpose](#purpose)
+* [Dependencies](#dependencies)
+* [Compatibility](#compatibility)
+* [Installation](#installation)
+* [Quick Start](#quick-start)
 * [Commands](#commands)
+* [Development / Local Install](#development--local-install)
+* [Project Structure](#project-structure)
+* [Tests](#tests)
+* [License](#license)
 <!-- tocstop -->
-# Usage
+
+<!-- purpose -->
+# Purpose
+
+Here is a listing of reasons for why you might want to use this tool
+
+* Render your LaTeX document in the way that is represented in your HTML for predictability in output.
+* Quicker preview of the changes you make in your LaTeX document using the browser
+* Control over the rendering of the final document rendering when custom css through the convertedbook project folder
+
+<!-- purposestop -->
+
+# Dependencies
+
+Ensure that you have the requisite software before installing convertedbook
+
+* [pandoc](https://pandoc.org/installing.html)
+* [nodejs](https://nodejs.org/en/download)
+* [texlive](https://tug.org/texlive/) (extra font packages might be needed)
+
+# Compatibility
+
+This library was developed and tested only on Linux. It might work on either Windows or
+MacOs because the dependencies are relatively standard.
+
+The versions of dependencies listed below are known to work with this library
+
+* pandoc - v3.7.0.2
+* nodejs - v24.1.0
+* pdfTeX (from texlive) - 3.141592653-2.6-1.40.27
+
+# Installation
+
+Install convertedbook with npm globally for use as a general cli tool. 
+
 <!-- usage -->
 ```sh-session
 $ npm install -g convertedbook
 $ convertedbook COMMAND
 running command...
-$ convertedbook (-v|--version|version)
-convertedbook/1.0.0 linux-x64 node-v14.15.3
+$ convertedbook (--version)
+convertedbook/1.0.0 linux-x64 node-v24.5.0
 $ convertedbook --help [COMMAND]
 USAGE
   $ convertedbook COMMAND
 ...
 ```
 <!-- usagestop -->
+
+<!-- usagealternative -->
+
+## Tarball Install
+
+Alternatively, you can use the convertedbook binary through the tarball
+without having nodejs installed. Download, extract and execute the binary.
+
+``` sh-session
+tar -xzvf <convertedbook-filename>.tar.gz -C "$(basename convertedbook-filename.tar.gz .tar.gz)"
+./bin/convertedbook
+```
+<!-- usagealternativestop -->
+
+<!-- quickstartusage -->
+# Quick Start
+
+After installing convertedbook,
+
+Create your project
+
+``` bash
+convertedbook generate my-new-project
+cd my-new-project
+```
+
+Navigate into the newly created project folder and run the server.
+Make changes to the src/index.tex file to see the live preview changes.
+
+``` bash
+convertedbook serve
+```
+
+The index.html file serves as the default output. If you want to output
+into a different file format, you can use the build command to
+change the output file type.
+
+There is no need to specify the input file path because it is inferred from the
+within a project folder
+
+``` bash
+
+convertedbook build pdf
+```
+
+<!-- quickstartusagestop -->
+
 # Commands
 <!-- commands -->
-* [`convertedbook build`](#convertedbook-build)
-* [`convertedbook generate [FOLDERNAME]`](#convertedbook-generate-foldername)
+* [`convertedbook build [DESCRIPTION]`](#convertedbook-build-description)
+* [`convertedbook generate NAME`](#convertedbook-generate-name)
 * [`convertedbook help [COMMAND]`](#convertedbook-help-command)
-* [`convertedbook serve [FILE]`](#convertedbook-serve-file)
+* [`convertedbook serve`](#convertedbook-serve)
 
-## `convertedbook build`
+## `convertedbook build [DESCRIPTION]`
 
-Generate output format of your choosing from these following formats: html, pdf, and epub
+Convert the LaTeX file to HTML, EPUB or PDF
 
 ```
 USAGE
-  $ convertedbook build
+  $ convertedbook build [DESCRIPTION...] [-h] [-f] [-e] [-i <value>] [-o <value>] [-d] [--port <value>]
 
-OPTIONS
-  -a, --args=args
-  -d, --dry-run=dry-run  test out the build command to see cli output without generating the actual output file(s)
-  -h, --help             show CLI help
-  -i, --input=input      path of the input file to convert
-  -o, --output=output    path of the output file destination
+ARGUMENTS
+  DESCRIPTION...  Generate output format of your choosing from these following formats: html, pdf, and epub
+
+FLAGS
+  -d, --dry-run         Test out the build command to see cli output without generating the actual output file(s)
+  -e, --exact           Only for pdf output. Generate pdf based on html instead of using Pandoc
+  -f, --force           Overwrite an existing output file
+  -h, --help            Show CLI help.
+  -i, --input=<value>   Path of the input file to convert
+  -o, --output=<value>  Path of the output file destination
+      --port=<value>    Build server port
+
+DESCRIPTION
+  Convert the LaTeX file to HTML, EPUB or PDF
 
 ALIASES
   $ convertedbook b
 
-EXAMPLE
-  $ convertedbook build pdf
+EXAMPLES
+  One-off build - Operate on an LaTeX file that resides
+  outside of a project folder.
+
+  This outputs to an html file and assumes that destination file resides in
+  the same location as the input file. The input option is required
+
+    $ convertedbook build html --input="./index.tex"
+
+  One-off build - Can specify an "exact" option for the
+  output pdf file to use playwright to get an precise mirror representation
+  of the document based on the web page display of the document.
+
+    $ convertedbook build pdf --input="./index.tex" --exact
 ```
 
-_See code: [src/commands/build.ts](https://github.com/WilliamHuey/ConvertedBook/blob/v1.0.0/src/commands/build.ts)_
+_See code: [src/commands/build.ts](https://github.com/WilliamHuey/convertedbook/blob/v1.0.0/src/commands/build.ts)_
 
-## `convertedbook generate [FOLDERNAME]`
+## `convertedbook generate NAME`
 
-Create a "convertedbook" project folder.
+Create a new "convertedbook" project folder with files.
 
 ```
 USAGE
-  $ convertedbook generate [FOLDERNAME]
+  $ convertedbook generate NAME [-h] [-n <value>] [-f] [-p <value>] [-d] [-t]
 
-OPTIONS
-  -d, --dry-run                            test out the generate command to see cli output without generating the actual
-                                           project folder and files
+FLAGS
+  -d, --dry-run                   Test out the generate command to see cli output without generating the actual project
+                                  folder and files
+  -f, --force                     Overwrite an existing folder
+  -h, --help                      Show CLI help.
+  -n, --name=<value>              Generate
+  -p, --npm-project-name=<value>  Add the package.json's project name field
+  -t, --toc                       When present, display the table of contents link on the top of the document
 
-  -h, --help                               show CLI help
-
-  -n, --name=name                          Generate
-
-  -p, --npm-project-name=npm-project-name  add the package.json's project name field
-
-  -t, --toc                                when present, display the table of contents link on the top of the document
+DESCRIPTION
+  Create a new "convertedbook" project folder with files.
 
 ALIASES
   $ convertedbook g
+
+EXAMPLES
+  Generate a project with the name of 'my-folder' and the package.json project key of 'a-projectname'
+
+    $ convertedbook generate my-folder --npm-project-name="a-projectname"
+
+  Dry run of the command above for testing
+
+    $ convertedbook generate my-folder --npm-project-name="a-projectname" --dry-run
 ```
 
-_See code: [src/commands/generate.ts](https://github.com/WilliamHuey/ConvertedBook/blob/v1.0.0/src/commands/generate.ts)_
+_See code: [src/commands/generate.ts](https://github.com/WilliamHuey/convertedbook/blob/v1.0.0/src/commands/generate.ts)_
 
 ## `convertedbook help [COMMAND]`
 
-Display help for convertedbook
+Display help for convertedbook.
 
 ```
 USAGE
-  $ convertedbook help [COMMAND]
+  $ convertedbook help [COMMAND...] [-n]
 
 ARGUMENTS
-  COMMAND  command to show help for
+  COMMAND...  Command to show help for.
 
-OPTIONS
-  --all  see all commands in CLI
+FLAGS
+  -n, --nested-commands  Include all nested commands in the output.
+
+DESCRIPTION
+  Display help for convertedbook.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.0/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.32/src/commands/help.ts)_
 
-## `convertedbook serve [FILE]`
+## `convertedbook serve`
 
-describe the command here
+Run live server to view real-time updates on document changes in the browser. You must change into the directory of your convertedbook project before you are able to run this command. To change the server port, edit the port value in server-config.js.
 
 ```
 USAGE
-  $ convertedbook serve [FILE]
+  $ convertedbook serve [-h] [-n <value>] [-p <value>] [-o <value>]
 
-OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
+FLAGS
+  -h, --help             Show CLI help.
+  -n, --name=<value>     Serve
+  -o, --options=<value>  General options
+  -p, --pandoc=<value>   Pandoc options
+
+DESCRIPTION
+  Run live server to view real-time updates on document changes in the browser. You must change into the directory of
+  your convertedbook project before you are able to run this command. To change the server port, edit the port value in
+  server-config.js.
+
+
+ALIASES
+  $ convertedbook s
+  $ convertedbook server
+
+EXAMPLES
+  $ convertedbook serve
 ```
 
-_See code: [src/commands/serve.ts](https://github.com/WilliamHuey/ConvertedBook/blob/v1.0.0/src/commands/serve.ts)_
+_See code: [src/commands/serve.ts](https://github.com/WilliamHuey/convertedbook/blob/v1.0.0/src/commands/serve.ts)_
 <!-- commandsstop -->
+
+<!-- developmentsheader -->
+# Development / Local Install
+
+* Clone this repository to your machine
+* Change into root directory install dependencies
+
+  ``` bash
+  npm install
+  ```
+
+* Assuming you do not have ```convertedbook``` installed,
+  you can
+
+  ``` bash
+  npm link
+  ```
+
+  to alias the ```convertedbook``` command to point to the source entry file for ease of reference.
+
+  If you do have ```convertedbook``` installed through
+
+  ``` bash
+  npm install -g convertedbook
+  ```
+
+  then you will need to uninstall that first before using this development repository.
+  If you wish not uninstall that version, you will need to point to the development
+  executable (bin/run.js)
+
+  Run the following build command once because the ```npm link``` convertedbook points to the dist
+  folder files.
+  This provides the commands for ```convertedbook```.
+
+  ``` bash
+  npm run build
+  ```
+
+* After making changes to source files run
+
+  ``` bash
+  npm run build
+  ```
+
+  for the ```convertedbook``` cli to pick up the changes.
+
+<!-- developmentsheaderstop -->
+
+<!-- projectstructure -->
+# Project Structure
+
+After you have run the convertedbook ```generate``` command it will create a npm project folder
+which has the following contents
+
+``` text
+.
+├── build
+├── convert.js
+├── node_modules
+├── package.json
+├── package-lock.json
+├── server-config.js
+├── server.js
+└── src
+    ├── config
+    ├── helper.js
+    ├── index.tex
+    └── styles
+```
+
+## File Descriptions
+
+The generated folder is a [Parcel](https://parceljs.org/) frontend application. You are given the ability
+to customize any of the files used to create the HTML. The files that are bolded are files suggested for modification.
+
+* build - The output folder for serving contents (convertedbook server)
+* convert.js - File which performs the conversion of LaTeX file to HTML for the preview server
+* node_modules - Npm node modules folder for dependencies
+* **package.json** - Npm package declaration file
+* package-lock.json - Lock file for package.json file
+* server-config.js - File to configure the server. Allows you to customize the port for the server.
+* server.js - Starts the server
+* src/ - Folder which stores the source LaTeX assets
+* **config/templates/default.html5** - The template which pandoc uses for rendering the output to html for the server
+* **helper.js** - JavaScript logic for the HTML
+* **index.tex** - Main LaTeX source file
+* **styles/global.js** - General styles file that you can add styles to customize the look of the page
+* **styles/project.js** - Configuration for your global.js file
+* **styles/vendor.css** - External css files you include in addition to the ones you define in the global.js file
+
+Files that are auto-generated for this folder and shouldn't be modified directly:
+
+* index.html - The main html file used by the live server
+
+<!-- projectstructurestop -->
+
+<!-- testsheader -->
+# Tests
+
+After development changes, run the tests to ensure that existing functionality is preserved.
+
+``` bash
+npm run test
+```
+
+To run tests for the ```build``` or ```generate``` commands selectively
+
+``` bash
+npm run test:build
+npm run test:generate
+```
+
+Running the following command is the same as running the two commands above
+
+``` bash
+npm run test:nodownloads
+```
+
+Certain test will require you to be connected to the internet because
+a converted project will require downloading npm modules.
+
+``` bash
+npm run test:downloads
+```
+
+For when you want to run download test specifically for certain commands
+
+``` bash
+npm run test:downloadbuild
+npm run test:downloadgenerate
+```
+<!-- testsheaderstop -->
+
+# License
+
+MIT

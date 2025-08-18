@@ -16,7 +16,7 @@ export class GenerateStructureOutline {
         package.json
         server.js
         tsconfig.json
-        vite.config.js
+        convert.js
     */
     Object.assign(this, {
       files: [
@@ -30,16 +30,12 @@ export class GenerateStructureOutline {
           fileContent: 'server'
         },
         {
-          name: 'server-config.json',
+          name: 'server-config.js',
           fileContent: 'serverConfig'
         },
         {
-          name: 'vite.config.js',
-          fileContent: 'viteConfig'
-        },
-        {
-          name: 'tsconfig.json',
-          fileContent: 'tsConfig'
+          name: 'convert.js',
+          fileContent: 'convert'
         }
       ],
       folders: [
@@ -51,8 +47,8 @@ export class GenerateStructureOutline {
           content: {
             files: [
               {
-                name: 'helper.ts',
-                fileContent: 'helperTs'
+                name: 'helper.js',
+                fileContent: 'helperJs'
               },
               {
                 name: 'index.tex',

@@ -12,9 +12,6 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Dependency directories
 node_modules/
 
-# Snowpack dependency directory (https://snowpack.dev/)
-web_modules/
-
 # Optional npm cache directory
 .npm
 
@@ -36,4 +33,10 @@ build/
 dist/
 
 # The index.tex outputs index.html
+index.html
+
+# Parcel generated files
+.parcel-cache
+index.js
+index.js.map
 index.html

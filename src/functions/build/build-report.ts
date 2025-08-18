@@ -1,11 +1,19 @@
 // Third party modules
-import { length, isEmpty, intersection, symmetricDifference, difference } from 'ramda';
-const listify = require('listify');
+import { length, isEmpty, isNil, intersection, symmetricDifference, difference } from 'ramda';
+import { map } from 'rxjs/operators';
+import { from } from 'rxjs';
+import listify from 'listify';
 
 // Library modules
-import Build from '../../commands/build';
-import { buildFlags } from './build-flags';
-import { CommandArgsFlags } from './build-checks';
+import Build from '../../commands/build.js';
+import { buildFlags } from './build-flags.js';
+import { CommandArgsFlags } from './build-checks.js';
+import { configurationValues } from '../shared/configuration-values.js';
+const { serverConfig } = configurationValues;
+
+// Port ranges
+const upperPortValue = 65535,
+  lowerPortValue = 1;
 
 export interface BuildReportConditions {
   exactMatchBuildOrder: boolean;
@@ -17,21 +25,20 @@ export interface BuildReportConditions {
   someFlagsRequiredRecognized: boolean;
   recognizedFormats: Array<string>;
   normalizedFormats: Array<string>;
+  validServerBuildPort: boolean;
+  outputFlagExists: boolean;
+  patchOutput: string
 }
-
-type optionalArgsFlagKeys = 'input' | 'output'
-export type optionalArgsFlagKeysArray = optionalArgsFlagKeys[]
 
 interface BuildFlagsStatus {
   allRequiredFlagsRecognized: boolean;
   someFlagsRequiredRecognized: boolean;
-  optionalArgsFlagKeys: optionalArgsFlagKeysArray;
   argsFlagKeys: Array<string>;
 }
 
 export interface BuildReportResults {
   conditionsHelpers: {
-    argsCommaList: Array<string>;
+    argsCommaList: string;
     noValidFormats: boolean;
     emptyArgs: boolean;
     unknownFormats: Array<string>;
@@ -41,20 +48,71 @@ export interface BuildReportResults {
   conditions: BuildReportConditions;
 }
 
-export function buildReport(this: Build, { argv, flags, serverjsBuild$ }: CommandArgsFlags): BuildReportResults {
+interface ServerFileCheckParams {
+  serverFileName: string
+}
+
+export interface ServerFileCheck {
+  customPort: number;
+  customPortValid: boolean;
+  default: number;
+}
+
+export function serverFileCheck({ serverFileName }: ServerFileCheckParams) {
+
+  return from(import(`${process.cwd()}/${serverFileName}`))
+    .pipe(
+      map((result: Record<any, any>) => {
+        const customPort = !isNil(result),
+          customPortValid = customPort && result?.serverConfig?.port &&
+            (lowerPortValue <= result?.serverConfig?.port &&
+            result?.serverConfig?.port <= upperPortValue) ? true : false;
+
+        return {
+          customPort: result?.serverConfig?.port,
+          customPortValid,
+          default: serverConfig.port
+        }
+      })
+    )
+}
+
+export function buildReport(this: Build, { argv: argsGroup, flags, buildCheckData, serverjsBuild$ }: CommandArgsFlags): BuildReportResults {
 
   // Discern which is an unknown format or flag
-  const recognizedFormats = intersection(Build.acceptedOutputFormats, argv);
-  const unrecognizedElements = difference(argv, Build.acceptedOutputFormats);
+
+  // Default to empty array to avoid errors when read later
+  argsGroup = isNil(argsGroup) ? [] : argsGroup;
+
+  const recognizedFormats = intersection(Build.acceptedOutputFormats, argsGroup);
+  const unrecognizedElements = difference(argsGroup, Build.acceptedOutputFormats);
   const unknownFlags = unrecognizedElements.filter(element => {
     return element.slice(0, 2) === '--';
   });
-  const emptyArgs = recognizedFormats.length === 0 && unknownFlags.length === argv.length;
+  const emptyArgs = recognizedFormats.length === 0 && unknownFlags.length === argsGroup.length;
   const unknownFormats = difference(unrecognizedElements, unknownFlags);
   const hasUnknownFormats = unknownFormats.length > 0;
+  const { port: buildServerPort } = flags;
+
+  // Output flag
+  const outputFlagExists = 'output' in flags ? true : false;
+
+  // Check for server build port's validness
+
+  const inputServerBuildServerPort = buildServerPort ?
+    parseInt(buildServerPort, 10):
+    null;
+
+  let validServerBuildPort = false
+  if (!isNil(inputServerBuildServerPort)) {
+    if (lowerPortValue <= inputServerBuildServerPort &&
+      inputServerBuildServerPort <= upperPortValue) {
+      validServerBuildPort = true;
+    }
+  }
 
   // Check for 'html', 'pdf' or 'pdf', 'html'
-  const numberArgs = argv.length,
+  const numberArgs = argsGroup.length,
     buildOrder = Build.BuildWithOrder,
     buildOrderLen = buildOrder.length;
 
@@ -73,9 +131,9 @@ export function buildReport(this: Build, { argv, flags, serverjsBuild$ }: Comman
       (!exactMatchBuildOrder && !additionalArgsOverBuildOrder),
     onlyOneBuildFormat = numberArgs === 1;
 
-  // Create a comma list of the supported build formats
+  // Create a comma separated list of the supported build formats
   const argsCommaList = listify(recognizedFormats),
-    noValidFormats = argsCommaList.length === 0;
+    noValidFormats = recognizedFormats.length === 0;
 
   // Argument flags presence check
   const buildFlagsStatus = buildFlags.bind(this)(flags, serverjsBuild$),
@@ -84,6 +142,11 @@ export function buildReport(this: Build, { argv, flags, serverjsBuild$ }: Comman
       Build.acceptedOutputFormats : recognizedFormats,
     allRequiredFlagsRecognized = buildFlagsStatus.allRequiredFlagsRecognized,
     someFlagsRequiredRecognized = buildFlagsStatus.someFlagsRequiredRecognized;
+
+  // Set to a default output file on the same level as the input file
+  // if one wasn't provided.
+  const patchOutput = buildCheckData?.patchOutputPath ?
+    buildCheckData?.patchOutputPath : '';
 
   return {
     conditionsHelpers: {
@@ -103,7 +166,10 @@ export function buildReport(this: Build, { argv, flags, serverjsBuild$ }: Comman
       allRequiredFlagsRecognized,
       someFlagsRequiredRecognized,
       recognizedFormats,
-      normalizedFormats
+      normalizedFormats,
+      validServerBuildPort,
+      outputFlagExists,
+      patchOutput
     }
   };
 }

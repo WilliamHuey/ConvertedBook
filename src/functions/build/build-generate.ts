@@ -4,52 +4,56 @@ import { unlinkSync } from 'fs';
 
 // Third party modules
 import { ReplaySubject } from 'rxjs';
-import { reject } from 'ramda';
 
 // Library modules
-import { typeCheck, stringTypes } from '@utilities/type-check';
-import Build from '../../commands/build';
-import { BuildCheckGoodResults, CommandFlagKeys } from './build-checks';
+import { typeCheck, stringTypes } from '../../utilities/type-check.js';
+import Build from '../../commands/build.js';
+import { BuildCheckGoodResults, CommandFlagKeys } from './build-checks.js';
 import { AsyncCheckResults, FileOutputExistence }
-  from './build-cli-input-async-checks';
-import { truncateFilePath } from './build-utilities';
-import { pandocGenerated } from './build-generate-pandoc';
-import { playwrightGenerated } from './build-generate-playwright';
+  from './build-cli-input-async-checks.js';
+import { truncateFilePath } from './build-utilities.js';
+import { pandocGenerated } from './build-generate-pandoc.js';
+import { playwrightGenerated } from './build-generate-playwright.js';
+import { messages, messagesKeys } from './build-log.js';
+import { messages as messagesServer,
+  messagesKeys as messagesKeysServer } from '../serve/serve-log.js';
 
-export interface BuildGenerate {
+export interface BuildPlaywrightGenerate {
+  normalizedOutputPath: string,
+  buildDocuments$: ReplaySubject<any>;
+  docsGenerated$: ReplaySubject<any>;
+  additionalInputArgs: Record<any, any>;
+}
+
+export interface BuildGenerate extends BuildPlaywrightGenerate {
   input: string;
   normalizedFormats: string[];
   flags: CommandFlagKeys;
   fileOutputExistence: FileOutputExistence;
   htmlCliGenerate?: boolean,
   checkFromServerCli: boolean;
-  normalizedOutputPath: string;
-  buildDocuments$: ReplaySubject<any>;
-  docsGenerated$: ReplaySubject<any>;
   exactPdf?: boolean;
-  additionalInputArgs: Record<any, any>;
 }
 
-const pdfAndHtmlFormat = (n: string) => n === 'pdf' || n === 'html';
-
 export function buildGenerate(
-  results: BuildCheckGoodResults,
-  asyncResults: AsyncCheckResults,
+  results: BuildCheckGoodResults & AsyncCheckResults,
   docsGenerated$: ReplaySubject<any>,
+  consoleLogSubject$ : ReplaySubject<any>,
   additionalInputArgs: Record<any, any>): any
 export function buildGenerate(
   this: Build,
-  results: BuildCheckGoodResults,
-  asyncResults: AsyncCheckResults,
+  results: BuildCheckGoodResults & AsyncCheckResults,
   docsGenerated$: ReplaySubject<any>,
+  consoleLogSubject$ : ReplaySubject<any>,
   additionalInputArgs: Record<any, any>) {
-  const { conditions, fromServerCli, exactPdf } = results,
+  const { conditions, fromServerCli, exactPdf, truncateOutput, outputFilename, fileOutputExistence } = results,
     { input, output: outputPath } = conditions.flags,
     { normalizedFormats, flags } = conditions,
-    { truncateOutput, outputFilename, fileOutputExistence } = asyncResults,
     normalizedOutputPath = truncateOutput ?
       `${truncateFilePath(outputPath).filePathFolder}/${outputFilename}` :
       `${outputPath}${outputFilename}`;
+
+  const outputExt = path.extname(outputPath);
 
   const checkFromServerCli = typeCheck(fromServerCli, stringTypes.Undefined) ?
     false : true;
@@ -57,49 +61,7 @@ export function buildGenerate(
   // Exact pdf creation will require playwright
   const buildDocuments$ = new ReplaySubject(undefined);
 
-  const hasPdfFormat = normalizedFormats.includes('pdf'),
-    hasHtmlFormat = normalizedFormats.includes('html'),
-    moreThanTwoFormats = normalizedFormats.length > 2,
-
-    // inclusive of pdf format
-    hasFormatsOtherThanPdfandHtml = moreThanTwoFormats &&
-      (hasHtmlFormat && hasPdfFormat);
-
-  const playWrightPdfGeneration = exactPdf && hasPdfFormat;
-
-  if (playWrightPdfGeneration && additionalInputArgs.flag !== 'pandoc') {
-
-    // Manipulate the settings to only generate the html with pandoc
-    pandocGenerated({
-      input,
-      normalizedFormats: normalizedFormats,
-      htmlCliGenerate: normalizedFormats.includes('html'),
-      flags: Object.assign(flags, { output: path.parse(flags.input).name }),
-      fileOutputExistence,
-      checkFromServerCli,
-      normalizedOutputPath,
-      buildDocuments$,
-      docsGenerated$,
-      exactPdf: true,
-      additionalInputArgs
-    });
-
-    if (results.isServerJsFound$) {
-      results.isServerJsFound$.subscribe(() => {
-        playwrightGenerated({
-          input,
-          normalizedFormats,
-          flags,
-          fileOutputExistence,
-          checkFromServerCli,
-          normalizedOutputPath,
-          docsGenerated$,
-          buildDocuments$,
-          additionalInputArgs
-        });
-      });
-    }
-  }
+  const hasPdfFormat = normalizedFormats.includes('pdf');
 
   // Generally run the pandoc generation when converting any file type,
   // except for when an 'exact' pdf is requested to mirror the look of
@@ -109,7 +71,7 @@ export function buildGenerate(
   // even when the exactpdf option is present because conversion shouldn't
   // be limited by the exactpdf options for other file formats.
   docsGenerated$
-    .subscribe(() => {
+    .subscribe((res) => {
 
       // Delete the intermediary html file when after
       // completion of an exact pdf generation, but
@@ -119,52 +81,73 @@ export function buildGenerate(
         try {
           unlinkSync(`${normalizedOutputPath}.html`);
         } catch (_) {
-          // avoid logging out error when html does not exist
+          // Avoid logging out error when html does not exist
         }
       }
-      console.log('Complete file format generation');
+      this.log(`${messages[messagesKeys.completeFileFormatGeneration]}`);
     });
 
-  if (!exactPdf) {
-    return pandocGenerated({
-      input,
-      normalizedFormats,
-      flags,
-      fileOutputExistence,
-      checkFromServerCli,
-      normalizedOutputPath,
-      buildDocuments$,
-      exactPdf,
-      docsGenerated$,
-      additionalInputArgs
-    });
-  } else {
+  // Warn if the exact flag was given, but the pdf output was not specified
+  if (!normalizedFormats.includes('pdf') && exactPdf) {
+    this.log(`${messages[messagesKeys.warningExactFlagOnForPdf]}`);
+    consoleLogSubject$
+      .next({warning: `${messages[messagesKeys.warningExactFlagOnForPdf]}` })
+  }
 
-    // Still generate all other files that was indicated for conversion
-    // only pandoc will be able to create these files.
-    if (hasFormatsOtherThanPdfandHtml) {
-      return pandocGenerated({
-        input,
-
-        // Avoid generating the pdf and html again since its handled
-        // by the first branch's pandoc generation.
-        normalizedFormats: reject(pdfAndHtmlFormat, normalizedFormats),
-        flags,
-        fileOutputExistence,
-        checkFromServerCli,
-        normalizedOutputPath,
-        buildDocuments$,
-        docsGenerated$,
-        exactPdf,
-        additionalInputArgs
-      });
-    } else {
-
-      // Generation to complete before returning the document
-      // generation completion status
-      return {
-        docsGenerated$
-      }
+  // The 'normalizedFormats' values should be the more accurate measure
+  // of what needs to be output
+  if (normalizedFormats.includes('html')) {
+    if (outputExt !== ".html") {
+      this.log(`${messages[messagesKeys.warningHtmlFileExtOnlyForHtml]}`);
+      consoleLogSubject$
+      .next({warning: `${messages[messagesKeys.warningHtmlFileExtOnlyForHtml]}` })
     }
   }
+
+  if (hasPdfFormat) {
+    // Exact pdf generation is handled by playwright
+
+    // Only allow the exact flag to be used in a project folder
+    if (exactPdf) {
+
+      // The html might be generated alongside the pdf
+      if (checkFromServerCli) {
+
+        // Manipulate the settings to only generate the html with pandoc
+        pandocGenerated({
+          input,
+          normalizedFormats: normalizedFormats,
+          flags: Object.assign(flags, { output: path.parse(flags.input).name }),
+          fileOutputExistence,
+          checkFromServerCli,
+          normalizedOutputPath,
+          buildDocuments$,
+          docsGenerated$,
+          additionalInputArgs
+        });
+
+        playwrightGenerated({
+          normalizedOutputPath,
+          buildDocuments$,
+          docsGenerated$,
+          additionalInputArgs
+        });
+      } else {
+        this.log(`${messagesServer[messagesKeysServer.serverJsNotFound]}`);
+      }
+
+    }
+  }
+
+  return pandocGenerated({
+    input,
+    normalizedFormats,
+    flags,
+    fileOutputExistence,
+    checkFromServerCli,
+    normalizedOutputPath,
+    buildDocuments$,
+    docsGenerated$,
+    additionalInputArgs
+  });
 }

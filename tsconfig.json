@@ -1,23 +1,36 @@
 {
   "compilerOptions": {
+    "composite": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleResolution": "NodeNext",
     "declaration": true,
     "importHelpers": true,
-    "module": "commonjs",
-    "outDir": "lib",
-    "rootDir": "src",
+    "module": "NodeNext",
+    "outDir": "dist",
     "strict": true,
-    "target": "es2017",
-    "types": [
-      "node"
-    ],
-    "baseUrl": "./src",
+    "target": "ES2022",
     "paths": {
-      "@utilities/*": [
-        "utilities/*"
+      "@src/*": [
+        "src/*"
       ]
-    }
+    },
+    "rootDir": "src",
+    "baseUrl": ".",
   },
   "include": [
-    "src"
-  ]
+    "./src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    ".vscode"
+  ],
+  "ts-node": {
+    "esm": true
+  }
 }

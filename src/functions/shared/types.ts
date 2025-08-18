@@ -1,0 +1,1 @@
+export type messageType = string | ((data: object | string) => string);

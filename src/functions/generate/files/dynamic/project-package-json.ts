@@ -7,21 +7,23 @@ export class ProjectPackageJson {
       main: 'index.js',
       author: '',
       license: 'ISC',
+      "targets": {
+        "main": false
+      },
       dependencies: {
-        "@emotion/css": "^11.9.0",
-        "@linaria/cli": "^4.0.0-beta.0",
-        "@linaria/shaker": "^4.0.0-beta.0",
+        "@emotion/css": "^11.13.5",
+        "@linaria/cli": "^5.0.4",
+        "@linaria/shaker": "^5.0.3",
+        "@parcel/config-default": "^2.14.4",
+        "@parcel/core": "^2.14.4",
+        "@parcel/watcher": "^2.5.1",
         "dom-walk": "^0.1.2",
-        "latex.css": "^1.7.1",
-        "lit": "^2.2.6",
-        "lookpath": "^1.2.2",
-        "vite": "^3.0.0"
+        "latex.css": "^1.12.0",
+        "lit": "^3.3.0",
+        "lodash": "^4.17.21",
+        "path-exists": "^5.0.0"
       },
-      scripts: {
-        "dev": "vite -d",
-        "build": "vite build",
-        "preview": "vite preview"
-      },
+      "type": "module"
     });
   }
 }

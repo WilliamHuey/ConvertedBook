@@ -4,11 +4,14 @@ import * as path from 'path';
 // Third party modules
 import { of, Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
-import { readFile } from '@utilities/rxjs-fs';
 
 // Library modules
-import { typeCheck, stringTypes } from '@utilities/type-check';
-import { ProjectPackageJson } from './files/dynamic/project-package-json';
+import { typeCheck, stringTypes } from '../../utilities/type-check.js'
+import { ProjectPackageJson } from './files/dynamic/project-package-json.js';
+import { readFile } from '../../utilities/rxjs-fs.js';
+import { currDir } from '../../utilities/filesystem.js';
+
+const __dirname = currDir(import.meta.url);
 
 interface FileContentNameValueType {
   name: string;
@@ -26,7 +29,7 @@ const fileContent: FileContentType = {
   gitignore: { name: 'generate-file-git-ignore.txt' },
   indexHtml: { name: 'generate-file-index.html' },
   indexTex: { name: 'generate-file-index.tex' },
-  helperTs: { name: 'generate-file-helper.ts' },
+  helperJs: { name: 'generate-file-helper.js' },
   projectJs: { name: 'generate-file-project.js' },
   globalJs: { name: 'generate-file-global.js' },
   configStylesIndex: { name: 'generate-file-vendor.css' },
@@ -41,9 +44,8 @@ const fileContent: FileContentType = {
     }
   },
   server: { name: 'generate-file-server.js' },
-  serverConfig: { name: 'generate-file-server-config.json' },
-  viteConfig: { name: 'generate-file-vite.config.js' },
-  tsConfig: { name: 'generate-file-tsconfig.json' }
+  serverConfig: { name: 'generate-file-server-config.js' },
+  convert: { name: 'generate-file-convert.js' }
 };
 
 // Data could vary and pattern is not predictable
@@ -55,15 +57,17 @@ export function fileContentObservable(key: string, data: Record<string, any>): O
   if (key === '')
     return of('');
 
-  if (typeCheck(fileContent[key], stringTypes.Undefined))
+  if (typeCheck(fileContent[key], stringTypes.Undefined)){
     return of('');
+  }
 
-  if (typeCheck(asFn.content, stringTypes.Function))
+  if (typeCheck(asFn.content, stringTypes.Function)) {
     return of(asFn.content(data));
+  }
 
-  if (typeCheck(asStr.name, stringTypes.String))
-    return readFile(path.join(__dirname, `/files/${asStr.name}`), 'utf8')
-      .pipe(share());
+  if (typeCheck(asStr.name, stringTypes.String)) {
+    return readFile(path.join(__dirname, `/files/${asStr.name}`), 'utf8');
+  }
 
   return of('');
 }

@@ -1,5 +1,5 @@
+// @ts-nocheck
 import { LitElement, css, unsafeCSS, html } from 'lit';
-import { property } from 'lit/decorators.js';
 import { injectGlobal } from '@emotion/css'
 import walk from "dom-walk";
 
@@ -18,7 +18,7 @@ document.body.classList.add(myStyle);
 
 class ConvertedBookAppBar extends LitElement {
 
-  static stylesPrefix: string = 'convertedbook';
+  static stylesPrefix = 'convertedbook';
 
   static styles = css`
 
@@ -165,11 +165,13 @@ class ConvertedBookAppBar extends LitElement {
     }
   `;
 
-  @property({ type: Boolean })
-  open: boolean = false;
+  static properties = {
+    open: { type: Boolean }
+  };
 
   constructor() {
     super();
+    this._setUpTableOfContents;
   }
 
   render() {
@@ -199,7 +201,7 @@ class ConvertedBookAppBar extends LitElement {
   firstUpdated() {
     this.shadowRoot
       .addEventListener('click', (evt) => {
-        const eventEl = (evt.target as HTMLButtonElement),
+        const eventEl = (evt.target),
           elementType = eventEl.nodeName;
         if (elementType === 'BUTTON' &&
           eventEl.id === "convertedbook-button") {

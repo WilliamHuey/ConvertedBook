@@ -1,20 +1,31 @@
 // Third party modules
-import { cond, always } from 'ramda';
+import { cond, always, isNil } from 'ramda';
 import { XOR } from 'ts-xor';
-import { Observable } from 'rxjs';
-const listify = require('listify');
+import { Observable, ReplaySubject } from 'rxjs';
+import listify from 'listify';
 
 // Library modules
-import Build from '../../commands/build';
-import { action, messagesKeys } from './build-log';
-import { BuildReportConditions } from './build-report';
+import Build from '../../commands/build.js';
+import { action, messagesKeys, messages } from './build-log.js';
+import { BuildReportConditions, ServerFileCheck } from './build-report.js';
+import { ServerjsBuild } from './build-import.js';
+import { BuildCheckData } from './build-cli-input-async-checks.js';
 
-import { ServerjsBuild } from './build-import';
+export type BuildMsg = {
+  msg: string
+}
+
+export type BuildRelatedMsg = {
+  [key: string]: Array<BuildMsg>;
+  warning: Array<BuildMsg>;
+  info: Array<BuildMsg>;
+}
 
 export type BuildCheckBadResults = {
   msg: string;
   continue: boolean;
   isServerJsFound$?: Observable<Boolean>;
+  relatedMsgs?: BuildRelatedMsg;
 }
 
 export type BuildCheckGoodResults = {
@@ -24,26 +35,28 @@ export type BuildCheckGoodResults = {
   fromServerCli?: boolean;
   exactPdf?: boolean;
   isServerJsFound$?: Observable<Boolean>;
+  relatedMsgs?: BuildRelatedMsg;
 }
 
 export type BuildCheckResults = XOR<BuildCheckBadResults, BuildCheckGoodResults>
 
-export type CommandFlagKeys = { input: string; output: string; 'dry-run': string };
+export type CommandFlagKeys = { input: string; output: string; 'dry-run': string, port?: string };
 
-export type CommandArgsFlags = { argv: string[]; flags: CommandFlagKeys, serverjsBuild$?: Observable<ServerjsBuild> | undefined }
+export type CommandArgsFlags = { argv: string[]; flags: CommandFlagKeys, buildCheckData?: BuildCheckData, serverjsBuild$?: Observable<ServerjsBuild> | undefined }
 
 type CondsFlagsArgv = BuildReportConditions & CommandArgsFlags;
 
 // Rigorous checks after more simple args and flags check,
 // used by 'buildCliInputsChecks'
-export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjsBuild$?: Observable<ServerjsBuild>): BuildCheckResults {
+export function buildChecks(this: Build, buildCmd: Record<string, any>, consoleLogSubject$: ReplaySubject<{ }>, buildCheckData?: BuildCheckData, serverjsBuild$?: Observable<ServerjsBuild>, portInfo?: ServerFileCheck): BuildCheckResults {
 
   const { argv, flags }: Partial<Record<string, any>> = buildCmd;
+
   // Get the status of the arguments
   const {
     conditionsHelpers,
     conditions
-  } = this.buildReport({ argv, flags, serverjsBuild$ });
+  } = this.buildReport({ argv, flags, buildCheckData, serverjsBuild$ });
 
   const {
     argsCommaList,
@@ -59,31 +72,38 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
     multipleArgsNotDependentBuildOrder,
     emptyArgsValidFlags,
     allRequiredFlagsRecognized,
-    someFlagsRequiredRecognized
+    someFlagsRequiredRecognized,
+    validServerBuildPort
   } = conditions;
 
   if (!serverjsBuild$) {
 
     // Missing a required flag and can not continue
     if (someFlagsRequiredRecognized) {
-      return {
-        msg: this.buildLog({
-          action: action.check,
-          log: messagesKeys.someRequiredFlagsFound
-        }),
-        continue: false
-      };
+
+      if (!buildCheckData?.patchOutputPath) {
+        return {
+          msg: this.buildLog({
+            action: action.check,
+            log: messagesKeys.someRequiredFlagsFound
+          }),
+          continue: false
+        };
+      }
     }
 
     // No required flags present and will not continue
     if (!allRequiredFlagsRecognized) {
-      return {
-        msg: this.buildLog({
-          action: action.check,
-          log: messagesKeys.noRequiredFlagsFound
-        }),
-        continue: false
-      };
+
+      if (!buildCheckData?.patchOutputPath){
+        return {
+          msg: this.buildLog({
+            action: action.check,
+            log: messagesKeys.noRequiredFlagsFound
+          }),
+          continue: false
+        };
+      }
     }
 
     // No more processing without any valid output formats
@@ -100,13 +120,30 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
 
     // Unknown format warning
     if (hasUnknownFormats) {
-      console.log(this.buildLog({
+      this.log(this.buildLog({
         action: action.check,
         log: messagesKeys.ignoreUnknownFormats,
         data: unknownFormats
       }));
+      consoleLogSubject$.next({warning: (messages[messagesKeys.ignoreUnknownFormatsWithUnknowns] as Function)((unknownFormats) )});
     }
+  } else {
 
+    // Can not have invalid build server port when using
+    // the 'exact' option
+    if (!portInfo?.customPortValid) {
+
+      // The validServerBuildPort info is not 
+      // accurate when running from project folder
+      // when the build command is ran directly
+      return {
+        msg: this.buildLog({
+          action: action.check,
+          log: messagesKeys.invalidServerBuildPort,
+        }),
+        continue: false
+      };
+    }
   }
 
   // Supply the information after making checks on the build command
@@ -115,8 +152,18 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
   // Patch 'conditionsFlagsArgv' with the location of the source tex file and
   // the 'index.html' files for a project folder generation
   if (serverjsBuild$) {
+
+    // Default to the original project folder's
+    // input and output values when they are not provided
+
+    // The 'normalizedFormats' values should be the more accurate measure
+    // of what needs to be output
+    let { input, output } = flags;
+    input = isNil(input) ? "./src/index.tex" : input;
+    output = isNil(output) ? "./index.html" : output;
+
     Object.assign(conditionsFlagsArgv.flags,
-      { input: './src/index.tex', output: './index.html', force: true });
+      { input, output });
   }
 
   let listOfConds = [
@@ -141,7 +188,6 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
     }];
   }));
 
-
   // Also a valid scenario:
   // Build format matches where all the argument
   // conditions share the same log format
@@ -163,5 +209,8 @@ export function buildChecks(this: Build, buildCmd: Record<string, any>, serverjs
     ]
   );
 
-  return emptyArgsValidFlagsCond() || buildArgsConds();
+  const emptyArgs = emptyArgsValidFlagsCond();
+  const buildCond = buildArgsConds();
+
+  return buildCond || emptyArgs;
 }

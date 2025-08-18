@@ -2,11 +2,11 @@
 import { all } from 'ramda';
 import { forkJoin, from, Observable } from 'rxjs';
 import { filter, map, take } from 'rxjs/operators';
-const { lookpath } = require('lookpath');
+import { lookpath } from 'lookpath';
 
 // Library modules
-import { typeCheck, stringTypes } from '@utilities/type-check';
-import Build from '../../commands/build';
+import { typeCheck, stringTypes } from '../../utilities/type-check.js';
+import Build from '../../commands/build.js';
 
 export function buildDependencies(this: Build) {
   // Check for presence of external dependencies

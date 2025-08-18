@@ -1,16 +1,10 @@
 // Native modules
 import * as path from 'path';
 
-// Third party modules
-import { test } from '@oclif/test';
+// Library modules
+import { currDir } from "../../src/utilities/filesystem.js"
 
-// Observables resolution is slow and the
-// tests need retries to prevent incorrect
-// readings
-const retryTest = function () {
-  return test
-    .retries(500);
-};
+const __dirname = currDir(import.meta.url);
 
 // Remove generated testing files
 // after the set of tests have completed
@@ -21,7 +15,6 @@ const dryFlag = ['--dry-run'];
 const testDataDirectory = path.join(__dirname, '../', 'fixtures/io/');
 
 export {
-  retryTest,
   baseTempFolder,
   dryFlag,
   testDataDirectory
