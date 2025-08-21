@@ -36,7 +36,7 @@ You have the option to convert your LaTeX files to these output formats:
 
 Here is a listing of reasons for why you might want to use this tool
 
-* Render your LaTeX document in the way that is represented in your HTML for predictability in output.
+* Render your LaTeX document in the way that is represented in your HTML for predictability in output
 * Quicker preview of the changes you make in your LaTeX document using the browser
 * Control over the rendering of the final document rendering when custom css through the convertedbook project folder
 
@@ -52,7 +52,7 @@ Ensure that you have the requisite software before installing convertedbook
 
 # Compatibility
 
-This library was developed and tested only on Linux. It might work on either Windows or
+This library was developed and tested only on Linux. It might work on Windows or
 MacOs because the dependencies are relatively standard.
 
 The versions of dependencies listed below are known to work with this library
@@ -88,6 +88,7 @@ without having nodejs installed. Download, extract and execute the binary.
 
 ``` sh-session
 tar -xzvf <convertedbook-filename>.tar.gz -C "$(basename convertedbook-filename.tar.gz .tar.gz)"
+
 ./bin/convertedbook
 ```
 <!-- usagealternativestop -->
@@ -119,7 +120,6 @@ There is no need to specify the input file path because it is inferred from the
 within a project folder
 
 ``` bash
-
 convertedbook build pdf
 ```
 
@@ -134,7 +134,8 @@ convertedbook build pdf
 
 ## `convertedbook build [DESCRIPTION]`
 
-Convert the LaTeX file to HTML, EPUB or PDF
+Convert the LaTeX file to HTML, EPUB or PDF. This command works with either a convertedbook project folder or on
+a single LaTeX file outside a project folder.
 
 ```
 USAGE
@@ -233,7 +234,7 @@ _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.3
 
 ## `convertedbook serve`
 
-Run live server to view real-time updates on document changes in the browser. You must change into the directory of your convertedbook project before you are able to run this command. To change the server port, edit the port value in server-config.js.
+Run a live server to view real-time updates on document changes in the browser. You must change into the directory of your convertedbook project before you are able to run this command. To change the server port, edit the port value in server-config.js.
 
 ```
 USAGE
@@ -265,14 +266,14 @@ _See code: [src/commands/serve.ts](https://github.com/WilliamHuey/convertedbook/
 <!-- developmentsheader -->
 # Development / Local Install
 
-* Clone this repository to your machine
-* Change into root directory install dependencies
+  Clone this repository to your machine
+  Change into root directory install dependencies
 
   ``` bash
   npm install
   ```
 
-* Assuming you do not have ```convertedbook``` installed,
+  Assuming you do not have ```convertedbook``` installed,
   you can
 
   ``` bash
@@ -281,25 +282,25 @@ _See code: [src/commands/serve.ts](https://github.com/WilliamHuey/convertedbook/
 
   to alias the ```convertedbook``` command to point to the source entry file for ease of reference.
 
-  If you do have ```convertedbook``` installed through
+  If you already have ```convertedbook``` installed through
 
   ``` bash
   npm install -g convertedbook
   ```
 
   then you will need to uninstall that first before using this development repository.
-  If you wish not uninstall that version, you will need to point to the development
-  executable (bin/run.js)
+
 
   Run the following build command once because the ```npm link``` convertedbook points to the dist
   folder files.
+
   This provides the commands for ```convertedbook```.
 
   ``` bash
   npm run build
   ```
 
-* After making changes to source files run
+  After making changes to source files run
 
   ``` bash
   npm run build
@@ -334,14 +335,14 @@ which has the following contents
 ## File Descriptions
 
 The generated folder is a [Parcel](https://parceljs.org/) frontend application. You are given the ability
-to customize any of the files used to create the HTML. The files that are bolded are files suggested for modification.
+to customize any of the files used to create the HTML. The files that are bolded are recommended for modification.
 
 * build - The output folder for serving contents (convertedbook server)
 * convert.js - File which performs the conversion of LaTeX file to HTML for the preview server
 * node_modules - Npm node modules folder for dependencies
 * **package.json** - Npm package declaration file
 * package-lock.json - Lock file for package.json file
-* server-config.js - File to configure the server. Allows you to customize the port for the server.
+* **server-config.js** - File to configure the server. Allows you to customize the port for the server.
 * server.js - Starts the server
 * src/ - Folder which stores the source LaTeX assets
 * **config/templates/default.html5** - The template which pandoc uses for rendering the output to html for the server
@@ -360,7 +361,7 @@ Files that are auto-generated for this folder and shouldn't be modified directly
 <!-- testsheader -->
 # Tests
 
-After development changes, run the tests to ensure that existing functionality is preserved.
+After making development changes, run the tests to ensure that existing functionalities are preserved.
 
 ``` bash
 npm run test
