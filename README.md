@@ -134,8 +134,7 @@ convertedbook build pdf
 
 ## `convertedbook build [DESCRIPTION]`
 
-Convert the LaTeX file to HTML, EPUB or PDF. This command works with either a convertedbook project folder or on
-a single LaTeX file outside a project folder.
+Convert the LaTeX file to HTML, EPUB or PDF. This command works with either a convertedbook project folder or on a single LaTeX file outside a project folder.
 
 ```
 USAGE
@@ -154,7 +153,8 @@ FLAGS
       --port=<value>    Build server port
 
 DESCRIPTION
-  Convert the LaTeX file to HTML, EPUB or PDF
+  Convert the LaTeX file to HTML, EPUB or PDF. This command works with either a convertedbook project folder or on a
+  single LaTeX file outside a project folder.
 
 ALIASES
   $ convertedbook b
@@ -247,7 +247,7 @@ FLAGS
   -p, --pandoc=<value>   Pandoc options
 
 DESCRIPTION
-  Run live server to view real-time updates on document changes in the browser. You must change into the directory of
+  Run a live server to view real-time updates on document changes in the browser. You must change into the directory of
   your convertedbook project before you are able to run this command. To change the server port, edit the port value in
   server-config.js.
 

@@ -13,7 +13,7 @@ import { messages, messagesKeys } from '../functions/serve/serve-log.js';
 type ServerReplaySubject = ReplaySubject<ChildProcess | String>
 
 export default class Serve extends Command {
-  static description = `Run live server to view real-time updates on document changes in the browser. You must change into the directory of your convertedbook project before you are able to run this command. To change the server port, edit the port value in server-config.js.
+  static description = `Run a live server to view real-time updates on document changes in the browser. You must change into the directory of your convertedbook project before you are able to run this command. To change the server port, edit the port value in server-config.js.
   `
 
   static examples = [

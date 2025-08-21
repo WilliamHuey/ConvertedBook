@@ -40,7 +40,7 @@ export default class Build extends Command {
   static consoleErrorLog$: Observable<any>;
   static consoleLogSubject$: ReplaySubject<{}>;
 
-  static description = 'Convert the LaTeX file to HTML, EPUB or PDF'
+  static description = 'Convert the LaTeX file to HTML, EPUB or PDF. This command works with either a convertedbook project folder or on a single LaTeX file outside a project folder.'
 
   static examples = [
     {
