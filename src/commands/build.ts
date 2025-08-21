@@ -469,8 +469,6 @@ export default class Build extends Command {
                 const hasExactOpt = options.includes('exact');
                 const hasForceOpt = options.includes('force');
                 const hasPandocOpt = options.includes('pandoc');
-                console.log('options: ', options);
-                console.log('hasPandocOpt: ', hasPandocOpt);
 
                 if (hasDryRunOpt) {
 
