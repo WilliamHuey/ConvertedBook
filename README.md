@@ -29,6 +29,7 @@ You have the option to convert your LaTeX files to these output formats:
 * [Development / Local Install](#development--local-install)
 * [Project Structure](#project-structure)
 * [Tests](#tests)
+* [Notes](#notes)
 * [License](#license)
 <!-- tocstop -->
 
@@ -395,6 +396,22 @@ npm run test:downloadbuild
 npm run test:downloadgenerate
 ```
 <!-- testsheaderstop -->
+
+<!-- notesheader -->
+
+# Notes
+
+## Alternative Live LaTeX Preview Solutions
+
+[Overleaf](https://github.com/overleaf/overleaf)
+[VSCode Extension -  LaTeX-Workshop](https://github.com/James-Yu/LaTeX-Workshop)
+
+Although there are other live preview solutions out there,
+Convertedbook caters to a single user workflow that allows
+you to customize your LaTeX project with the help of
+Npm and HTML.
+
+<!-- notesheaderstop -->
 
 # License
 
