@@ -44,7 +44,7 @@
     "vitest": "^3.2.4"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=24.0.0"
   },
   "files": [
     "/bin",
@@ -52,7 +52,7 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/WilliamHuey/convertedbook",
+  "homepage": "https://github.com/WilliamHuey/Convertedbook",
   "license": "MIT",
   "main": "",
   "name": "convertedbook",
@@ -65,7 +65,7 @@
     ],
     "topicSeparator": " "
   },
-  "repository": "WilliamHuey/convertedbook",
+  "repository": "WilliamHuey/Convertedbook",
   "scripts": {
     "build": "tsx ./src/functions/generate/generate-remove-files.ts && shx rm -rf dist && tsc -b && tsx ./src/functions/generate/generate-copy-files.ts",
     "lint": "eslint . --ext .ts",
@@ -84,7 +84,7 @@
     "readme": "npm run build && oclif readme --no-aliases"
   },
   "version": "1.0.0",
-  "bugs": "https://github.com/WilliamHuey/convertedbook/issues",
+  "bugs": "https://github.com/WilliamHuey/Convertedbook/issues",
   "keywords": [
     "oclif"
   ],
