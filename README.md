@@ -537,10 +537,11 @@ npm run test:downloadgenerate
 
 # Notes
 
-## Alternative Live LaTeX Preview Solutions
+## Live LaTeX Preview Alternatives
 
-[Overleaf](https://github.com/overleaf/overleaf)
-[VSCode Extension -  LaTeX-Workshop](https://github.com/James-Yu/LaTeX-Workshop)
+* [Overleaf](https://github.com/overleaf/overleaf)
+* [VSCode Extension - LaTeX-Workshop](https://github.com/James-Yu/LaTeX-Workshop)
+* [Softcover](https://github.com/softcover/softcover)
 
 Although there are other live preview solutions out there,
 Convertedbook caters to a single user workflow that allows
