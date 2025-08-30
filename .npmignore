@@ -21,10 +21,9 @@ oclif.manifest.json
 .github
 .sync.ffs_db
 tsconfig.tsbuildinfo
-
 index.tex
 *.pdf
-
 /coverage
+.npmrc
 
 /assets
