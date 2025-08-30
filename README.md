@@ -224,7 +224,7 @@ EXAMPLES
     $ convertedbook build pdf --input="./index.tex" --exact
 ```
 
-_See code: [src/commands/build.ts](https://github.com/WilliamHuey/convertedbook/blob/v1.0.0/src/commands/build.ts)_
+_See code: [src/commands/build.ts](https://github.com/WilliamHuey/Convertedbook/blob/v1.0.0/src/commands/build.ts)_
 
 ## `convertedbook g NAME`
 
@@ -292,7 +292,7 @@ EXAMPLES
     $ convertedbook generate my-folder --npm-project-name="a-projectname" --dry-run
 ```
 
-_See code: [src/commands/generate.ts](https://github.com/WilliamHuey/convertedbook/blob/v1.0.0/src/commands/generate.ts)_
+_See code: [src/commands/generate.ts](https://github.com/WilliamHuey/Convertedbook/blob/v1.0.0/src/commands/generate.ts)_
 
 ## `convertedbook help [COMMAND]`
 
@@ -370,7 +370,7 @@ EXAMPLES
   $ convertedbook serve
 ```
 
-_See code: [src/commands/serve.ts](https://github.com/WilliamHuey/convertedbook/blob/v1.0.0/src/commands/serve.ts)_
+_See code: [src/commands/serve.ts](https://github.com/WilliamHuey/Convertedbook/blob/v1.0.0/src/commands/serve.ts)_
 
 ## `convertedbook server`
 
