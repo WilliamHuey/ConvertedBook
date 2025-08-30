@@ -129,10 +129,57 @@ convertedbook build pdf
 
 # Commands
 <!-- commands -->
+* [`convertedbook b [DESCRIPTION]`](#convertedbook-b-description)
 * [`convertedbook build [DESCRIPTION]`](#convertedbook-build-description)
+* [`convertedbook g NAME`](#convertedbook-g-name)
 * [`convertedbook generate NAME`](#convertedbook-generate-name)
 * [`convertedbook help [COMMAND]`](#convertedbook-help-command)
+* [`convertedbook s`](#convertedbook-s)
 * [`convertedbook serve`](#convertedbook-serve)
+* [`convertedbook server`](#convertedbook-server)
+
+## `convertedbook b [DESCRIPTION]`
+
+Convert the LaTeX file to HTML, EPUB or PDF. This command works with either a convertedbook project folder or on a single LaTeX file outside a project folder.
+
+```
+USAGE
+  $ convertedbook b [DESCRIPTION...] [-h] [-f] [-e] [-i <value>] [-o <value>] [-d] [--port <value>]
+
+ARGUMENTS
+  DESCRIPTION...  Generate output format of your choosing from these following formats: html, pdf, and epub
+
+FLAGS
+  -d, --dry-run         Test out the build command to see cli output without generating the actual output file(s)
+  -e, --exact           Only for pdf output. Generate pdf based on html instead of using Pandoc
+  -f, --force           Overwrite an existing output file
+  -h, --help            Show CLI help.
+  -i, --input=<value>   Path of the input file to convert
+  -o, --output=<value>  Path of the output file destination
+      --port=<value>    Build server port
+
+DESCRIPTION
+  Convert the LaTeX file to HTML, EPUB or PDF. This command works with either a convertedbook project folder or on a
+  single LaTeX file outside a project folder.
+
+ALIASES
+  $ convertedbook b
+
+EXAMPLES
+  One-off build - Operate on an LaTeX file that resides
+  outside of a project folder.
+
+  This outputs to an html file and assumes that destination file resides in
+  the same location as the input file. The input option is required
+
+    $ convertedbook b html --input="./index.tex"
+
+  One-off build - Can specify an "exact" option for the
+  output pdf file to use playwright to get an precise mirror representation
+  of the document based on the web page display of the document.
+
+    $ convertedbook b pdf --input="./index.tex" --exact
+```
 
 ## `convertedbook build [DESCRIPTION]`
 
@@ -178,6 +225,39 @@ EXAMPLES
 ```
 
 _See code: [src/commands/build.ts](https://github.com/WilliamHuey/convertedbook/blob/v1.0.0/src/commands/build.ts)_
+
+## `convertedbook g NAME`
+
+Create a new "convertedbook" project folder with files.
+
+```
+USAGE
+  $ convertedbook g NAME [-h] [-n <value>] [-f] [-p <value>] [-d] [-t]
+
+FLAGS
+  -d, --dry-run                   Test out the generate command to see cli output without generating the actual project
+                                  folder and files
+  -f, --force                     Overwrite an existing folder
+  -h, --help                      Show CLI help.
+  -n, --name=<value>              Generate
+  -p, --npm-project-name=<value>  Add the package.json's project name field
+  -t, --toc                       When present, display the table of contents link on the top of the document
+
+DESCRIPTION
+  Create a new "convertedbook" project folder with files.
+
+ALIASES
+  $ convertedbook g
+
+EXAMPLES
+  Generate a project with the name of 'my-folder' and the package.json project key of 'a-projectname'
+
+    $ convertedbook g my-folder --npm-project-name="a-projectname"
+
+  Dry run of the command above for testing
+
+    $ convertedbook g my-folder --npm-project-name="a-projectname" --dry-run
+```
 
 ## `convertedbook generate NAME`
 
@@ -234,6 +314,34 @@ DESCRIPTION
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.32/src/commands/help.ts)_
 
+## `convertedbook s`
+
+Run a live server to view real-time updates on document changes in the browser. You must change into the directory of your convertedbook project before you are able to run this command. To change the server port, edit the port value in server-config.js.
+
+```
+USAGE
+  $ convertedbook s [-h] [-n <value>] [-p <value>] [-o <value>]
+
+FLAGS
+  -h, --help             Show CLI help.
+  -n, --name=<value>     Serve
+  -o, --options=<value>  General options
+  -p, --pandoc=<value>   Pandoc options
+
+DESCRIPTION
+  Run a live server to view real-time updates on document changes in the browser. You must change into the directory of
+  your convertedbook project before you are able to run this command. To change the server port, edit the port value in
+  server-config.js.
+
+
+ALIASES
+  $ convertedbook s
+  $ convertedbook server
+
+EXAMPLES
+  $ convertedbook s
+```
+
 ## `convertedbook serve`
 
 Run a live server to view real-time updates on document changes in the browser. You must change into the directory of your convertedbook project before you are able to run this command. To change the server port, edit the port value in server-config.js.
@@ -263,6 +371,34 @@ EXAMPLES
 ```
 
 _See code: [src/commands/serve.ts](https://github.com/WilliamHuey/convertedbook/blob/v1.0.0/src/commands/serve.ts)_
+
+## `convertedbook server`
+
+Run a live server to view real-time updates on document changes in the browser. You must change into the directory of your convertedbook project before you are able to run this command. To change the server port, edit the port value in server-config.js.
+
+```
+USAGE
+  $ convertedbook server [-h] [-n <value>] [-p <value>] [-o <value>]
+
+FLAGS
+  -h, --help             Show CLI help.
+  -n, --name=<value>     Serve
+  -o, --options=<value>  General options
+  -p, --pandoc=<value>   Pandoc options
+
+DESCRIPTION
+  Run a live server to view real-time updates on document changes in the browser. You must change into the directory of
+  your convertedbook project before you are able to run this command. To change the server port, edit the port value in
+  server-config.js.
+
+
+ALIASES
+  $ convertedbook s
+  $ convertedbook server
+
+EXAMPLES
+  $ convertedbook server
+```
 <!-- commandsstop -->
 
 <!-- developmentsheader -->
