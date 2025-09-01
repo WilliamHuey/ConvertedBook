@@ -51,11 +51,14 @@ Ensure that you have the requisite software before installing convertedbook
 * [pandoc](https://pandoc.org/installing.html)
 * [nodejs](https://nodejs.org/en/download)
 * [texlive](https://tug.org/texlive/) (extra font packages might be needed)
+  * You can substitute
+  *  textlive with [MikTeX](https://miktex.org/download)
+  for a more minimal install of LaTeX dependencies
 
 # Compatibility
 
-This library was developed and tested only on Linux. It might work on Windows or
-MacOs because the dependencies are relatively standard.
+This library was developed and tested only on Linux and Windows.
+It will most likely work on MacOs because the dependencies are relatively standard.
 
 The versions of dependencies listed below are known to work with this library
 
@@ -129,14 +132,29 @@ convertedbook build pdf
 
 # Commands
 <!-- commands -->
-* [`convertedbook b [DESCRIPTION]`](#convertedbook-b-description)
-* [`convertedbook build [DESCRIPTION]`](#convertedbook-build-description)
-* [`convertedbook g NAME`](#convertedbook-g-name)
-* [`convertedbook generate NAME`](#convertedbook-generate-name)
-* [`convertedbook help [COMMAND]`](#convertedbook-help-command)
-* [`convertedbook s`](#convertedbook-s)
-* [`convertedbook serve`](#convertedbook-serve)
-* [`convertedbook server`](#convertedbook-server)
+- [Convertedbook](#convertedbook)
+- [Purpose](#purpose)
+- [Dependencies](#dependencies)
+- [Compatibility](#compatibility)
+- [Installation](#installation)
+  - [Tarball Install](#tarball-install)
+- [Quick Start](#quick-start)
+- [Commands](#commands)
+  - [`convertedbook b [DESCRIPTION]`](#convertedbook-b-description)
+  - [`convertedbook build [DESCRIPTION]`](#convertedbook-build-description)
+  - [`convertedbook g NAME`](#convertedbook-g-name)
+  - [`convertedbook generate NAME`](#convertedbook-generate-name)
+  - [`convertedbook help [COMMAND]`](#convertedbook-help-command)
+  - [`convertedbook s`](#convertedbook-s)
+  - [`convertedbook serve`](#convertedbook-serve)
+  - [`convertedbook server`](#convertedbook-server)
+- [Development / Local Install](#development--local-install)
+- [Project Structure](#project-structure)
+  - [File Descriptions](#file-descriptions)
+- [Tests](#tests)
+- [Notes](#notes)
+  - [Live LaTeX Preview Alternatives](#live-latex-preview-alternatives)
+- [License](#license)
 
 ## `convertedbook b [DESCRIPTION]`
 

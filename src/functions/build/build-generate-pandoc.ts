@@ -1,6 +1,7 @@
 // Native modules
 import spawn from 'cross-spawn';
 import { unlinkSync } from 'fs';
+import * as path from 'path';
 
 // Third party modules
 import { forkJoin, bindCallback, of } from 'rxjs';
@@ -25,9 +26,16 @@ export function pandocGenerated({
   normalizedOutputPath,
   buildDocuments$,
   docsGenerated$ }: BuildGenerate) {
+
+  // For compatibility with windows
+  const posixInputPath = path.posix.normalize(input.replace(/\\/g, '/'));
+  const posixNormalizedOutputPath =  path.posix
+    .normalize(normalizedOutputPath.replace(/\\/g, '/'));
+
   const generated = normalizedFormats
     .map(format => {
-      return pandocGenerateFormat(input, normalizedOutputPath, format,
+      return pandocGenerateFormat(
+        posixInputPath, posixNormalizedOutputPath, format,
         fileOutputExistence, flags, checkFromServerCli
         );
     });
