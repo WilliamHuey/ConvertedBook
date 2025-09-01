@@ -2,7 +2,7 @@ export class ProjectPackageJson {
   constructor(name: string) {
     Object.assign(this, {
       name: name || 'placeholder-name',
-      version: '1.0.0',
+      version: '1.0.1',
       description: '',
       main: 'index.js',
       author: '',
