@@ -17,6 +17,7 @@ export class ProjectPackageJson {
         "@parcel/config-default": "^2.14.4",
         "@parcel/core": "^2.14.4",
         "@parcel/watcher": "^2.5.1",
+        "cross-spawn": "^7.0.6",
         "dom-walk": "^0.1.2",
         "latex.css": "^1.12.0",
         "lit": "^3.3.0",

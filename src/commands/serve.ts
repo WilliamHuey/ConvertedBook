@@ -1,11 +1,12 @@
 // Native modules
-import { ChildProcess, spawn } from 'child_process';
+import { ChildProcess } from 'child_process';
 
 // Third party modules
 import { Command, Flags } from '@oclif/core';
 import { from, ReplaySubject } from 'rxjs';
 import { filter, takeLast } from 'rxjs/operators';
 import { pathExists } from 'path-exists';
+import spawn from 'cross-spawn';
 
 // Library modules
 import { messages, messagesKeys } from '../functions/serve/serve-log.js';

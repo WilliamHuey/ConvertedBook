@@ -1,5 +1,5 @@
 // Vendor modules
-import { spawn } from "child_process";
+import spawn from 'cross-spawn';
 
 // Native modules
 import * as path from 'path';

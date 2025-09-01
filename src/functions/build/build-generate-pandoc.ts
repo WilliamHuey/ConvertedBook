@@ -1,9 +1,9 @@
 // Native modules
-import { spawn } from 'child_process';
+import spawn from 'cross-spawn';
 import { unlinkSync } from 'fs';
 
 // Third party modules
-import { forkJoin, bindCallback } from 'rxjs';
+import { forkJoin, bindCallback, of } from 'rxjs';
 import { first } from 'rxjs/operators';
 import listify from 'listify';
 
@@ -99,29 +99,34 @@ export function pandocGenerateFormat(input: string,
   // Convert callback into observable for the
   // 'complete' signal. The observable can also be
   // converted for use as a promise for testing.
-  const pandocOnComplete$ = bindCallback(
-    pandocService.stdout.on);
 
-  const pandocClose$ = pandocOnComplete$
-    .call(pandocService, 'close');
+  if (pandocService.stdout) {
+    const pandocOnComplete$ = bindCallback(
+      pandocService.stdout.on);
 
-  // Log information from pandoc
-  pandocClose$
-    .subscribe({
-      next: () => {
-        console.log(`${(messages[messagesKeys.generatedFormat] as Function)(format)}`);
+    const pandocClose$ = pandocOnComplete$
+      .call(pandocService, 'close');
 
-        // Warn on existing file format with the name of the output path
-        if (fileOutputExistence[format] && !fromServerCli && !flags.force)
-          console.log(`${(messages[messagesKeys.warning] as Function)(format)}`);
-      },
-      error: (e: any) => {
-        console.log(`${(messages[messagesKeys.error] as Function)(e)}`);
-      }
-    });
-
-  return {
+    // Log information from pandoc
     pandocClose$
-  };
+      .subscribe({
+        next: () => {
+          console.log(`${(messages[messagesKeys.generatedFormat] as Function)(format)}`);
+
+          // Warn on existing file format with the name of the output path
+          if (fileOutputExistence[format] && !fromServerCli && !flags.force)
+            console.log(`${(messages[messagesKeys.warning] as Function)(format)}`);
+        },
+        error: (e: any) => {
+          console.log(`${(messages[messagesKeys.error] as Function)(e)}`);
+        }
+      });
+
+    return {
+      pandocClose$
+    };
+  } else {
+    return { pandocClose$: of("Error: Std not defined")};
+  }
 }
 
