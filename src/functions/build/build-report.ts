@@ -1,3 +1,6 @@
+// Native modules
+import * as path from 'path';
+
 // Third party modules
 import { length, isEmpty, isNil, intersection, symmetricDifference, difference } from 'ramda';
 import { map } from 'rxjs/operators';
@@ -60,7 +63,12 @@ export interface ServerFileCheck {
 
 export function serverFileCheck({ serverFileName }: ServerFileCheckParams) {
 
-  return from(import(`${process.cwd()}/${serverFileName}`))
+  // Format server url for compatibility with windows
+  const serverFilePath = process.platform === 'win32'
+    ? 'file:///' + path.resolve(process.cwd(), serverFileName).replace(/\\/g, '/')
+    : path.resolve(process.cwd(), serverFileName);
+
+  return from(import(serverFilePath))
     .pipe(
       map((result: Record<any, any>) => {
         const customPort = !isNil(result),
