@@ -1,5 +1,5 @@
 // Native modules
-import { spawn } from 'child_process';
+import spawn from 'cross-spawn';
 import * as fs from 'fs';
 
 // Third party modules
@@ -251,8 +251,6 @@ export default class Generate extends Command {
         }))
       .pipe(share());
 
-
-
     const creationVerified$ = merge(
       fullProjectFolderNonExists$,
       deleteFolderOnForce$
@@ -301,7 +299,6 @@ export default class Generate extends Command {
             .generateStructure(fullProjectFolderExists$)
             .structureCreationCount$;
         }),
-        // take(1),
         tap(this.logCreationBegin),
         mergeMap(() => {
 
@@ -310,10 +307,19 @@ export default class Generate extends Command {
             cwd: normalizedFolderPath,
           });
 
-          const npmOnComplete$ = bindCallback(npmService.stdout.on),
-            npmClose$ = npmOnComplete$.call(npmService, 'close');
+          npmService.on("error", function(err) {
+            console.log('err--', err)
+          });
 
-          return npmClose$;
+          if (npmService.stdout) {
+            const npmOnComplete$ = bindCallback(npmService.stdout.on),
+              npmClose$ = npmOnComplete$.call(npmService, 'close');
+
+            return npmClose$;
+          } else {
+            return of("Error: Std not defined");
+          }
+          
         })
       )
       .pipe(map(() => {

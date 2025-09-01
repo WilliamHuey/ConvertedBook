@@ -7,6 +7,7 @@
     "@oclif/core": "^4",
     "@oclif/plugin-help": "^6",
     "@oclif/plugin-plugins": "^5.4.46",
+    "cross-spawn": "^7.0.6",
     "fast-glob": "^3.3.3",
     "get-port": "^7.1.0",
     "inflection": "^3.0.2",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@oclif/prettier-config": "^0.2.1",
     "@oclif/test": "^4",
+    "@types/cross-spawn": "^6.0.6",
     "@types/listify": "^1.0.2",
     "@types/node": "^24",
     "@types/ramda": "^0.31.0",
