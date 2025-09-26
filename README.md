@@ -51,9 +51,8 @@ Ensure that you have the requisite software before installing convertedbook
 * [pandoc](https://pandoc.org/installing.html)
 * [nodejs](https://nodejs.org/en/download)
 * [texlive](https://tug.org/texlive/) (extra font packages might be needed)
-  * You can substitute
-  *  textlive with [MikTeX](https://miktex.org/download)
-  for a more minimal install of LaTeX dependencies
+  * You can substitute textlive with [MikTeX](https://miktex.org/download)
+  for a more minimal installation of LaTeX dependencies
 
 # Compatibility
 
@@ -82,6 +81,13 @@ USAGE
   $ convertedbook COMMAND
 ...
 ```
+
+## Docker
+
+If you want to install convertedbook without having to deal with the
+complexity of installing the required dependencies, you can access the
+convertedbook docker image from [here](https://hub.docker.com/r/williamhuey/convertedbook).
+
 <!-- usagestop -->
 
 <!-- usagealternative -->

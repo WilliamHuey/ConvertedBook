@@ -85,7 +85,7 @@
     "test:report": "nyc report --reporter=text --report-dir=coverage --temp-dir=coverage",
     "readme": "npm run build && oclif readme --no-aliases"
   },
-  "version": "1.0.1",
+  "version": "1.0.2",
   "bugs": "https://github.com/WilliamHuey/Convertedbook/issues",
   "keywords": [
     "oclif"
